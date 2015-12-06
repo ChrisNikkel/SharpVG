@@ -1,9 +1,5 @@
-namespace SharpVG.Tests
-(*
-open SharpVG.SharpVG
-module Tests = 
-
-  
+open SharpVG
+module Tests =  
   [<EntryPoint>]
   let main argv =
     // Test
@@ -49,4 +45,3 @@ module Tests =
     body |> String.concat "\n" |> (html "SVG Demo") |> (printfn "%s")
   
     0 // return an integer exit code
-*)
