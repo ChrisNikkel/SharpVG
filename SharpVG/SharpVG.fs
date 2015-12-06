@@ -21,178 +21,174 @@
 //p   {border-left: 1px dotted gray;}
 //circle {stroke: #006600; fill: #00cc00;}
 //</style>
-
-open System
-
-type Colors =
-  | None = 0
-  | AliceBlue = 1
-  | AntiqueWhite = 2
-  | Aqua = 3
-  | Aquamarine = 4
-  | Azure = 5
-  | Beige = 6
-  | Bisque = 7
-  | Black = 8
-  | BlanchedAlmond = 9
-  | Blue = 10
-  | BlueViolet = 11
-  | Brown = 12
-  | BurlyWood = 13
-  | CadetBlue = 14
-  | Chartreuse = 15
-  | Chocolate = 16
-  | Coral = 17
-  | CornflowerBlue = 18
-  | CornSilk = 19
-  | Crimson = 20
-  | Cyan = 21
-  | DarkBlue = 22
-  | DarkCyan = 23
-  | DarkGoldenRod = 24
-  | DarkGray = 25
-  | DarkGreen = 26
-  | DarkGrey = 27
-  | DarkKhaki = 28
-  | DarkMagenta = 29
-  | DarkOliveGreen = 30
-  | DarkOrange = 31
-  | DarkOrchid = 32
-  | DarkRed = 33
-  | DarkSalmon = 34
-  | DarkSeaGreen = 35
-  | DarkSlateBlue = 36
-  | DarkSlateGray = 37
-  | DarkSlateGrey = 38
-  | DarkTurquoise = 39
-  | DarkViolet = 40
-  | DeepPink = 41
-  | DeepSkyBlue = 42
-  | DimGray = 43
-  | DimGrey = 44
-  | DodgerBlue = 45
-  | FireBrick = 46
-  | FloralWhite = 47
-  | ForestGreen = 48
-  | Fuchsia = 49
-  | Gainsboro = 50
-  | GhostWhite = 51
-  | Gold = 52
-  | GoldenRod = 53
-  | Gray = 54
-  | Grey = 55
-  | Green = 56
-  | GreenYellow = 57
-  | HoneyDew = 58
-  | HotPink = 59
-  | IndianRed = 60
-  | Indigo = 61
-  | Ivory = 62
-  | Khaki = 63
-  | Lavender = 64
-  | LavenderBlush = 65
-  | LawnGreen = 66
-  | LemonChiffon = 67
-  | LightBlue = 68
-  | LightCoral = 69
-  | LightCyan = 70
-  | LightGoldenRodYellow = 71
-  | LightGray = 72
-  | LightGreen = 73
-  | LightGrey = 74
-  | LightPink = 75
-  | LightSalmon = 76
-  | LightSeaGreen = 77
-  | LightSkyBlue = 78
-  | LightSlateGray = 79
-  | LightSlateGrey = 80
-  | LightSteelBlue = 81
-  | LightYellow = 82
-  | Lime = 83
-  | LimeGreen = 84
-  | Linen = 85
-  | Magenta = 86
-  | Maroon = 87
-  | MediumAquamarine = 88
-  | MediumBlue = 89
-  | MediumOrchid = 90
-  | MediumPurple = 91
-  | MediumSeaGreen = 92
-  | MediumSlateBlue = 93
-  | MediumSpringGreen = 94
-  | MediumTurquoise = 95
-  | MediumVioletRed = 96
-  | MidnightBlue = 97
-  | MintCream = 98
-  | MistyRose = 99
-  | Moccasin = 100
-  | NavajoWhite = 101
-  | Navy = 102
-  | OldLace = 103
-  | Olive = 104
-  | OliveDrab = 105
-  | Orange = 106
-  | OrangeRed = 107
-  | Orchid = 108
-  | PaleGoldenRod = 109
-  | PaleGreen = 110
-  | PaleTurquoise = 111
-  | PaleVioletRed = 112
-  | PapayaWhip = 113
-  | PeachPuff = 114
-  | Peru = 115
-  | Pink = 116
-  | Plum = 117
-  | PowderBlue = 118
-  | Purple = 119
-  | Red = 120
-  | RosyBrown = 121
-  | RoyalBlue = 122
-  | SaddleBrown = 123
-  | Salmon = 124
-  | SandyBrown = 125
-  | SeaGreen = 126
-  | SeaShell = 127
-  | Sienna = 128
-  | Silver = 129
-  | SkyBlue = 130
-  | SlateBlue = 131
-  | SlateGray = 132
-  | SlateGrey = 133
-  | Snow = 134
-  | SpringGreen = 135
-  | SteelBlue = 136
-  | Tan = 137
-  | Teal = 138
-  | Thistle = 139
-  | Tomato = 140
-  | Turquoise = 141
-  | Violet = 142
-  | Wheat = 143
-  | White = 144
-  | WhiteSmoke = 145
-  | Yellow = 146
-  | YellowGreen = 147
-
-type Color =
-  | Name of Colors
-  | SmallHex of int16  // #rgb
-  | Hex of int  // #rrggbb
-  | Values of byte * byte * byte // 0 - 255
-  | Percents of double * double * double // 0.0% - 100.0%
-
-type Size =
-  | Pixels of int
-  | Ems of double
-  | Percent of int
-type Style = { Fill : Color; Stroke : Color; StrokeWidth : Size }
-type Point = { X : Size; Y : Size; }
-type Area = { Width : Size; Height : Size; }
-
-
-
-[<EntryPoint>]
-let main argv =
+namespace SharpVG.SharpVG
+module SharpVG =
+  open System
+  
+  type Colors =
+    | None = 0
+    | AliceBlue = 1
+    | AntiqueWhite = 2
+    | Aqua = 3
+    | Aquamarine = 4
+    | Azure = 5
+    | Beige = 6
+    | Bisque = 7
+    | Black = 8
+    | BlanchedAlmond = 9
+    | Blue = 10
+    | BlueViolet = 11
+    | Brown = 12
+    | BurlyWood = 13
+    | CadetBlue = 14
+    | Chartreuse = 15
+    | Chocolate = 16
+    | Coral = 17
+    | CornflowerBlue = 18
+    | CornSilk = 19
+    | Crimson = 20
+    | Cyan = 21
+    | DarkBlue = 22
+    | DarkCyan = 23
+    | DarkGoldenRod = 24
+    | DarkGray = 25
+    | DarkGreen = 26
+    | DarkGrey = 27
+    | DarkKhaki = 28
+    | DarkMagenta = 29
+    | DarkOliveGreen = 30
+    | DarkOrange = 31
+    | DarkOrchid = 32
+    | DarkRed = 33
+    | DarkSalmon = 34
+    | DarkSeaGreen = 35
+    | DarkSlateBlue = 36
+    | DarkSlateGray = 37
+    | DarkSlateGrey = 38
+    | DarkTurquoise = 39
+    | DarkViolet = 40
+    | DeepPink = 41
+    | DeepSkyBlue = 42
+    | DimGray = 43
+    | DimGrey = 44
+    | DodgerBlue = 45
+    | FireBrick = 46
+    | FloralWhite = 47
+    | ForestGreen = 48
+    | Fuchsia = 49
+    | Gainsboro = 50
+    | GhostWhite = 51
+    | Gold = 52
+    | GoldenRod = 53
+    | Gray = 54
+    | Grey = 55
+    | Green = 56
+    | GreenYellow = 57
+    | HoneyDew = 58
+    | HotPink = 59
+    | IndianRed = 60
+    | Indigo = 61
+    | Ivory = 62
+    | Khaki = 63
+    | Lavender = 64
+    | LavenderBlush = 65
+    | LawnGreen = 66
+    | LemonChiffon = 67
+    | LightBlue = 68
+    | LightCoral = 69
+    | LightCyan = 70
+    | LightGoldenRodYellow = 71
+    | LightGray = 72
+    | LightGreen = 73
+    | LightGrey = 74
+    | LightPink = 75
+    | LightSalmon = 76
+    | LightSeaGreen = 77
+    | LightSkyBlue = 78
+    | LightSlateGray = 79
+    | LightSlateGrey = 80
+    | LightSteelBlue = 81
+    | LightYellow = 82
+    | Lime = 83
+    | LimeGreen = 84
+    | Linen = 85
+    | Magenta = 86
+    | Maroon = 87
+    | MediumAquamarine = 88
+    | MediumBlue = 89
+    | MediumOrchid = 90
+    | MediumPurple = 91
+    | MediumSeaGreen = 92
+    | MediumSlateBlue = 93
+    | MediumSpringGreen = 94
+    | MediumTurquoise = 95
+    | MediumVioletRed = 96
+    | MidnightBlue = 97
+    | MintCream = 98
+    | MistyRose = 99
+    | Moccasin = 100
+    | NavajoWhite = 101
+    | Navy = 102
+    | OldLace = 103
+    | Olive = 104
+    | OliveDrab = 105
+    | Orange = 106
+    | OrangeRed = 107
+    | Orchid = 108
+    | PaleGoldenRod = 109
+    | PaleGreen = 110
+    | PaleTurquoise = 111
+    | PaleVioletRed = 112
+    | PapayaWhip = 113
+    | PeachPuff = 114
+    | Peru = 115
+    | Pink = 116
+    | Plum = 117
+    | PowderBlue = 118
+    | Purple = 119
+    | Red = 120
+    | RosyBrown = 121
+    | RoyalBlue = 122
+    | SaddleBrown = 123
+    | Salmon = 124
+    | SandyBrown = 125
+    | SeaGreen = 126
+    | SeaShell = 127
+    | Sienna = 128
+    | Silver = 129
+    | SkyBlue = 130
+    | SlateBlue = 131
+    | SlateGray = 132
+    | SlateGrey = 133
+    | Snow = 134
+    | SpringGreen = 135
+    | SteelBlue = 136
+    | Tan = 137
+    | Teal = 138
+    | Thistle = 139
+    | Tomato = 140
+    | Turquoise = 141
+    | Violet = 142
+    | Wheat = 143
+    | White = 144
+    | WhiteSmoke = 145
+    | Yellow = 146
+    | YellowGreen = 147
+  
+  type Color =
+    | Name of Colors
+    | SmallHex of int16  // #rgb
+    | Hex of int  // #rrggbb
+    | Values of byte * byte * byte // 0 - 255
+    | Percents of double * double * double // 0.0% - 100.0%
+  
+  type Size =
+    | Pixels of int
+    | Ems of double
+    | Percent of int
+  type Style = { Fill : Color; Stroke : Color; StrokeWidth : Size }
+  type Point = { X : Size; Y : Size; }
+  type Area = { Width : Size; Height : Size; }
 
   // Helpers
   let quoter = "\""
@@ -325,48 +321,4 @@ let main argv =
   let script body =
     "<script type=\"application/ecmascript\"><![CDATA[" +
     body +
-     "]]></script>"
-
-  // Test
-  let points = seq {
-    yield {X = Size.Pixels(1); Y = Size.Pixels(1)}
-    yield {X = Size.Pixels(4); Y = Size.Pixels(4)}
-    yield {X = Size.Pixels(10); Y = Size.Pixels(10)}
-  }
-  let point = {X = Size.Pixels(24); Y = Size.Pixels(15)}
-  let size = {Height = Size.Pixels(30); Width = Size.Pixels(30)}
-  let style1 = {Stroke = (Hex(0xff0000)); StrokeWidth = Pixels(3); Fill = Color.Name(Colors.Red); }
-  let style2 = {Stroke = (SmallHex(0xf00s)); StrokeWidth = Pixels(6); Fill = Color.Name(Colors.Blue); }
-
-
-  let graphics = seq {
-    yield image point size "myimage.jpg"
-    yield text style1 point "Hello World!"
-    yield text style2 point "Hello World!"
-    yield polygon style1 points
-    yield polyline style2 points
-    yield line style1 point point
-    yield circle style2 point (Pixels(2))
-    yield ellipse style1 point point
-    yield rect style2 point size
-    yield script """
-    function circle_click(evt) {
-      var circle = evt.target;
-      var currentRadius = circle.getAttribute("r");
-      if (currentRadius == 100)
-        circle.setAttribute("r", currentRadius*2);
-      else
-        circle.setAttribute("r", currentRadius*0.5);
-    }
-  """
-  }
-
-  let styleBody = style
-  let svgBody = graphics |> String.concat "\n  " |> (svg size) 
-  let body = seq {
-    yield styleBody
-    yield svgBody
-  }
-  body |> String.concat "\n" |> (html "SVG Demo") |> (printfn "%s")
-
-  0 // return an integer exit code
+    "]]></script>"
