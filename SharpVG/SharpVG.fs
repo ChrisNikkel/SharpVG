@@ -21,7 +21,7 @@
 //p   {border-left: 1px dotted gray;}
 //circle {stroke: #006600; fill: #00cc00;}
 //</style>
-module SharpVG
+module SharpVG 
   open System
   
   type Colors =
