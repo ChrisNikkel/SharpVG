@@ -21,7 +21,7 @@ Target "Build" (fun _ ->
 )
 
 // define test dlls
-let testDlls = !! (testBinDir + "/Release/Tests.dll")
+let testDlls = !! (testBinDir @@ "/Release/Tests.dll")
 
 Target "Test" (fun _ ->
     testDlls
