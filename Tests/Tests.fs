@@ -1,5 +1,16 @@
 open SharpVG
+open Xunit
+open FsCheck.Xunit
+
 module Tests =  
+  [<Fact>]
+  let ``true is true`` () =
+    true
+    
+  [<Property>]
+  let ``true is true again`` () =
+    true
+
   [<EntryPoint>]
   let main argv =
     // Test
