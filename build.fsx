@@ -19,9 +19,22 @@ Target "Build" (fun _ ->
     |> Log "AppBuild-Output: "
 )
 
+// define test dlls
+let testDlls = !! (testBinDir + "/Release/Tests.dll")
+
+Target "Test" (fun _ ->
+    testDlls
+        |> xUnit (fun p -> 
+            {p with
+                ToolPath = "./packages/xunit.runner.console/tools/xunit.console.x86.exe"
+            })
+)
+
 // Dependencies
 "Clean"
   ==> "Build"
+"Build"
+  ==> "Test"
 
 // start build
 RunTargetOrDefault "Build"

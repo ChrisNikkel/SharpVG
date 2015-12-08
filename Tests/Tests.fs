@@ -1,8 +1,8 @@
-open SharpVG
-open Xunit
-open FsCheck.Xunit
+module Tests 
+  open SharpVG
+  open Xunit
+  open FsCheck.Xunit
 
-module Tests =  
   [<Fact>]
   let ``true is true`` () =
     true
@@ -10,9 +10,9 @@ module Tests =
   [<Property>]
   let ``true is true again`` () =
     true
-
-  [<EntryPoint>]
-  let main argv =
+  
+  [<Fact>]
+  let ``do lots and don't fail`` () =
     // Test
     let points = seq {
       yield {X = Size.Pixels(1); Y = Size.Pixels(1)}
@@ -55,4 +55,5 @@ module Tests =
     }
     body |> String.concat "\n" |> (html "SVG Demo") |> (printfn "%s")
   
-    0 // return an integer exit code
+    true
+ 
