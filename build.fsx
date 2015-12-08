@@ -1,6 +1,7 @@
 // include Fake lib
 #r "packages/FAKE/tools/FakeLib.dll"
 open Fake
+open Fake.Testing
 
 // Properties
 let buildObjDir = "./SharpVG/obj"
@@ -24,9 +25,9 @@ let testDlls = !! (testBinDir + "/Release/Tests.dll")
 
 Target "Test" (fun _ ->
     testDlls
-        |> xUnit (fun p -> 
+        |> xUnit2 (fun p -> 
             {p with
-                ToolPath = "./packages/xunit.runner.console/tools/xunit.console.x86.exe"
+                HtmlOutputPath = Some (testBinDir @@ "/Release/xunit.html")             
             })
 )
 
