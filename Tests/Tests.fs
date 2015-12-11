@@ -1,4 +1,4 @@
-module Tests 
+module Tests
   open SharpVG
   open Xunit
   open FsCheck.Xunit
@@ -6,11 +6,22 @@ module Tests
   [<Fact>]
   let ``true is true`` () =
     true
-    
+
   [<Property>]
   let ``true is true again`` () =
     true
-  
+
+  let isTagEnclosed (tag:string) =
+    let trimmedTag = tag.Trim()
+    trimmedTag.[0..0] = "<" && trimmedTag.[(trimmedTag.Length - 2)..(trimmedTag.Length - 1)] = "/>"
+
+  [<Property>]
+  let ``draw lines`` (x1, y1, x2, y2) =
+    let point1 = {X = Size.Pixels(x1); Y = Size.Pixels(y1)}
+    let point2 = {X = Size.Pixels(x2); Y = Size.Pixels(y2)}
+    let lineTag = line {Stroke = (Hex(0xff0000)); StrokeWidth = Pixels(3); Fill = Color.Name(Colors.Red); } point1 point2
+    isTagEnclosed lineTag
+
   [<Fact>]
   let ``do lots and don't fail`` () =
     // Test
@@ -23,8 +34,8 @@ module Tests
     let size = {Height = Size.Pixels(30); Width = Size.Pixels(30)}
     let style1 = {Stroke = (Hex(0xff0000)); StrokeWidth = Pixels(3); Fill = Color.Name(Colors.Red); }
     let style2 = {Stroke = (SmallHex(0xf00s)); StrokeWidth = Pixels(6); Fill = Color.Name(Colors.Blue); }
-  
-  
+
+
     let graphics = seq {
       yield image point size "myimage.jpg"
       yield text style1 point "Hello World!"
@@ -46,14 +57,13 @@ module Tests
       }
     """
     }
-  
+
     let styleBody = style
-    let svgBody = graphics |> String.concat "\n  " |> (svg size) 
+    let svgBody = graphics |> String.concat "\n  " |> (svg size)
     let body = seq {
       yield styleBody
       yield svgBody
     }
     body |> String.concat "\n" |> (html "SVG Demo") |> (printfn "%s")
-  
+
     true
- 
