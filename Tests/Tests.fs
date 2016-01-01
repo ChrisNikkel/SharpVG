@@ -37,6 +37,21 @@ module Tests
         info "%d %s" c lineTag
         isTagEnclosed lineTag
 
+  [<Property>]
+      let ``draw squares`` (x1, y1, h, w, c, r, g, b, p) =
+        BasicConfigurator.Configure() |> ignore
+        let point = {X = Size.Pixels(x1); Y = Size.Pixels(y1)}
+        let area = {Height = Size.Pixels(h); Width = Size.Pixels(w)}
+        let lineTag =
+          rect {
+            Stroke = Color.Values(r, g, b);
+            StrokeWidth = Pixels(p);
+            Fill = Color.Hex(c);
+          } point area
+
+        info "%d %s" c lineTag
+        isTagEnclosed lineTag
+
   [<Fact>]
         let ``do lots and don't fail`` () =
             BasicConfigurator.Configure() |> ignore
