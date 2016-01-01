@@ -38,19 +38,31 @@ module Tests
         isTagEnclosed lineTag
 
   [<Property>]
-      let ``draw squares`` (x1, y1, h, w, c, r, g, b, p) =
+      let ``draw rectangles`` (x, y, h, w, c, r, g, b, p) =
         BasicConfigurator.Configure() |> ignore
-        let point = {X = Size.Pixels(x1); Y = Size.Pixels(y1)}
+        let point = {X = Size.Pixels(x); Y = Size.Pixels(y)}
         let area = {Height = Size.Pixels(h); Width = Size.Pixels(w)}
-        let lineTag =
+        let rectTag =
           rect {
             Stroke = Color.Values(r, g, b);
             StrokeWidth = Pixels(p);
             Fill = Color.Hex(c);
           } point area
 
-        info "%d %s" c lineTag
-        isTagEnclosed lineTag
+        isTagEnclosed rectTag
+
+    [<Property>]
+      let ``draw circles`` (x, y, radius, c, r, g, b, p) =
+        BasicConfigurator.Configure() |> ignore
+        let point = {X = Size.Pixels(x); Y = Size.Pixels(y)}
+        let circleTag =
+          circle {
+            Stroke = Color.Values(r, g, b);
+            StrokeWidth = Pixels(p);
+            Fill = Color.Hex(c);
+          } point radius
+
+        isTagEnclosed circleTag
 
   [<Fact>]
         let ``do lots and don't fail`` () =
