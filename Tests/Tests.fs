@@ -43,45 +43,48 @@ module Tests
         BasicConfigurator.Configure() |> ignore
         let point1 = {X = Size.Pixels(x1); Y = Size.Pixels(y1)}
         let point2 = {X = Size.Pixels(x2); Y = Size.Pixels(y2)}
-        let lineTag =
+        let tagString =
             line {
                 Stroke = Color.Values(r, g, b);
                 StrokeWidth = Pixels(p);
                 Fill = Color.Hex(c);
             } point1 point2
 
-        info "%d %s" c lineTag
-        isTagEnclosed lineTag
-        && (isMatched '<' '>' lineTag)
+        info "%d %s" c tagString
+        isTagEnclosed tagString
+        && (isMatched '<' '>' tagString)
+        && (tagString.Contains "line")
 
     [<Property>]
     let ``draw rectangles`` (x, y, h, w, c, r, g, b, p) =
         BasicConfigurator.Configure() |> ignore
         let point = {X = Size.Pixels(x); Y = Size.Pixels(y)}
         let area = {Height = Size.Pixels(h); Width = Size.Pixels(w)}
-        let rectTag =
+        let tagString =
             rect {
                 Stroke = Color.Values(r, g, b);
                 StrokeWidth = Pixels(p);
                 Fill = Color.Hex(c);
             } point area
 
-        isTagEnclosed rectTag
-        && (isMatched '<' '>' rectTag)
+        isTagEnclosed tagString
+        && (isMatched '<' '>' tagString)
+        && (tagString.Contains "rect")
 
     [<Property>]
     let ``draw circles`` (x, y, radius, c, r, g, b, p) =
         BasicConfigurator.Configure() |> ignore
         let point = {X = Size.Pixels(x); Y = Size.Pixels(y)}
-        let circleTag =
+        let tagString =
             circle {
                 Stroke = Color.Values(r, g, b);
                 StrokeWidth = Pixels(p);
                 Fill = Color.Hex(c);
             } point radius
 
-        isTagEnclosed circleTag
-        && (isMatched '<' '>' circleTag)
+        isTagEnclosed tagString
+        && (isMatched '<' '>' tagString)
+        && (tagString.Contains "circle")
 
     [<Fact>]
     let ``do lots and don't fail`` () =
