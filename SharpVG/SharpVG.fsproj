@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers.fs" />
-    <Compile Include="Colors.fs" />
+    <Compile Include="Color.fs" />
     <Compile Include="Size.fs" />
     <Compile Include="Point.fs" />
     <Compile Include="Area.fs" />
