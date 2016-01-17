@@ -25,17 +25,26 @@ let testDlls = !! (testBinDir @@ "/Release/Tests.dll")
 
 Target "Test" (fun _ ->
     testDlls
-        |> xUnit2 (fun p -> 
+        |> xUnit2 (fun p ->
             {p with
-                HtmlOutputPath = Some (testBinDir @@ "/Release/xunit.html")             
+                HtmlOutputPath = Some (testBinDir @@ "/Release/xunit.html")
             })
 )
 
+Target "Help" <| fun () ->
+    printfn ""
+    printfn "  Please specify the target by calling 'build <Target>'"
+    printfn ""
+    printfn "  Targets for building:"
+    printfn "  * Build"
+    printfn "  * Test"
+    printfn "  * Clean"
+    printfn "  * Help"
+
 // Dependencies
 "Clean"
-  ==> "Build"
 "Build"
-  ==> "Test"
+"Build" ==> "Test"
 
 // start build
 RunTargetOrDefault "Build"
