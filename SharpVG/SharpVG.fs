@@ -31,6 +31,7 @@ module Core =
     open PointHelpers
     open AreaHelpers
     open StyleHelpers
+    open TransformHelpers
 
     // Public
     let html title body =
@@ -56,6 +57,13 @@ module Core =
         "<svg " + areaToString size + ">\n  " +
         body +
         "\n</svg>\n"
+
+    let group id transform point body =
+        "<g id=" + quote id +
+        transformToString transform +
+        pointToString point + ">" +
+        body +
+        "</g>"
 
     let image upperLeft size imageName =
         "<image xlink:href=" +

@@ -50,6 +50,7 @@
     <Compile Include="Point.fs" />
     <Compile Include="Area.fs" />
     <Compile Include="Style.fs" />
+    <Compile Include="Transform.fs" />
     <Compile Include="SharpVG.fs" />
   </ItemGroup>
   <PropertyGroup>
