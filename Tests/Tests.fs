@@ -99,13 +99,13 @@ module Tests
         let size = {Height = Size.Pixels(30); Width = Size.Pixels(30)}
         let style1 = {Stroke = (Hex(0xff0000)); StrokeWidth = Pixels(3); Fill = Color.Name(Colors.Red); }
         let style2 = {Stroke = (SmallHex(0xf00s)); StrokeWidth = Pixels(6); Fill = Color.Name(Colors.Blue); }
-
+        let transform = Transform.Scale(2, 5)
 
         let graphics = seq {
             yield image point size "myimage.jpg"
             yield text style1 point "Hello World!"
             yield text style2 point "Hello World!"
-            yield polygon style1 points
+            yield group "MyGroup" transform point (polygon style1 points)
             yield polyline style2 points
             yield line style1 point point
             yield circle style2 point (Pixels(2))
