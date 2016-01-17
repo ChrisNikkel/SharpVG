@@ -23,65 +23,14 @@
 //</style>
 namespace SharpVG
 
-type Size =
-    | Pixels of int
-    | Ems of double
-    | Percent of int
-type Style = { Fill : Color; Stroke : Color; StrokeWidth : Size }
-type Point = { X : Size; Y : Size; }
-type Area = { Width : Size; Height : Size; }
 
 module Core =
-
-    open System
-
-    // Helpers
-    let quoter = "\""
-    let inline quote i =
-        quoter + string i + quoter
-
-    let addSpace needsSpace =
-        (if needsSpace then " " else "")
-
-    let sizeToString size =
-        match size with
-        | Pixels p -> string p
-        | Ems e -> string e + "em"
-        | Percent p -> string p + "%"
-
-    let pointModifierToDescriptiveString point pre post =
-        pre + "x" + post + "=" + quote (sizeToString point.X) + " " +
-        pre + "y" + post + "=" + quote (sizeToString point.Y)
-
-    let pointToDescriptiveString point =
-        pointModifierToDescriptiveString point "" ""
-
-    let pointToString point =
-        sizeToString point.X + "," + sizeToString point.Y
-
-    let pointsToString pointsToString =
-        pointsToString
-        |> Seq.fold (
-            fun acc point ->
-            acc + addSpace (acc <> "") + pointToString point
-            ) ""
-
-    let areaToString area =
-        "height=" + quote (sizeToString area.Height) + " " +
-        "width=" + quote (sizeToString area.Width)
-
-    let colorToString color =
-        match color with
-        | Name n -> Enum.GetName(typeof<Colors>, n).ToLower()
-        | SmallHex sh -> String.Format("0x{0:x}", sh)
-        | Hex h -> String.Format("0x{0:x}", h)
-        | Values (r, g, b) -> "(" + string r + ", " + string g + ", " + string b + ")"
-        | Percents (r, g, b) -> "(" + string r + "%, " + string g + "%, " + string b + "%)"
-
-    let styleToString style =
-        "stroke=" + quote (colorToString style.Stroke) + " " +
-        "stroke-width=" + quote (sizeToString style.StrokeWidth) + " " +
-        "fill=" + quote (colorToString style.Fill)
+    open Helpers
+    open ColorHelpers
+    open SizeHelpers
+    open PointHelpers
+    open AreaHelpers
+    open StyleHelpers
 
     // Public
     let html title body =
