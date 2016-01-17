@@ -44,6 +44,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Colors.fs" />
     <Compile Include="SharpVG.fs" />
   </ItemGroup>
   <PropertyGroup>

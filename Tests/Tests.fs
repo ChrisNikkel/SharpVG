@@ -1,5 +1,6 @@
 module Tests
     open SharpVG
+    open SharpVG.Core
     open Xunit
     open FsCheck
     open FsCheck.Xunit
