@@ -23,15 +23,82 @@
 //</style>
 namespace SharpVG
 
+open Helpers
+open ColorHelpers
+open SizeHelpers
+open PointHelpers
+open AreaHelpers
+open StyleHelpers
+open TransformHelpers
+
+
+type Line = {
+    Point1: Point
+    Point2: Point
+}
+
+type Text = {
+    UpperLeft: Point
+    Body: Text
+}
+
+type Image = {
+    UpperLeft: Point
+    Size: Area
+    Label: string option
+}
+
+type Circle = {
+    Center: Point
+    Radius: Size
+}
+
+type Ellipse = {
+    Center: Point
+    Radius: Point
+}
+
+type Rect = {
+    UpperLeft: Point
+    Size: Area
+}
+
+type Polygon = Points of seq<Point>
+
+
+type Polyline = Points of seq<Point>
+
+type Script = Body of string
+
+type Element =
+    | Line
+    | Text
+    | Image
+    | Circle
+    | Ellipse
+    | Rect
+    | Polygon
+    | Polyline
+
+type StyledElement = Element * Style
+
+type Svg = Elements of Body * Point
+
+and Group = Elements of Body * Transform option
+
+and BodyElement =
+    | Group
+    | Svg
+    | Script
+    | Element
+    | StyledElement
+
+and Body =
+    seq<BodyElement>
+
+
 
 module Core =
-    open Helpers
-    open ColorHelpers
-    open SizeHelpers
-    open PointHelpers
-    open AreaHelpers
-    open StyleHelpers
-    open TransformHelpers
 
     // Public
     let html title body =
@@ -97,7 +164,7 @@ module Core =
     let ellipse style center radius =
         "<ellipse " +
         pointModifierToDescriptiveString center "c" "" + " " +
-        pointModifierToDescriptiveString center "r" "" + " " +
+        pointModifierToDescriptiveString radius "r" "" + " " +
         styleToString style +
         "/>"
 
@@ -124,3 +191,23 @@ module Core =
         "<script type=\"application/ecmascript\"><![CDATA[" +
         body +
         "]]></script>"
+
+// Playground:
+    let line2 line =
+        let (style, lineSegment) = line
+        let (point1, point2) = lineSegment
+        "<line " +
+        pointModifierToDescriptiveString point1 "" "1" + " " +
+        pointModifierToDescriptiveString point2 "" "2" + " " +
+        (match style with Some(style) -> styleToString style | None -> "") +
+        "/>"
+
+    let withStyle element style = (element, style)
+    let createLineSegment point1 point2 = (point1, point2)
+    let createPointFromPixels x y = { X = Size.Pixels(x); Y = Size.Pixels(y) }
+
+    let test =
+        let s = {Stroke = (Hex(0xff0000)); StrokeWidth = Pixels(3); Fill = Color.Name(Colors.Red); }
+        let a = line2 (Some(s),({X = Size.Pixels(10); Y = Size.Pixels(10)}, {X = Size.Pixels(10); Y = Size.Pixels(10)}))
+        let b = line2 (Some(s), createLineSegment (createPointFromPixels 1 1) (createPointFromPixels 10 10))
+        0
