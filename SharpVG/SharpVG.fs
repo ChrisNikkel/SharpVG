@@ -70,7 +70,7 @@ type Polyline = Points of seq<Point>
 
 type Script = Body of string
 
-type Element =
+type Tag =
     | Line
     | Text
     | Image
@@ -80,17 +80,24 @@ type Element =
     | Polygon
     | Polyline
 
-type StyledElement = Element * Style
+type StyledElement = Tag * Style
 
-type Svg = Elements of Body * Point
+type Svg = {
+    Body: Body
+    UpperLeft: Point option
+}
 
-and Group = Elements of Body * Transform option
+and Group = {
+    Body: Body
+    UpperLeft: Point
+    Transform: Transform option
+}
 
 and BodyElement =
     | Group
     | Svg
     | Script
-    | Element
+    | Tag
     | StyledElement
 
 and Body =
@@ -99,8 +106,58 @@ and Body =
 
 
 module Core =
-
     // Public
+    let emptyTagToString name attribute = "<" + name + " " + attribute + "/>"
+
+    let tagToString name attribute body = "<" + name + " " + attribute + "/" + body + ">"
+
+    let addSpaces strings = (strings |> Seq.reduce (fun acc str -> acc + " " + str)).TrimStart()
+
+    let imageAttributesToString image =
+        seq {
+            yield (quote image.Label);
+            yield (pointToDescriptiveString image.UpperLeft);
+            yield (areaToString image.Size)
+        } |> addSpaces
+
+    let textAttributesToString text =
+        seq {
+            yield (quote text.Body);
+            yield (pointToDescriptiveString text.UpperLeft);
+        } |> addSpaces
+
+    let lineAttributesToString line =
+        seq {
+            yield pointModifierToDescriptiveString line.Point1 "" "1";
+            yield pointModifierToDescriptiveString line.Point2 "" "2";
+        } |> addSpaces
+
+    let circleAttributesToString circle =
+        seq {
+            yield pointModifierToDescriptiveString circle.Center "c" "";
+            yield "r=" + quote (pointToString circle.Radius);
+        } |> addSpaces
+
+
+    let ellipseAttributesToString ellipse =
+        seq {
+            yield pointModifierToDescriptiveString ellipse.Center "c" "";
+            yield pointModifierToDescriptiveString ellipse.Radius "r" "";
+        } |> addSpaces
+
+    let rectAttributesToString (rect: Rect) =
+        seq {
+            yield pointToDescriptiveString rect.UpperLeft;
+            yield areaToString rect.Size;
+        } |> addSpaces
+
+    let polygonAttributesToString polygon = "points=" + quote (pointsToString polygon)
+
+    //TODO: Remove duplicate from polygon
+    let polylineAttributesToString polyline = "points=" + quote (pointsToString polyline)
+
+    //TODO: Add tag to string
+
     let html title body =
         "<!DOCTYPE html>\n<html>\n<head>\n  <title>" +
         title +
@@ -193,6 +250,8 @@ module Core =
         "]]></script>"
 
 // Playground:
+
+// TODO: Make tag a base class and create derived classes that implement .WithAttributes() etc.
     let line2 line =
         let (style, lineSegment) = line
         let (point1, point2) = lineSegment
