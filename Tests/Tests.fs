@@ -42,14 +42,11 @@ module Tests
     [<Property>]
     let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p) =
         BasicConfigurator.Configure() |> ignore
-        let point1 = {X = Size.Pixels(x1); Y = Size.Pixels(y1)}
-        let point2 = {X = Size.Pixels(x2); Y = Size.Pixels(y2)}
-        let tagString =
-            line {
-                Stroke = Color.Values(r, g, b);
-                StrokeWidth = Pixels(p);
-                Fill = Color.Hex(c);
-            } point1 point2
+        let point1 = { X = Size.Pixels(x1); Y = Size.Pixels(y1) }
+        let point2 = { X = Size.Pixels(x2); Y = Size.Pixels(y2) }
+        let style = { Stroke = Color.Values(r, g, b); StrokeWidth = Pixels(p); Fill = Color.Hex(c); }
+        let line = { Point1 = point1; Point2 = point2; Style = Some(style) }
+        let tagString = { Element = Line(line) }.toString
 
         info "%d %s" c tagString
         isTagEnclosed tagString
@@ -59,15 +56,11 @@ module Tests
     [<Property>]
     let ``draw rectangles`` (x, y, h, w, c, r, g, b, p) =
         BasicConfigurator.Configure() |> ignore
-        let point = {X = Size.Pixels(x); Y = Size.Pixels(y)}
-        let area = {Height = Size.Pixels(h); Width = Size.Pixels(w)}
-        let tagString =
-            rect {
-                Stroke = Color.Values(r, g, b);
-                StrokeWidth = Pixels(p);
-                Fill = Color.Hex(c);
-            } point area
-
+        let point = { X = Size.Pixels(x); Y = Size.Pixels(y) }
+        let area = { Height = Size.Pixels(h); Width = Size.Pixels(w) }
+        let style = { Stroke = Color.Values(r, g, b); StrokeWidth = Pixels(p); Fill = Color.Hex(c); }
+        let rect = { UpperLeft = point; Size = area; Style = Some(style) }
+        let tagString = { Element = Rect(rect) }.toString
         isTagEnclosed tagString
         && (isMatched '<' '>' tagString)
         && (tagString.Contains "rect")
@@ -75,13 +68,10 @@ module Tests
     [<Property>]
     let ``draw circles`` (x, y, radius, c, r, g, b, p) =
         BasicConfigurator.Configure() |> ignore
-        let point = {X = Size.Pixels(x); Y = Size.Pixels(y)}
-        let tagString =
-            circle {
-                Stroke = Color.Values(r, g, b);
-                StrokeWidth = Pixels(p);
-                Fill = Color.Hex(c);
-            } point radius
+        let point = { X = Size.Pixels(x); Y = Size.Pixels(y) }
+        let style = { Stroke = Color.Values(r, g, b); StrokeWidth = Pixels(p); Fill = Color.Hex(c); }
+        let circle = { Center = point; Radius = radius; Style = Some(style)}
+        let tagString = { Element = Circle(circle) }.toString
 
         isTagEnclosed tagString
         && (isMatched '<' '>' tagString)
@@ -102,25 +92,26 @@ module Tests
         let transform = Transform.Scale(2, 5)
 
         let graphics = seq {
-            yield image point size "myimage.jpg"
-            yield text style1 point "Hello World!"
-            yield text style2 point "Hello World!"
-            yield group "MyGroup" transform point (polygon style1 points)
-            yield polyline style2 points
-            yield line style1 point point
-            yield circle style2 point (Pixels(2))
-            yield ellipse style1 point point
-            yield rect style2 point size
-            yield script """
-            function circle_click(evt) {
-                var circle = evt.target;
-                var currentRadius = circle.getAttribute("r");
-                if (currentRadius == 100)
-                circle.setAttribute("r", currentRadius*2);
-                else
-                circle.setAttribute("r", currentRadius*0.5);
-            }
-            """
+            yield { Element = Image { UpperLeft = point; Size = size; Source = "myimage.jpg" } }.toString
+            yield { Element = Text { UpperLeft = point; Body = "Hello World!"; Style = Some(style1) } }.toString
+            yield { Element = Text { UpperLeft = point; Body =  "Hello World!"; Style = Some(style2) } }.toString
+            // TODO: Add: yield group "MyGroup" transform point { Element = Polygon(Polygon { Points = points; Style = Some(style) }) }.toString
+            yield { Element = Polyline { Points = points;  Style = Some(style2) } }.toString
+            yield { Element = Line { Point1 = point; Point2 = point; Style = Some(style1) } }.toString
+            yield { Element = Circle { Center = point; Radius = (Pixels(2)); Style = Some(style2) } }.toString
+            yield { Element = Ellipse { Center = point; Radius = point; Style = Some(style1) } }.toString
+            yield { Element = Rect { UpperLeft = point; Size = size; Style = Some(style2) } }.toString
+// TODO: Add this
+//            yield Script { Body = """
+//            function circle_click(evt) {
+//                var circle = evt.target;
+//                var currentRadius = circle.getAttribute("r");
+//                if (currentRadius == 100)
+//                circle.setAttribute("r", currentRadius*2);
+//                else
+//                circle.setAttribute("r", currentRadius*0.5);
+//            }
+//            """ }
         }
 
         let styleBody = style

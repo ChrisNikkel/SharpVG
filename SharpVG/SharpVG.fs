@@ -32,55 +32,157 @@ open StyleHelpers
 open TransformHelpers
 
 
-type Line = {
-    Point1: Point
-    Point2: Point
-}
+type Script =
+    {
+        Body: string
+    }
 
-type Text = {
-    UpperLeft: Point
-    Body: Text
-}
+and ScriptSvgStringifier =
+    val Script: Script
 
-type Image = {
-    UpperLeft: Point
-    Size: Area
-    Label: string option
-}
+    member __.toString =
+        "<script type=\"application/ecmascript\"><![CDATA[" +
+        __.Script.Body +
+        "]]></script>"
 
-type Circle = {
-    Center: Point
-    Radius: Size
-}
+    override __.ToString() = __.toString
 
-type Ellipse = {
-    Center: Point
-    Radius: Point
-}
+type Element =
+    | Line of Line
+    | Text of Text
+    | Image of Image
+    | Circle of Circle
+    | Ellipse of Ellipse
+    | Rect of Rect
+    | Polygon of Polygon
+    | Polyline of Polyline
 
-type Rect = {
-    UpperLeft: Point
-    Size: Area
-}
+and Line =
+    {
+        Point1 : Point
+        Point2 : Point
+        Style : Style option
+    }
 
-type Polygon = Points of seq<Point>
+and Circle =
+    {
+        Center : Point
+        Radius : Size
+        Style : Style option
+    }
 
+and Ellipse =
+    {
+        Center : Point
+        Radius : Point
+        Style : Style option
+    }
 
-type Polyline = Points of seq<Point>
+and Rect =
+    {
+        UpperLeft : Point
+        Size : Area
+        Style : Style option
+    }
 
-type Script = Body of string
+and Polygon =
+    {
+        Points : seq<Point>
+        Style : Style option
+    }
 
-type Tag =
-    | Line
-    | Text
-    | Image
-    | Circle
-    | Ellipse
-    | Rect
-    | Polygon
-    | Polyline
+and Polyline =
+    {
+        Points : seq<Point>
+        Style : Style option
+    }
 
-type StyledElement = Tag * Style
+and Text =
+    {
+        UpperLeft : Point
+        Body : string
+        Style : Style option
+    }
+
+and Image =
+    {
+        UpperLeft: Point
+        Size: Area
+        Source: string
+    }
+
+    //member this.withLabel source with Source = Some(label);
+
+    //member this.toString =
+    //    "<" + this.name + " " +
+    //    this.attributes +
+    //    "/>"
+
+    //override this.ToString() = this.toString
+
+and ElementSvgStringifier =
+    {
+        Element: Element
+    }
+
+    member __.name =
+        match __.Element with
+            | Line _ -> "line"
+            | Text _ -> "text"
+            | Image _ -> "image"
+            | Circle _ -> "circle"
+            | Ellipse _ -> "ellipse"
+            | Rect _ -> "rect"
+            | Polygon _ -> "polygon"
+            | Polyline _ -> "polyline"
+
+    member __.attributes =
+        let elementAttributes =
+            match __.Element with
+                | Line { Point1 = point1; Point2 = point2 } ->
+                    pointModifierToDescriptiveString point1 "" "1" + " " +
+                    pointModifierToDescriptiveString point2 "" "2"
+
+                | Text { UpperLeft = upperLeft; } ->
+                    pointToDescriptiveString upperLeft
+
+                | Image { UpperLeft = upperLeft; Size = size; Source = source } ->
+                "xlink:href=" +
+                    quote source + " " +
+                    pointToDescriptiveString upperLeft + " " +
+                    areaToString size
+
+                | Circle  { Center = center; Radius = radius } ->
+                    pointModifierToDescriptiveString center "c" "" +
+                    " r=" + quote (sizeToString radius)
+
+                | Ellipse { Center = center; Radius = radius } ->
+                    pointModifierToDescriptiveString center "c" "" +
+                    " r=" + quote (pointToString radius)
+
+                | Rect { UpperLeft = upperLeft; Size = size; } ->
+                    pointToDescriptiveString upperLeft + " " +
+                    areaToString size
+
+                | Polygon { Points = points } | Polyline { Points = points } ->
+                    "points=" + quote (pointsToString points)
+
+        match __.Element with
+            | Line { Style = Some(style) } | Text { Style = Some(style) } | Circle { Style = Some(style) } | Ellipse { Style = Some(style) } | Rect { Style = Some(style) } | Polygon { Style = Some(style) } | Polyline { Style = Some(style) } ->
+                elementAttributes + " " + styleToString style
+            | _ -> elementAttributes
+
+    member __.body =
+        match __.Element with
+            | Text { Body = body } -> Some(body)
+            | _ -> None
+
+    member __.toString =
+        match __.body with
+            | Some(body) -> "<" + __.name + " " + __.attributes + ">" + body + "</" + __.name + ">"
+            | None -> "<" + __.name + " " + __.attributes + ">"
+
+    override __.ToString() = __.toString
 
 type Svg = {
     Body: Body
@@ -97,8 +199,7 @@ and BodyElement =
     | Group
     | Svg
     | Script
-    | Tag
-    | StyledElement
+    | Element
 
 and Body =
     seq<BodyElement>
@@ -106,56 +207,6 @@ and Body =
 
 
 module Core =
-    // Public
-    let emptyTagToString name attribute = "<" + name + " " + attribute + "/>"
-
-    let tagToString name attribute body = "<" + name + " " + attribute + "/" + body + ">"
-
-    let addSpaces strings = (strings |> Seq.reduce (fun acc str -> acc + " " + str)).TrimStart()
-
-    let imageAttributesToString image =
-        seq {
-            yield (quote image.Label);
-            yield (pointToDescriptiveString image.UpperLeft);
-            yield (areaToString image.Size)
-        } |> addSpaces
-
-    let textAttributesToString text =
-        seq {
-            yield (quote text.Body);
-            yield (pointToDescriptiveString text.UpperLeft);
-        } |> addSpaces
-
-    let lineAttributesToString line =
-        seq {
-            yield pointModifierToDescriptiveString line.Point1 "" "1";
-            yield pointModifierToDescriptiveString line.Point2 "" "2";
-        } |> addSpaces
-
-    let circleAttributesToString circle =
-        seq {
-            yield pointModifierToDescriptiveString circle.Center "c" "";
-            yield "r=" + quote (pointToString circle.Radius);
-        } |> addSpaces
-
-
-    let ellipseAttributesToString ellipse =
-        seq {
-            yield pointModifierToDescriptiveString ellipse.Center "c" "";
-            yield pointModifierToDescriptiveString ellipse.Radius "r" "";
-        } |> addSpaces
-
-    let rectAttributesToString (rect: Rect) =
-        seq {
-            yield pointToDescriptiveString rect.UpperLeft;
-            yield areaToString rect.Size;
-        } |> addSpaces
-
-    let polygonAttributesToString polygon = "points=" + quote (pointsToString polygon)
-
-    //TODO: Remove duplicate from polygon
-    let polylineAttributesToString polyline = "points=" + quote (pointsToString polyline)
-
     //TODO: Add tag to string
 
     let html title body =
@@ -188,85 +239,3 @@ module Core =
         pointToString point + ">" +
         body +
         "</g>"
-
-    let image upperLeft size imageName =
-        "<image xlink:href=" +
-        quote imageName + " " +
-        pointToDescriptiveString upperLeft + " " +
-        areaToString size +
-        "/>"
-
-    let text style upperLeft text =
-        "<text " +
-        pointToDescriptiveString upperLeft + " " +
-        styleToString style + " " +
-        ">" +
-        text +
-        "</text>"
-
-    let line style point1 point2 =
-        "<line " +
-        pointModifierToDescriptiveString point1 "" "1" + " " +
-        pointModifierToDescriptiveString point2 "" "2" + " " +
-        styleToString style +
-        "/>"
-
-    let circle style center radius =
-        "<circle " +
-        pointModifierToDescriptiveString center "c" "" +
-        " r=" + quote (sizeToString radius) + " " +
-        styleToString style +
-        "/>"
-
-    let ellipse style center radius =
-        "<ellipse " +
-        pointModifierToDescriptiveString center "c" "" + " " +
-        pointModifierToDescriptiveString radius "r" "" + " " +
-        styleToString style +
-        "/>"
-
-    let rect style upperLeft size =
-        "<rect " +
-        pointToDescriptiveString upperLeft + " " +
-        areaToString size + " " +
-        styleToString style +
-        "/>"
-
-    let polygon style points =
-        "<polygon points=" +
-        quote (pointsToString points) + " " +
-        styleToString style +
-        "/>"
-
-    let polyline style points =
-        "<polyline points=" +
-        quote (pointsToString points) + " " +
-        styleToString style +
-        "/>"
-
-    let script body =
-        "<script type=\"application/ecmascript\"><![CDATA[" +
-        body +
-        "]]></script>"
-
-// Playground:
-
-// TODO: Make tag a base class and create derived classes that implement .WithAttributes() etc.
-    let line2 line =
-        let (style, lineSegment) = line
-        let (point1, point2) = lineSegment
-        "<line " +
-        pointModifierToDescriptiveString point1 "" "1" + " " +
-        pointModifierToDescriptiveString point2 "" "2" + " " +
-        (match style with Some(style) -> styleToString style | None -> "") +
-        "/>"
-
-    let withStyle element style = (element, style)
-    let createLineSegment point1 point2 = (point1, point2)
-    let createPointFromPixels x y = { X = Size.Pixels(x); Y = Size.Pixels(y) }
-
-    let test =
-        let s = {Stroke = (Hex(0xff0000)); StrokeWidth = Pixels(3); Fill = Color.Name(Colors.Red); }
-        let a = line2 (Some(s),({X = Size.Pixels(10); Y = Size.Pixels(10)}, {X = Size.Pixels(10); Y = Size.Pixels(10)}))
-        let b = line2 (Some(s), createLineSegment (createPointFromPixels 1 1) (createPointFromPixels 10 10))
-        0
