@@ -28,24 +28,7 @@ open ColorHelpers
 open SizeHelpers
 open PointHelpers
 open AreaHelpers
-open StyleHelpers
 open TransformHelpers
-
-
-type Script =
-    {
-        Body: string
-    }
-
-and ScriptSvgStringifier =
-    val Script: Script
-
-    member __.toString =
-        "<script type=\"application/ecmascript\"><![CDATA[" +
-        __.Script.Body +
-        "]]></script>"
-
-    override __.ToString() = __.toString
 
 type Element =
     | Line of Line
@@ -56,60 +39,68 @@ type Element =
     | Rect of Rect
     | Polygon of Polygon
     | Polyline of Polyline
+    
+    member __.asBase =
+        match __ with
+                | Line l -> (l :> ElementBase)
+                | Text t -> (t :> ElementBase)
+                | Image i -> (i :> ElementBase)
+                | Circle c -> (c :> ElementBase)
+                | Ellipse e -> (e :> ElementBase)
+                | Rect r -> (r :> ElementBase)
+                | Polygon p -> (p :> ElementBase)
+                | Polyline p -> (p :> ElementBase)
+                
+    member __.toString =
+        let name = __.asBase.name
+        
+        let attributes =
+            let elementAttributes =
+                match __ with
+                    | Line { Point1 = point1; Point2 = point2 } ->
+                        pointModifierToDescriptiveString point1 "" "1" + " " +
+                        pointModifierToDescriptiveString point2 "" "2"
 
-and Line =
-    {
-        Point1 : Point
-        Point2 : Point
-        Style : Style option
-    }
+                    | Text { UpperLeft = upperLeft; } ->
+                        pointToDescriptiveString upperLeft
 
-and Circle =
-    {
-        Center : Point
-        Radius : Size
-        Style : Style option
-    }
+                    | Image { UpperLeft = upperLeft; Size = size; Source = source } ->
+                    "xlink:href=" +
+                        quote source + " " +
+                        pointToDescriptiveString upperLeft + " " +
+                        areaToString size
 
-and Ellipse =
-    {
-        Center : Point
-        Radius : Point
-        Style : Style option
-    }
+                    | Circle  { Center = center; Radius = radius } ->
+                        pointModifierToDescriptiveString center "c" "" +
+                        " r=" + quote (sizeToString radius)
 
-and Rect =
-    {
-        UpperLeft : Point
-        Size : Area
-        Style : Style option
-    }
+                    | Ellipse { Center = center; Radius = radius } ->
+                        pointModifierToDescriptiveString center "c" "" +
+                        " r=" + quote (pointToString radius)
 
-and Polygon =
-    {
-        Points : seq<Point>
-        Style : Style option
-    }
+                    | Rect { UpperLeft = upperLeft; Size = size; } ->
+                        pointToDescriptiveString upperLeft + " " +
+                        areaToString size
 
-and Polyline =
-    {
-        Points : seq<Point>
-        Style : Style option
-    }
+                    | Polygon { Points = points } | Polyline { Points = points } ->
+                        "points=" + quote (pointsToString points)
 
-and Text =
-    {
-        UpperLeft : Point
-        Body : string
-        Style : Style option
-    }
+            match __ with
+                | Line { Style = Some(style) } | Text { Style = Some(style) } | Circle { Style = Some(style) } | Ellipse { Style = Some(style) } | Rect { Style = Some(style) } | Polygon { Style = Some(style) } | Polyline { Style = Some(style) } ->
+                    elementAttributes + " " + style.toString
+                | _ -> elementAttributes
 
-and Image =
-    {
-        UpperLeft: Point
-        Size: Area
-        Source: string
-    }
+        let body =
+            match __ with
+                | Text { Body = body } -> Some(body)
+                | _ -> None
+                
+        match body with
+            | Some(body) -> "<" + name + " " + attributes + ">" + body + "</" + name + ">"
+            | None -> "<" + name + " " + attributes + ">"
+    
+
+    override __.ToString() = __.toString
 
     //member this.withLabel source with Source = Some(label);
 
@@ -120,13 +111,9 @@ and Image =
 
     //override this.ToString() = this.toString
 
-and ElementSvgStringifier =
-    {
-        Element: Element
-    }
-
+and ElementSvgStringifier(element : Element) =
     member __.name =
-        match __.Element with
+        match element with
             | Line _ -> "line"
             | Text _ -> "text"
             | Image _ -> "image"
@@ -138,7 +125,7 @@ and ElementSvgStringifier =
 
     member __.attributes =
         let elementAttributes =
-            match __.Element with
+            match element with
                 | Line { Point1 = point1; Point2 = point2 } ->
                     pointModifierToDescriptiveString point1 "" "1" + " " +
                     pointModifierToDescriptiveString point2 "" "2"
@@ -167,13 +154,13 @@ and ElementSvgStringifier =
                 | Polygon { Points = points } | Polyline { Points = points } ->
                     "points=" + quote (pointsToString points)
 
-        match __.Element with
+        match element with
             | Line { Style = Some(style) } | Text { Style = Some(style) } | Circle { Style = Some(style) } | Ellipse { Style = Some(style) } | Rect { Style = Some(style) } | Polygon { Style = Some(style) } | Polyline { Style = Some(style) } ->
-                elementAttributes + " " + styleToString style
+                elementAttributes + " " + style.toString
             | _ -> elementAttributes
 
     member __.body =
-        match __.Element with
+        match element with
             | Text { Body = body } -> Some(body)
             | _ -> None
 

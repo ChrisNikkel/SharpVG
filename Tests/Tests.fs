@@ -46,7 +46,7 @@ module Tests
         let point2 = { X = Size.Pixels(x2); Y = Size.Pixels(y2) }
         let style = { Stroke = Color.Values(r, g, b); StrokeWidth = Pixels(p); Fill = Color.Hex(c); }
         let line = { Point1 = point1; Point2 = point2; Style = Some(style) }
-        let tagString = { Element = Line(line) }.toString
+        let tagString = Element.Line(line).toString
 
         info "%d %s" c tagString
         isTagEnclosed tagString
@@ -60,7 +60,7 @@ module Tests
         let area = { Height = Size.Pixels(h); Width = Size.Pixels(w) }
         let style = { Stroke = Color.Values(r, g, b); StrokeWidth = Pixels(p); Fill = Color.Hex(c); }
         let rect = { UpperLeft = point; Size = area; Style = Some(style) }
-        let tagString = { Element = Rect(rect) }.toString
+        let tagString = Element.Rect(rect).toString
         isTagEnclosed tagString
         && (isMatched '<' '>' tagString)
         && (tagString.Contains "rect")
@@ -71,7 +71,7 @@ module Tests
         let point = { X = Size.Pixels(x); Y = Size.Pixels(y) }
         let style = { Stroke = Color.Values(r, g, b); StrokeWidth = Pixels(p); Fill = Color.Hex(c); }
         let circle = { Center = point; Radius = radius; Style = Some(style)}
-        let tagString = { Element = Circle(circle) }.toString
+        let tagString = Element.Circle(circle).toString
 
         isTagEnclosed tagString
         && (isMatched '<' '>' tagString)
@@ -92,15 +92,15 @@ module Tests
         let transform = Transform.Scale(2, 5)
 
         let graphics = seq {
-            yield { Element = Image { UpperLeft = point; Size = size; Source = "myimage.jpg" } }.toString
-            yield { Element = Text { UpperLeft = point; Body = "Hello World!"; Style = Some(style1) } }.toString
-            yield { Element = Text { UpperLeft = point; Body =  "Hello World!"; Style = Some(style2) } }.toString
+            yield Element.Image({ UpperLeft = point; Size = size; Source = "myimage.jpg" }).toString
+            yield Element.Text({ UpperLeft = point; Body = "Hello World!"; Style = Some(style1) }).toString
+            yield Element.Text({ UpperLeft = point; Body =  "Hello World!"; Style = Some(style2) }).toString
             // TODO: Add: yield group "MyGroup" transform point { Element = Polygon(Polygon { Points = points; Style = Some(style) }) }.toString
-            yield { Element = Polyline { Points = points;  Style = Some(style2) } }.toString
-            yield { Element = Line { Point1 = point; Point2 = point; Style = Some(style1) } }.toString
-            yield { Element = Circle { Center = point; Radius = (Pixels(2)); Style = Some(style2) } }.toString
-            yield { Element = Ellipse { Center = point; Radius = point; Style = Some(style1) } }.toString
-            yield { Element = Rect { UpperLeft = point; Size = size; Style = Some(style2) } }.toString
+            yield Element.Polyline({ Points = points;  Style = Some(style2) }).toString
+            yield Element.Line({ Point1 = point; Point2 = point; Style = Some(style1) }).toString
+            yield Element.Circle({ Center = point; Radius = (Pixels(2)); Style = Some(style2) }).toString
+            yield Element.Ellipse({ Center = point; Radius = point; Style = Some(style1) }).toString
+            yield Element.Rect({ UpperLeft = point; Size = size; Style = Some(style2) }).toString
 // TODO: Add this
 //            yield Script { Body = """
 //            function circle_click(evt) {
