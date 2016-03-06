@@ -215,6 +215,7 @@ module Core =
         }\n" +
         "</style>\n"
 
+    // TODO: Make object and allow things lie fromSeq, fromList, etc.
     let svg size body =
         "<svg " + areaToString size + ">\n  " +
         body +
