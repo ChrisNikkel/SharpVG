@@ -2,8 +2,10 @@ namespace SharpVG
 open Helpers
 open PointHelpers
 
-type SvgEllipse(ellipse : Ellipse) =
+type SvgEllipse(ellipse : Ellipse, style : Style option) =
     inherit SvgElement(Element.PlainElement(BaseElement.Ellipse(ellipse)))
+
+    new(ellipse : Ellipse) = SvgEllipse(ellipse, None)
 
     member __.Ellipse = ellipse
 

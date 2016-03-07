@@ -1,7 +1,7 @@
 namespace SharpVG
 
 [<AbstractClass>]
-type SvgElement(element : Element) =
+type SvgElement(element : Element, style : Style option) =
 
     member __.Element = element
 
