@@ -1,11 +1,14 @@
 namespace SharpVG
+open Helpers
+open PointHelpers
 
-type Ellipse =
-    {
-        Center : Point
-        Radius : Point
-        Style : Style option
-    }
-    
-    interface ElementBase with
-        member __.name = "ellipse"
+type SvgEllipse(ellipse : Ellipse) =
+    inherit SvgElement(Element.PlainElement(BaseElement.Ellipse(ellipse)))
+
+    member __.Ellipse = ellipse
+
+    override __.Name = "ellipse"
+
+    override __.Attributes =
+        pointModifierToDescriptiveString ellipse.Center "c" "" +
+        " r=" + quote (pointToString ellipse.Radius)

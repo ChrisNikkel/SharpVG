@@ -1,6 +1,6 @@
 namespace SharpVG
 
-type Script =
+type SvgScript =
     {
         Body: string
     }

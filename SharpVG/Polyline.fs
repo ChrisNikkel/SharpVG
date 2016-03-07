@@ -1,10 +1,10 @@
 namespace SharpVG
+open Helpers
+open PointHelpers
 
-type Polyline =
-    {
-        Points : seq<Point>
-        Style : Style option
-    }
-    
-    interface ElementBase with
-        member __.name = "polyline"
+type SvgPolyline(points : Points) =
+    inherit SvgElement(Element.PlainElement(BaseElement.Polyline(points)))
+
+    override __.Name = "polyline"
+
+    override __.Attributes = "points=" + quote (pointsToString points)

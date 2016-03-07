@@ -60,7 +60,7 @@ module Tests
         let area = { Height = Size.Pixels(h); Width = Size.Pixels(w) }
         let style = { Stroke = Color.Values(r, g, b); StrokeWidth = Pixels(p); Fill = Color.Hex(c); }
         let rect = { UpperLeft = point; Size = area; Style = Some(style) }
-        let tagString = Element.Rect(rect).toString
+        let tagString = SvgRect((BaseElement.Rect(rect), Style)).toString
         isTagEnclosed tagString
         && (isMatched '<' '>' tagString)
         && (tagString.Contains "rect")

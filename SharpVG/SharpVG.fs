@@ -30,146 +30,69 @@ open PointHelpers
 open AreaHelpers
 open TransformHelpers
 
-type Element =
+type Style =
+    {
+        Fill : Color;
+        Stroke : Color;
+        StrokeWidth : Size;
+    }
+
+
+type Line =
+    {
+        Point1: Point
+        Point2: Point
+    }
+
+type Text =
+    {
+        UpperLeft: Point
+        Body: string
+    }
+
+type Image =
+    {
+        UpperLeft: Point
+        Size: Area
+        Source: string
+    }
+
+type Circle =
+    {
+        Center: Point
+        Radius: Size
+    }
+
+type Ellipse =
+    {
+        Center: Point
+        Radius: Point
+    }
+
+type Rect =
+    {
+        UpperLeft: Point
+        Size: Area
+    }
+
+type Points = seq<Point>
+
+type Script = Body of string
+
+type BaseElement =
     | Line of Line
     | Text of Text
     | Image of Image
     | Circle of Circle
     | Ellipse of Ellipse
     | Rect of Rect
-    | Polygon of Polygon
-    | Polyline of Polyline
-    
-    member __.asBase =
-        match __ with
-                | Line l -> (l :> ElementBase)
-                | Text t -> (t :> ElementBase)
-                | Image i -> (i :> ElementBase)
-                | Circle c -> (c :> ElementBase)
-                | Ellipse e -> (e :> ElementBase)
-                | Rect r -> (r :> ElementBase)
-                | Polygon p -> (p :> ElementBase)
-                | Polyline p -> (p :> ElementBase)
-                
-    member __.toString =
-        let name = __.asBase.name
-        
-        let attributes =
-            let elementAttributes =
-                match __ with
-                    | Line { Point1 = point1; Point2 = point2 } ->
-                        pointModifierToDescriptiveString point1 "" "1" + " " +
-                        pointModifierToDescriptiveString point2 "" "2"
+    | Polygon of Points
+    | Polyline of Points
 
-                    | Text { UpperLeft = upperLeft; } ->
-                        pointToDescriptiveString upperLeft
-
-                    | Image { UpperLeft = upperLeft; Size = size; Source = source } ->
-                    "xlink:href=" +
-                        quote source + " " +
-                        pointToDescriptiveString upperLeft + " " +
-                        areaToString size
-
-                    | Circle  { Center = center; Radius = radius } ->
-                        pointModifierToDescriptiveString center "c" "" +
-                        " r=" + quote (sizeToString radius)
-
-                    | Ellipse { Center = center; Radius = radius } ->
-                        pointModifierToDescriptiveString center "c" "" +
-                        " r=" + quote (pointToString radius)
-
-                    | Rect { UpperLeft = upperLeft; Size = size; } ->
-                        pointToDescriptiveString upperLeft + " " +
-                        areaToString size
-
-                    | Polygon { Points = points } | Polyline { Points = points } ->
-                        "points=" + quote (pointsToString points)
-
-            match __ with
-                | Line { Style = Some(style) } | Text { Style = Some(style) } | Circle { Style = Some(style) } | Ellipse { Style = Some(style) } | Rect { Style = Some(style) } | Polygon { Style = Some(style) } | Polyline { Style = Some(style) } ->
-                    elementAttributes + " " + style.toString
-                | _ -> elementAttributes
-
-        let body =
-            match __ with
-                | Text { Body = body } -> Some(body)
-                | _ -> None
-                
-        match body with
-            | Some(body) -> "<" + name + " " + attributes + ">" + body + "</" + name + ">"
-            | None -> "<" + name + " " + attributes + ">"
-    
-
-    override __.ToString() = __.toString
-
-    //member this.withLabel source with Source = Some(label);
-
-    //member this.toString =
-    //    "<" + this.name + " " +
-    //    this.attributes +
-    //    "/>"
-
-    //override this.ToString() = this.toString
-
-and ElementSvgStringifier(element : Element) =
-    member __.name =
-        match element with
-            | Line _ -> "line"
-            | Text _ -> "text"
-            | Image _ -> "image"
-            | Circle _ -> "circle"
-            | Ellipse _ -> "ellipse"
-            | Rect _ -> "rect"
-            | Polygon _ -> "polygon"
-            | Polyline _ -> "polyline"
-
-    member __.attributes =
-        let elementAttributes =
-            match element with
-                | Line { Point1 = point1; Point2 = point2 } ->
-                    pointModifierToDescriptiveString point1 "" "1" + " " +
-                    pointModifierToDescriptiveString point2 "" "2"
-
-                | Text { UpperLeft = upperLeft; } ->
-                    pointToDescriptiveString upperLeft
-
-                | Image { UpperLeft = upperLeft; Size = size; Source = source } ->
-                "xlink:href=" +
-                    quote source + " " +
-                    pointToDescriptiveString upperLeft + " " +
-                    areaToString size
-
-                | Circle  { Center = center; Radius = radius } ->
-                    pointModifierToDescriptiveString center "c" "" +
-                    " r=" + quote (sizeToString radius)
-
-                | Ellipse { Center = center; Radius = radius } ->
-                    pointModifierToDescriptiveString center "c" "" +
-                    " r=" + quote (pointToString radius)
-
-                | Rect { UpperLeft = upperLeft; Size = size; } ->
-                    pointToDescriptiveString upperLeft + " " +
-                    areaToString size
-
-                | Polygon { Points = points } | Polyline { Points = points } ->
-                    "points=" + quote (pointsToString points)
-
-        match element with
-            | Line { Style = Some(style) } | Text { Style = Some(style) } | Circle { Style = Some(style) } | Ellipse { Style = Some(style) } | Rect { Style = Some(style) } | Polygon { Style = Some(style) } | Polyline { Style = Some(style) } ->
-                elementAttributes + " " + style.toString
-            | _ -> elementAttributes
-
-    member __.body =
-        match element with
-            | Text { Body = body } -> Some(body)
-            | _ -> None
-
-    member __.toString =
-        match __.body with
-            | Some(body) -> "<" + __.name + " " + __.attributes + ">" + body + "</" + __.name + ">"
-            | None -> "<" + __.name + " " + __.attributes + ">"
-
-    override __.ToString() = __.toString
+// TODO: Re-add Style
+type Element =
+    | StyledElement of BaseElement * Style
+    | PlainElement of BaseElement
 
 type Svg = {
     Body: Body
@@ -190,40 +113,3 @@ and BodyElement =
 
 and Body =
     seq<BodyElement>
-
-
-
-module Core =
-    //TODO: Add tag to string
-
-    let html title body =
-        "<!DOCTYPE html>\n<html>\n<head>\n  <title>" +
-        title +
-        "</title>\n</head>\n<body>\n" +
-        body +
-        "</body>\n</html>\n"
-
-    let style =
-        "<style>
-        circle {
-        stroke: #006600;
-        fill  : #00cc00;
-        }
-        circle.allBlack {
-        stroke: #000000;
-        fill  : #000000;
-        }\n" +
-        "</style>\n"
-
-    // TODO: Make object and allow things lie fromSeq, fromList, etc.
-    let svg size body =
-        "<svg " + areaToString size + ">\n  " +
-        body +
-        "\n</svg>\n"
-
-    let group id transform point body =
-        "<g id=" + quote id +
-        transformToString transform +
-        pointToString point + ">" +
-        body +
-        "</g>"

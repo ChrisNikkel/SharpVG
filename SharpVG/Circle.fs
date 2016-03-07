@@ -1,11 +1,15 @@
 namespace SharpVG
+open Helpers
+open PointHelpers
+open SizeHelpers
 
-type Circle =
-    {
-        Center : Point
-        Radius : Size
-        Style : Style option
-    }
-    
-    interface ElementBase with
-        member __.name = "circle"
+type SvgCircle(circle : Circle) =
+    inherit SvgElement(Element.PlainElement(BaseElement.Circle(circle)))
+
+    member __.Circle = circle
+
+    override __.Name = "circle"
+
+    override __.Attributes =
+        pointModifierToDescriptiveString circle.Center "c" "" +
+        " r=" + quote (sizeToString circle.Radius)

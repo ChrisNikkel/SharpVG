@@ -49,6 +49,9 @@
     <Compile Include="Size.fs" />
     <Compile Include="Point.fs" />
     <Compile Include="Area.fs" />
+    <Compile Include="Script.fs" />
+    <Compile Include="Transform.fs" />
+    <Compile Include="SharpVG.fs" />
     <Compile Include="Style.fs" />
     <Compile Include="Element.fs" />
     <Compile Include="Line.fs" />
@@ -57,11 +60,10 @@
     <Compile Include="Circle.fs" />
     <Compile Include="Ellipse.fs" />
     <Compile Include="Rect.fs" />
+    <Compile Include="Poly.fs" />
     <Compile Include="Polygon.fs" />
     <Compile Include="Polyline.fs" />
-    <Compile Include="Script.fs" />
-    <Compile Include="Transform.fs" />
-    <Compile Include="SharpVG.fs" />
+    <Compile Include="Svg.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

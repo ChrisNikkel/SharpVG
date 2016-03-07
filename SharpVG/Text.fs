@@ -1,10 +1,12 @@
 namespace SharpVG
+open PointHelpers
 
-type Text =
-    {
-        UpperLeft : Point
-        Body : string
-        Style : Style option
-    }
-    interface ElementBase with
-        member __.name = "text"
+type SvgText(text : Text) =
+    inherit SvgElement(Element.PlainElement(BaseElement.Text(text)))
+
+    override __.Name = "text"
+
+    override __.Body = Some(text.Body)
+
+    override __.Attributes =
+        pointToDescriptiveString text.UpperLeft

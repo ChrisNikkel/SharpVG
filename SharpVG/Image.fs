@@ -1,11 +1,17 @@
 namespace SharpVG
+open Helpers
+open AreaHelpers
+open PointHelpers
 
-type Image =
-    {
-        UpperLeft: Point
-        Size: Area
-        Source: string
-    }
-    
-    interface ElementBase with
-        member __.name = "image"
+type SvgImage(image) =
+    inherit SvgElement(Element.PlainElement(BaseElement.Image(image)))
+
+    member __.Image: Image = image
+
+    override __.Name = "image"
+
+    override __.Attributes =
+        "xlink:href=" +
+        quote image.Source + " " +
+        pointToDescriptiveString image.UpperLeft + " " +
+        areaToString image.Size

@@ -1,10 +1,10 @@
 namespace SharpVG
+open Helpers
+open PointHelpers
 
-type Polygon =
-    {
-        Points : seq<Point>
-        Style : Style option
-    }
-    
-    interface ElementBase with
-        member __.name = "polygon"
+type SvgPolygon(points : Points) =
+    inherit SvgElement(Element.PlainElement(BaseElement.Polygon(points)))
+
+    override __.Name = "polygon"
+
+    override __.Attributes = "points=" + quote (pointsToString points)
