@@ -3,7 +3,7 @@ open Helpers
 open PointHelpers
 
 type SvgEllipse(ellipse : Ellipse, style : Style option) =
-    inherit SvgElement(Element.PlainElement(BaseElement.Ellipse(ellipse)))
+    inherit SvgElement(Element.PlainElement(BaseElement.Ellipse(ellipse)), style)
 
     new(ellipse : Ellipse) = SvgEllipse(ellipse, None)
 

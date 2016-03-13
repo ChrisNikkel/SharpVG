@@ -2,8 +2,8 @@ namespace SharpVG
 open PointHelpers
 open AreaHelpers
 
-type SvgRect(rect : Rect) =
-    inherit SvgElement(Element.PlainElement(BaseElement.Rect(rect)))
+type SvgRect(rect : Rect, style : Style option) =
+    inherit SvgElement(Element.PlainElement(BaseElement.Rect(rect)), style)
 
     member __.Rect = rect
 

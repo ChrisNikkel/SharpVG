@@ -4,9 +4,8 @@ open PointHelpers
 open SizeHelpers
 
 type SvgCircle(circle : Circle, style : Style option) =
-TODO: FINISH UP MULTI CONSTRUCTORS
-    inherit SvgElement(Element.PlainElement(BaseElement.Circle(circle)))
-
+//TODO: FINISH UP MULTI CONSTRUCTORS
+    inherit SvgElement(Element.PlainElement(BaseElement.Circle(circle)), style)
     new(circle : Circle) = SvgCircle(circle, None)
 
     member __.Circle = circle

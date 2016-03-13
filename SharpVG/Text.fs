@@ -1,8 +1,8 @@
 namespace SharpVG
 open PointHelpers
 
-type SvgText(text : Text) =
-    inherit SvgElement(Element.PlainElement(BaseElement.Text(text)))
+type SvgText(text : Text, style : Style option) =
+    inherit SvgElement(Element.PlainElement(BaseElement.Text(text)), style)
 
     override __.Name = "text"
 

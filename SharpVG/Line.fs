@@ -1,8 +1,8 @@
 namespace SharpVG
 open PointHelpers
 
-type SvgLine(line : Line) =
-    inherit SvgElement(Element.PlainElement(BaseElement.Line(line)))
+type SvgLine(line : Line, style : Style option) =
+    inherit SvgElement(Element.PlainElement(BaseElement.Line(line)), style)
 
     member __.Line = line
 

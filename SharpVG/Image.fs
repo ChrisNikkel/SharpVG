@@ -3,8 +3,8 @@ open Helpers
 open AreaHelpers
 open PointHelpers
 
-type SvgImage(image) =
-    inherit SvgElement(Element.PlainElement(BaseElement.Image(image)))
+type SvgImage(image : Image, style : Style option) =
+    inherit SvgElement(Element.PlainElement(BaseElement.Image(image)), style)
 
     member __.Image: Image = image
 
