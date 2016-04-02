@@ -32,6 +32,6 @@ type SvgElement(element : Element, style : Style option) =
 
         match body with
             | Some(body) -> "<" + name + " " + styledAttributes + ">" + body + "</" + name + ">"
-            | None -> "<" + name + " " + styledAttributes + ">"
+            | None -> "<" + name + " " + styledAttributes + "/>"
 
     override __.ToString() = __.toString
