@@ -54,6 +54,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LogHelpers.fs" />
     <Compile Include="Tests.fs" />
     <None Include="App.config" />
   </ItemGroup>

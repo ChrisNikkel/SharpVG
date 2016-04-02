@@ -1,18 +1,10 @@
 module Tests
+    open LogHelpers
     open SharpVG
     open SharpVG.Core
     open Xunit
     open FsCheck
     open FsCheck.Xunit
-    open log4net
-    open log4net.Config
-
-    let _log = LogManager.GetLogger "Tests"
-    let debug format = Printf.ksprintf _log.Debug format
-    let info format = Printf.ksprintf _log.Info format
-    let warn format = Printf.ksprintf _log.Warn format
-    let error format = Printf.ksprintf _log.Error format
-    let fatal format = Printf.ksprintf _log.Fatal format
 
     type Positive =
         static member Int() =
@@ -41,7 +33,7 @@ module Tests
 
     [<Property>]
     let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p) =
-        BasicConfigurator.Configure() |> ignore
+        configureLogs
         let point1 = { X = Size.Pixels(x1); Y = Size.Pixels(y1) }
         let point2 = { X = Size.Pixels(x2); Y = Size.Pixels(y2) }
         let style = { Stroke = Color.Values(r, g, b); StrokeWidth = Pixels(p); Fill = Color.Hex(c); }
@@ -55,7 +47,7 @@ module Tests
 (* TODO: Fix test
     [<Property>]
     let ``draw rectangles`` (x, y, h, w, c, r, g, b, p) =
-        BasicConfigurator.Configure() |> ignore
+        configureLogs
         let point = { X = Size.Pixels(x); Y = Size.Pixels(y); }
         let area = { Height = Size.Pixels(h); Width = Size.Pixels(w); }
         let style = { Stroke = Color.Values(r, g, b); StrokeWidth = Pixels(p); Fill = Color.Hex(c); }
@@ -68,7 +60,7 @@ module Tests
 *)
     [<Property>]
     let ``draw circles`` (x, y, radius, c, r, g, b, p) =
-        BasicConfigurator.Configure() |> ignore
+        configureLogs
         let point = { X = Size.Pixels(x); Y = Size.Pixels(y) }
         let style = { Stroke = Color.Values(r, g, b); StrokeWidth = Pixels(p); Fill = Color.Hex(c); }
         let circle = { Center = point; Radius = radius }
@@ -80,7 +72,7 @@ module Tests
 
     [<Fact>]
     let ``do lots and don't fail`` () =
-        BasicConfigurator.Configure() |> ignore
+        configureLogs
         let points = seq {
             yield {X = Size.Pixels(1); Y = Size.Pixels(1)}
             yield {X = Size.Pixels(4); Y = Size.Pixels(4)}
