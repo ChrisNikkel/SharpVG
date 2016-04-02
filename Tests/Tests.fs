@@ -25,20 +25,20 @@ module Tests
         isTagEnclosed tagString
         && (isMatched '<' '>' tagString)
         && (tagString.Contains "line")
-(* TODO: Fix test
+
     [<Property>]
     let ``draw rectangles`` (x, y, h, w, c, r, g, b, p) =
         configureLogs
         let point = { X = Size.Pixels(x); Y = Size.Pixels(y); }
         let area = { Height = Size.Pixels(h); Width = Size.Pixels(w); }
         let style = { Stroke = Color.Values(r, g, b); StrokeWidth = Pixels(p); Fill = Color.Hex(c); }
-        let rect = { UpperLeft = point; Size = area; }
+        let (rect : Rect) = { UpperLeft = point; Size = area; }
         let tagString = SvgRect(rect, Some(style)).toString
 
         isTagEnclosed tagString
         && (isMatched '<' '>' tagString)
         && (tagString.Contains "rect")
-*)
+
     [<Property>]
     let ``draw circles`` (x, y, radius, c, r, g, b, p) =
         configureLogs
