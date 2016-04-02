@@ -21,10 +21,7 @@ module Tests
         let line = { Point1 = point1; Point2 = point2; }
         let tagString = SvgLine(line, Some(style)).toString
 
-        info "%d %s" c tagString
-        isTagEnclosed tagString
-        && (isMatched '<' '>' tagString)
-        && (tagString.Contains "line")
+        basicChecks "line" tagString
 
     [<Property>]
     let ``draw rectangles`` (x, y, h, w, c, r, g, b, p) =
@@ -35,9 +32,7 @@ module Tests
         let (rect : Rect) = { UpperLeft = point; Size = area; }
         let tagString = SvgRect(rect, Some(style)).toString
 
-        isTagEnclosed tagString
-        && (isMatched '<' '>' tagString)
-        && (tagString.Contains "rect")
+        basicChecks "rect" tagString
 
     [<Property>]
     let ``draw circles`` (x, y, radius, c, r, g, b, p) =
@@ -47,9 +42,7 @@ module Tests
         let circle = { Center = point; Radius = radius }
         let tagString = SvgCircle(circle, Some(style)).toString
 
-        isTagEnclosed tagString
-        && (isMatched '<' '>' tagString)
-        && (tagString.Contains "circle")
+        basicChecks "circle" tagString
 
     [<Fact>]
     let ``do lots and don't fail`` () =
