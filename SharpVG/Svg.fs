@@ -5,7 +5,23 @@ open AreaHelpers
 open TransformHelpers
 
 module Core =
-    //TODO: Add tag to string
+
+    let baseElementToSvg baseElement style =
+        match baseElement with
+            | Circle c -> SvgCircle(c, style) :> SvgElement
+            | Ellipse e -> SvgEllipse(e, style) :> SvgElement
+            | Image i -> SvgImage(i, style) :> SvgElement
+            | Line l -> SvgLine(l, style) :> SvgElement
+            | Polygon p -> SvgPolygon(p, style) :> SvgElement
+            | Polyline p -> SvgPolyline(p, style) :> SvgElement
+            | Rect r -> SvgRect(r, style) :> SvgElement
+            | Text t -> SvgText(t, style) :> SvgElement
+
+    let elementToSvg =
+        function
+            | StyledElement(b, s) -> baseElementToSvg b (Some(s))
+            | PlainElement(b) -> baseElementToSvg b None
+
 
     let html title body =
         "<!DOCTYPE html>\n<html>\n<head>\n  <title>" +
