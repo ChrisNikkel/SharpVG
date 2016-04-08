@@ -57,6 +57,7 @@
     <Compile Include="LogHelpers.fs" />
     <Compile Include="BasicChecks.fs" />
     <Compile Include="Tests.fs" />
+    <Compile Include="Triangle.fs" />
     <None Include="App.config" />
   </ItemGroup>
   <PropertyGroup>
