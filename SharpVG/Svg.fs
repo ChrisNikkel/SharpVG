@@ -22,7 +22,6 @@ module Core =
             | StyledElement(b, s) -> baseElementToSvg b (Some(s))
             | PlainElement(b) -> baseElementToSvg b None
 
-
     let html title body =
         "<!DOCTYPE html>\n<html>\n<head>\n  <title>" +
         title +
