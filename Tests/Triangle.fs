@@ -20,17 +20,17 @@ let midpoint a b =
     let ay = sizeToFloat a.Y
     let bx = sizeToFloat b.X
     let by = sizeToFloat b.Y
-    
+
     { X = Ems((ax + bx) / 2.0); Y = Ems((ay + by) / 2.0) }
 
-let insideTriangles t =      
+let insideTriangles t =
     [
         {a = t.a; b = midpoint t.a t.b; c = midpoint t.a t.c}
         {a = midpoint t.a t.b; b = t.b;  c = midpoint t.b t.c}
         {a = midpoint t.a t.c; b = midpoint t.b t.c; c = t.c}
     ]
 
-let triangleToPoints t = 
+let triangleToPoints t =
     [ t.a; t.b; t.c; t.a]
 
 let rec recursiveTriangles t iteration =
@@ -43,13 +43,14 @@ let rec recursiveTriangles t iteration =
 let triangleSize = 100.0
 let iterations = 11
 let startingTriangle =
-        [{ 
-            a = { X = Ems(-1.0 * triangleSize); Y = Ems(0.0)}; 
-            b = { X = Ems(0.0); Y = Ems(triangleSize * sqrt triangleSize)}; 
+        [{
+            a = { X = Ems(-1.0 * triangleSize); Y = Ems(0.0)};
+            b = { X = Ems(0.0); Y = Ems(triangleSize * sqrt triangleSize)};
             c = { X = Ems(triangleSize); Y = Ems(0.0) }
         }]
 
 let allTriangles = recursiveTriangles startingTriangle iterations |> List.map (fun t -> triangleToPoints t) |> List.concat
 [<Property>]
 let ``draw triangles`` =
-    allTriangles
+    let size = {Height = Pixels 30; Width = Pixels 30}
+    allTriangles |> (svg size) |> html "SVG Demo"
