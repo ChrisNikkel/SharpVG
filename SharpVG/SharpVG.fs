@@ -23,93 +23,22 @@
 //</style>
 namespace SharpVG
 
-open Helpers
-open ColorHelpers
-open SizeHelpers
-open PointHelpers
-open AreaHelpers
-open TransformHelpers
-
-type Style =
-    {
-        Fill : Color;
-        Stroke : Color;
-        StrokeWidth : Size;
-    }
-
-
-type Line =
-    {
-        Point1: Point
-        Point2: Point
-    }
-
-type Text =
-    {
-        UpperLeft: Point
-        Body: string
-    }
-
-type Image =
-    {
-        UpperLeft: Point
-        Size: Area
-        Source: string
-    }
-
-type Circle =
-    {
-        Center: Point
-        Radius: Size
-    }
-
-type Ellipse =
-    {
-        Center: Point
-        Radius: Point
-    }
-
-type Rect =
-    {
-        UpperLeft: Point
-        Size: Area
-    }
-
-type Points = seq<Point>
-
-type Script = Body of string
-
-type BaseElement =
-    | Line of Line
-    | Text of Text
-    | Image of Image
-    | Circle of Circle
-    | Ellipse of Ellipse
-    | Rect of Rect
-    | Polygon of Points
-    | Polyline of Points
-
-// TODO: Re-add Style
-type Element =
-    | StyledElement of BaseElement * Style
-    | PlainElement of BaseElement
-
-type Svg = {
-    Body: Body
-    UpperLeft: Point option
+type svg = {
+    body: body
+    upperLeft: point option
 }
 
-and Group = {
-    Body: Body
-    UpperLeft: Point
-    Transform: Transform option
+and group = {
+    body: body
+    upperLeft: point
+    transform: transform option
 }
 
-and BodyElement =
-    | Group
-    | Svg
-    | Script
-    | Element
+and bodyElement =
+    | Group of group
+    | Svg of svg
+    | Script of string
+    | Element of element
 
-and Body =
-    seq<BodyElement>
+and body =
+    seq<bodyElement>

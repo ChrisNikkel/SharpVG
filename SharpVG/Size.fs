@@ -1,25 +1,25 @@
 namespace SharpVG
 
-type Size =
+type size =
     | Pixels of int
     | Ems of float
     | Percent of float
 
-module SizeHelpers =
-    let sizeToString size =
+module Size =
+    let toString size =
         match size with
-        | Pixels p -> string p
-        | Ems e -> string e + "em"
-        | Percent p -> string p + "%"
+            | Pixels p -> string p
+            | Ems e -> string e + "em"
+            | Percent p -> string p + "%"
 
-    let sizeToFloat size =
+    let toFloat size =
         match size with
-        | Pixels p -> float p
-        | Ems e -> e
-        | Percent p -> p
+            | Pixels p -> float p
+            | Ems e -> e
+            | Percent p -> p
 
-    let sizeToInt size =
+    let toInt size =
         match size with
-        | Pixels p -> p
-        | Ems e -> int e
-        | Percent p -> int p
+            | Pixels p -> p
+            | Ems e -> int e
+            | Percent p -> int p

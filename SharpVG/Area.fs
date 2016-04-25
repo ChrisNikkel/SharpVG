@@ -1,11 +1,12 @@
 namespace SharpVG
 
-type Area = { Width : Size; Height : Size; }
+type area =
+    {
+        width : size;
+        height : size;
+    }
 
-module AreaHelpers =
-    open Helpers
-    open SizeHelpers
-
-    let areaToString area =
-        "height=" + quote (sizeToString area.Height) + " " +
-        "width=" + quote (sizeToString area.Width)
+module Area =
+    let toString area =
+        "height=" + Tag.quote (Size.toString area.height) + " " +
+        "width=" + Tag.quote (Size.toString area.width)

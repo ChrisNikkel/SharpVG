@@ -1,10 +1,10 @@
 namespace SharpVG
-open Helpers
-open PointHelpers
 
-type SvgPolygon(points : Points, style : Style option) =
-    inherit SvgElement(Element.PlainElement(BaseElement.Polygon(points)), style)
-
-    override __.Name = "polygon"
-
-    override __.Attributes = "points=" + quote (pointsToString points)
+module Polygon =
+    let toString points =
+        {
+            name = "polygon";
+            attribute = Some("points=" + Tag.quote (Points.toString points))
+            body = None
+        }
+        |> Tag.toString

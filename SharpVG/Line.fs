@@ -1,16 +1,16 @@
 namespace SharpVG
-open PointHelpers
 
-type SvgLine(line : Line, style : Style option) =
-    inherit SvgElement(Element.PlainElement(BaseElement.Line(line)), style)
+type line =
+    {
+        point1: point
+        point2: point
+    }
 
-    member __.Line = line
-
-    override __.Name = "line"
-
-    override __.Attributes =
-        pointModifierToDescriptiveString line.Point1 "" "1" + " " +
-        pointModifierToDescriptiveString line.Point2 "" "2"
-
-// TODO: Move to base and change from interface to inheritance
-//    override __.ToString() = (__ :> ElementBase).toString
+module Line =
+    let toString line =
+        {
+            name = "line";
+            attribute = Some((Point.toDescriptiveStringWithModifier line.point1 "" "1") + " " + (Point.toDescriptiveStringWithModifier line.point2 "" "2"));
+            body = None
+        }
+        |> Tag.toString

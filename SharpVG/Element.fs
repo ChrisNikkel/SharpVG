@@ -1,5 +1,32 @@
 namespace SharpVG
 
+// TODO: Remove file or figure out what needs to be here
+type baseElement =
+    | Line of line
+    | Text of text
+    | Image of image
+    | Circle of circle
+    | Ellipse of ellipse
+    | Rect of rect
+    | Polygon of points
+    | Polyline of points
+
+// TODO: Re-add Style
+type element =
+    | StyledElement of baseElement * style
+    | PlainElement of baseElement
+
+module Element =
+    let ofLine line = PlainElement(Line(line))
+    let ofText text = PlainElement(Text(text))
+    let ofImage image = PlainElement(Image(image))
+    let ofCircle circle = PlainElement(Circle(circle))
+    let ofEllipse ellipse = PlainElement(Ellipse(ellipse))
+    let ofRect rect = PlainElement(Rect(rect))
+    let ofPolygon polygon = PlainElement(Polygon(polygon))
+    let ofPolyline polyline = PlainElement(Polyline(polyline))
+
+(*
 [<AbstractClass>]
 type SvgElement(element : Element, style : Style option) =
 
@@ -35,3 +62,4 @@ type SvgElement(element : Element, style : Style option) =
             | None -> "<" + name + " " + styledAttributes + "/>"
 
     override __.ToString() = __.toString
+*)

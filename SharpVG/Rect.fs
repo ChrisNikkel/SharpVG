@@ -1,14 +1,16 @@
 namespace SharpVG
-open PointHelpers
-open AreaHelpers
 
-type SvgRect(rect : Rect, style : Style option) =
-    inherit SvgElement(Element.PlainElement(BaseElement.Rect(rect)), style)
+type rect =
+    {
+        upperLeft: point
+        size: area
+    }
 
-    member __.Rect = rect
-
-    override __.Name = "rect"
-
-    override __.Attributes =
-        pointToDescriptiveString rect.UpperLeft + " " +
-        areaToString rect.Size
+module Rect =
+    let toString rect =
+        {
+            name = "rect";
+            attribute = Some(Point.toDescriptiveString rect.upperLeft + " " + Area.toString rect.size)
+            body = None
+        }
+        |> Tag.toString

@@ -1,24 +1,18 @@
 namespace SharpVG
 
-type Point = { X : Size; Y : Size; }
+type point =
+    {
+        x : size;
+        y : size;
+    }
 
-module PointHelpers =
-    open Helpers
-    open SizeHelpers
+module Point =
+    let toDescriptiveStringWithModifier point pre post =
+        pre + "x" + post + "=" + Tag.quote (Size.toString point.x) + " " +
+        pre + "y" + post + "=" + Tag.quote (Size.toString point.y)
 
-    let pointModifierToDescriptiveString point pre post =
-        pre + "x" + post + "=" + quote (sizeToString point.X) + " " +
-        pre + "y" + post + "=" + quote (sizeToString point.Y)
+    let toDescriptiveString point =
+        toDescriptiveStringWithModifier point "" ""
 
-    let pointToDescriptiveString point =
-        pointModifierToDescriptiveString point "" ""
-
-    let pointToString point =
-        sizeToString point.X + "," + sizeToString point.Y
-
-    let pointsToString pointsToString =
-        pointsToString
-        |> Seq.fold (
-            fun acc point ->
-            acc + addSpace (acc <> "") + pointToString point
-            ) ""
+    let toString point =
+        Size.toString point.x + "," + Size.toString point.y

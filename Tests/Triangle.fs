@@ -6,22 +6,21 @@ open SharpVG.Core
 open Xunit
 open FsCheck
 open FsCheck.Xunit
-open SizeHelpers
 
 type triangle =
     {
-        a : Point
-        b : Point
-        c : Point
+        a : point
+        b : point
+        c : point
     }
 
 let midpoint a b =
-    let ax = sizeToFloat a.X
-    let ay = sizeToFloat a.Y
-    let bx = sizeToFloat b.X
-    let by = sizeToFloat b.Y
+    let ax = Size.toFloat a.x
+    let ay = Size.toFloat a.y
+    let bx = Size.toFloat b.x
+    let by = Size.toFloat b.y
 
-    { X = Ems((ax + bx) / 2.0); Y = Ems((ay + by) / 2.0) }
+    { x = Ems((ax + bx) / 2.0); y = Ems((ay + by) / 2.0) }
 
 let insideTriangles t =
     [
@@ -44,13 +43,13 @@ let triangleSize = 100.0
 let iterations = 11
 let startingTriangle =
         [{
-            a = { X = Ems(-1.0 * triangleSize); Y = Ems(0.0)};
-            b = { X = Ems(0.0); Y = Ems(triangleSize * sqrt triangleSize)};
-            c = { X = Ems(triangleSize); Y = Ems(0.0) }
+            a = { x = Ems(-1.0 * triangleSize); y = Ems(0.0)};
+            b = { x = Ems(0.0); y = Ems(triangleSize * sqrt triangleSize)};
+            c = { x = Ems(triangleSize); y = Ems(0.0) }
         }]
 
 let allTriangles = recursiveTriangles startingTriangle iterations |> List.map (fun t -> triangleToPoints t) |> List.concat
 [<Property>]
 let ``draw triangles`` =
-    let size = {Height = Pixels 30; Width = Pixels 30}
-    allTriangles |> (svg size) |> html "SVG Demo"
+    let size = {height = Pixels 30; width = Pixels 30}
+    allTriangles |> Points.toString |> (svg size) |> html "SVG Demo"

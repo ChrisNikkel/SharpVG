@@ -1,12 +1,16 @@
 namespace SharpVG
-open PointHelpers
 
-type SvgText(text : Text, style : Style option) =
-    inherit SvgElement(Element.PlainElement(BaseElement.Text(text)), style)
+type text =
+    {
+        upperLeft: point
+        body: string
+    }
 
-    override __.Name = "text"
-
-    override __.Body = Some(text.Body)
-
-    override __.Attributes =
-        pointToDescriptiveString text.UpperLeft
+module Text =
+    let toString text =
+        {
+            name = "text";
+            attribute = Some(Point.toDescriptiveString text.upperLeft)
+            body = Some(text.body)
+        }
+        |> Tag.toString

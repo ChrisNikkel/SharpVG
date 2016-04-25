@@ -1,17 +1,16 @@
 namespace SharpVG
-open Helpers
-open PointHelpers
-open SizeHelpers
 
-type SvgCircle(circle : Circle, style : Style option) =
-//TODO: FINISH UP MULTI CONSTRUCTORS
-    inherit SvgElement(Element.PlainElement(BaseElement.Circle(circle)), style)
-    new(circle : Circle) = SvgCircle(circle, None)
+type circle =
+    {
+        center: point
+        radius: size
+    }
 
-    member __.Circle = circle
-
-    override __.Name = "circle"
-
-    override __.Attributes =
-        pointModifierToDescriptiveString circle.Center "c" "" +
-        " r=" + quote (sizeToString circle.Radius)
+module Circle =
+    let toString circle =
+        {
+            name = "circle";
+            attribute = Some((Point.toDescriptiveStringWithModifier circle.center "c" "") + " r=" + Tag.quote (Size.toString circle.radius));
+            body = None
+        }
+        |> Tag.toString

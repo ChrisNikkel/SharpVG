@@ -1,26 +1,6 @@
 namespace SharpVG
-open Helpers
-open PointHelpers
-open AreaHelpers
-open TransformHelpers
 
 module Core =
-
-    let baseElementToSvg baseElement style =
-        match baseElement with
-            | Circle c -> SvgCircle(c, style) :> SvgElement
-            | Ellipse e -> SvgEllipse(e, style) :> SvgElement
-            | Image i -> SvgImage(i, style) :> SvgElement
-            | Line l -> SvgLine(l, style) :> SvgElement
-            | Polygon p -> SvgPolygon(p, style) :> SvgElement
-            | Polyline p -> SvgPolyline(p, style) :> SvgElement
-            | Rect r -> SvgRect(r, style) :> SvgElement
-            | Text t -> SvgText(t, style) :> SvgElement
-
-    let elementToSvg =
-        function
-            | StyledElement(b, s) -> baseElementToSvg b (Some(s))
-            | PlainElement(b) -> baseElementToSvg b None
 
     let html title body =
         "<!DOCTYPE html>\n<html>\n<head>\n  <title>" +
@@ -29,6 +9,7 @@ module Core =
         body +
         "</body>\n</html>\n"
 
+    // TODO: 
     let style =
         "<style>
         circle {
@@ -43,13 +24,13 @@ module Core =
 
     // TODO: Make object and allow things lie fromSeq, fromList, etc.
     let svg size body =
-        "<svg " + areaToString size + ">\n  " +
+        "<svg " + Area.toString size + ">\n  " +
         body +
         "\n</svg>\n"
 
     let group id transform point body =
-        "<g id=" + quote id +
-        transformToString transform +
-        pointToString point + ">" +
+        "<g id=" + Tag.quote id +
+        Transform.toString transform +
+        Point.toString point + ">" +
         body +
         "</g>"

@@ -1,12 +1,14 @@
 namespace SharpVG
-open Helpers
-open SizeHelpers
-open ColorHelpers
 
-type SvgStyle(style : Style) =
-    member __.Style = style
-    member __.toString =
-        "stroke=" + quote (colorToString style.Stroke) + " " +
-        "stroke-width=" + quote (sizeToString style.StrokeWidth) + " " +
-        "fill=" + quote (colorToString style.Fill)
-    override __.ToString() = __.toString
+type style =
+    {
+        fill : color;
+        stroke : color;
+        strokeWidth : size;
+    }
+
+module Style =
+    let toString style =
+        "stroke=" + Tag.quote (Color.toString style.stroke) + " " +
+        "stroke-width=" + Tag.quote (Size.toString style.strokeWidth) + " " +
+        "fill=" + Tag.quote (Color.toString style.fill)

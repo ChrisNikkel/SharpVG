@@ -1,6 +1,6 @@
 namespace SharpVG
 
-type Transform =
+type transform =
     | Matrix of int * int * int * int * int * int
     | Translate of int * int
     | Scale of int * int
@@ -8,8 +8,8 @@ type Transform =
     | SkewX of int
     | SkewY of int
 
-module TransformHelpers =
-    let transformToString transform =
+module Transform =
+    let toString transform =
          match transform with
             | Matrix (a, b, c, d, e, f) -> "matrix(" + string a + " "  + string b + " "  + string c + " "  + string d + " "  + string e + " "  + string f + ")"
             | Translate(x, y) -> "translate(" + string x + " " + string y + ")"
