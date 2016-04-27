@@ -26,6 +26,34 @@ module Element =
     let ofPolygon polygon = PlainElement(Polygon(polygon))
     let ofPolyline polyline = PlainElement(Polyline(polyline))
 
+    let withStyle style element =
+        match element with
+            | StyledElement(element, _) -> StyledElement(element, style)
+            | PlainElement(element) -> StyledElement(element, style)
+
+    let toTag element =
+        let baseElementToTag baseElement =
+            match baseElement with
+                | Line(line) -> line |> Line.toTag
+                | Text(text) -> text |> Text.toTag
+                | Image(image) -> image |> Image.toTag
+                | Circle(circle) -> circle |> Circle.toTag
+                | Ellipse(ellipse) -> ellipse |> Ellipse.toTag
+                | Rect(rect) -> rect |> Rect.toTag
+                | Polygon(polygon) -> polygon |> Polygon.toTag
+                | Polyline(polyline) -> polyline |> Polyline.toTag
+        match element with
+            | StyledElement(element, style) ->
+                let elementTag = baseElementToTag element
+                let newAttribute oldAttribute =
+                    match oldAttribute with
+                        | None -> Some(style |> Style.toString)
+                        | Some(attribute) -> Some(attribute + (style |> Style.toString))
+                { elementTag with attribute = newAttribute elementTag.attribute }
+            | PlainElement(element) -> baseElementToTag element
+
+    let toString element = element |> toTag |> Tag.toString
+
 (*
 [<AbstractClass>]
 type SvgElement(element : Element, style : Style option) =

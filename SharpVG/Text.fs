@@ -7,10 +7,12 @@ type text =
     }
 
 module Text =
-    let toString text =
+
+    let toTag text =
         {
             name = "text";
             attribute = Some(Point.toDescriptiveString text.upperLeft)
             body = Some(text.body)
         }
-        |> Tag.toString
+
+    let toString text = text |> toTag |> Tag.toString

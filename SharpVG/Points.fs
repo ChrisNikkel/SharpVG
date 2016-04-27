@@ -3,7 +3,7 @@ namespace SharpVG
 type points = seq<point>
 
 module Points =
-    let toString points =
+    let toString (points:points) =
         points
         |> Seq.fold
             (

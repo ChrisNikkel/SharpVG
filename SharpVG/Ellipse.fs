@@ -7,10 +7,12 @@ type ellipse =
     }
 
 module Ellipse =
-    let toString ellipse =
+
+    let toTag ellipse =
         {
             name = "ellipse";
             attribute = Some((Point.toDescriptiveStringWithModifier ellipse.center "c" "") + " r=" + Tag.quote (Point.toString ellipse.radius));
             body = None
         }
-        |> Tag.toString
+
+    let toString = toTag >> Tag.toString

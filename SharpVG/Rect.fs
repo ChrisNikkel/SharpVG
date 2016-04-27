@@ -7,10 +7,12 @@ type rect =
     }
 
 module Rect =
-    let toString rect =
+
+    let toTag rect =
         {
             name = "rect";
             attribute = Some(Point.toDescriptiveString rect.upperLeft + " " + Area.toString rect.size)
             body = None
         }
-        |> Tag.toString
+
+    let toString = toTag >> Tag.toString

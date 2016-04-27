@@ -7,10 +7,12 @@ type circle =
     }
 
 module Circle =
-    let toString circle =
+
+    let toTag circle =
         {
             name = "circle";
             attribute = Some((Point.toDescriptiveStringWithModifier circle.center "c" "") + " r=" + Tag.quote (Size.toString circle.radius));
             body = None
         }
-        |> Tag.toString
+
+    let toString = toTag >> Tag.toString

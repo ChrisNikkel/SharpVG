@@ -8,10 +8,12 @@ type image =
     }
 
 module Image =
-    let toString image =
+
+    let toTag image =
         {
             name = "image";
             attribute = Some((Point.toDescriptiveString image.upperLeft) + " " + Area.toString image.size);
             body = None
         }
-        |> Tag.toString
+
+    let toString = toTag >> Tag.toString

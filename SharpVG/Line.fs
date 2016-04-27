@@ -7,10 +7,12 @@ type line =
     }
 
 module Line =
-    let toString line =
+
+    let toTag line =
         {
             name = "line";
             attribute = Some((Point.toDescriptiveStringWithModifier line.point1 "" "1") + " " + (Point.toDescriptiveStringWithModifier line.point2 "" "2"));
             body = None
         }
-        |> Tag.toString
+
+    let toString = toTag >> Tag.toString

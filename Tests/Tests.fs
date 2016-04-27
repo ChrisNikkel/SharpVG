@@ -19,7 +19,7 @@ let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p) =
     let point2 = { x = Pixels x2; y = Pixels y2 }
     let style = { stroke = Values(r, g, b); strokeWidth = Pixels p; fill = Hex c }
     let line = { point1 = point1; point2 = point2; }
-    let tagString = line |> Line.toString
+    let tagString = line |> Element.ofLine |> Element.withStyle style |> Element.toString
 
     basicChecks "line" tagString
 
@@ -30,7 +30,7 @@ let ``draw rectangles`` (x, y, h, w, c, r, g, b, p) =
     let area = { height = Pixels h; width = Pixels w }
     let style = { stroke = Values(r, g, b); strokeWidth = Pixels p ; fill = Hex c }
     let (rect : rect) = { upperLeft = point; size = area }
-    let tagString = rect |> Rect.toString
+    let tagString = rect |> Element.ofRect |> Element.withStyle style |> Element.toString
 
     basicChecks "rect" tagString
 
@@ -40,7 +40,7 @@ let ``draw circles`` (x, y, radius, c, r, g, b, p) =
     let point = { x = Pixels x; y = Pixels y }
     let style = { stroke = Values(r, g, b); strokeWidth = Pixels p; fill = Hex c }
     let circle = { center = point; radius = radius }
-    let tagString = circle |> Circle.toString
+    let tagString = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
 
     basicChecks "circle" tagString
 // TODO: Reenable test
