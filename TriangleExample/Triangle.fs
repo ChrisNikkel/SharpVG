@@ -3,7 +3,7 @@ module Triangle
 open SharpVG
 open SharpVG.Core
 
-type triangle =
+type Triangle =
     {
         a : point
         b : point
@@ -29,14 +29,14 @@ let triangleToPoints t =
     [ t.a; t.b; t.c; t.a]
 
 let rec recursiveTriangles t iteration =
-    let it = t |> List.map (fun st -> insideTriangles st) |> List.concat;
+    let it = t |> List.map insideTriangles |> List.concat;
     if iteration > 1 then
         recursiveTriangles it (iteration - 1)
     else
         it
 
 let triangleSize = 100.0
-let iterations = 4
+let iterations = 2
 let startingTriangle =
         [{
             a = { x = Ems(-1.0 * triangleSize); y = Ems(0.0)};
@@ -44,10 +44,11 @@ let startingTriangle =
             c = { x = Ems(triangleSize); y = Ems(0.0) }
         }]
 
-let allTriangles = recursiveTriangles startingTriangle iterations |> List.map (fun t -> triangleToPoints t) |> List.concat
+let allTriangles = recursiveTriangles startingTriangle iterations |> List.map triangleToPoints |> List.concat
 
 [<EntryPoint>]
 let main argv = 
     let size = {height = Pixels 30; width = Pixels 30}
-    allTriangles |> Points.toString |> (svg size) |> html "SVG Demo" |> printfn "%A"
+    let style = { stroke = Hex 0x00ff00; strokeWidth = Pixels 2; fill = Hex 0x000000}
+    allTriangles |> Element.ofPolygon |> Element.withStyle style |>  Element.toString |> (svg size) |> html "SVG Demo" |> printfn "%A"
     0
