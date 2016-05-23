@@ -1,11 +1,7 @@
 module Triangle
 
-open LogHelpers
 open SharpVG
 open SharpVG.Core
-open Xunit
-open FsCheck
-open FsCheck.Xunit
 
 type triangle =
     {
@@ -40,7 +36,7 @@ let rec recursiveTriangles t iteration =
         it
 
 let triangleSize = 100.0
-let iterations = 11
+let iterations = 4
 let startingTriangle =
         [{
             a = { x = Ems(-1.0 * triangleSize); y = Ems(0.0)};
@@ -49,7 +45,9 @@ let startingTriangle =
         }]
 
 let allTriangles = recursiveTriangles startingTriangle iterations |> List.map (fun t -> triangleToPoints t) |> List.concat
-[<Property>]
-let ``draw triangles`` =
+
+[<EntryPoint>]
+let main argv = 
     let size = {height = Pixels 30; width = Pixels 30}
-    allTriangles |> Points.toString |> (svg size) |> html "SVG Demo"
+    allTriangles |> Points.toString |> (svg size) |> html "SVG Demo" |> printfn "%A"
+    0
