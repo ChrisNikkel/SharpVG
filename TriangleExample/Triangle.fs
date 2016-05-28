@@ -49,6 +49,7 @@ let allTriangles = recursiveTriangles startingTriangle iterations |> List.map tr
 [<EntryPoint>]
 let main argv = 
     let size = {height = Pixels 30; width = Pixels 30}
-    let style = { stroke = Hex 0x00ff00; strokeWidth = Pixels 2; fill = Hex 0x000000}
-    allTriangles |> Element.ofPolygon |> Element.withStyle style |>  Element.toString |> (svg size) |> html "SVG Demo" |> printfn "%A"
+    let style = { stroke = Hex 0x00ff00; strokeWidth = Pixels 2; fill = Hex 0x000000; opacity = 1.0 }
+    let svgData = allTriangles |> Element.ofPolygon |> Element.withStyle style |>  Element.toString |> (svg size) |> html "SVG Demo"
+    svgData |> printfn "%A"
     0
