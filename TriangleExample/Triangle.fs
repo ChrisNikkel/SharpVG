@@ -56,7 +56,7 @@ let main argv =
     let style = { stroke = Name colors.Green; strokeWidth = Pixels 2.0; fill =  Name colors.White; opacity = 1.0 }
     let allTriangles = recursiveTriangles startingTriangle iterations |> List.map triangleToPoints
     let triangleToSvgString = Element.ofPolygon >> (Element.withStyle style) >> Element.toString
-    let svgData = allTriangles |> List.map triangleToSvgString |> List.fold (+) "" |> (svg svgsize minimums size) |> html "SVG Demo"
+    let svgData = allTriangles |> List.map triangleToSvgString |> (String.concat " ") |> (svg svgsize minimums size) |> html "SVG Demo"
     let fileName = ".\\triangle.html"
     File.WriteAllLines(fileName, [svgData]);
     Process.Start(fileName) |> ignore
