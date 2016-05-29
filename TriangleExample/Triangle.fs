@@ -7,9 +7,9 @@ open System.IO
 
 type Triangle =
     {
-        a : point
-        b : point
-        c : point
+        A : point
+        B : point
+        C : point
     }
 
 let midpoint a b =
@@ -22,13 +22,13 @@ let midpoint a b =
 
 let insideTriangles t =
     [
-        {a = t.a; b = midpoint t.a t.b; c = midpoint t.a t.c}
-        {a = midpoint t.a t.b; b = t.b;  c = midpoint t.b t.c}
-        {a = midpoint t.a t.c; b = midpoint t.b t.c; c = t.c}
+        {A = t.A; B = midpoint t.A t.B; C = midpoint t.A t.C}
+        {A = midpoint t.A t.B; B = t.B;  C = midpoint t.B t.C}
+        {A = midpoint t.A t.C; B = midpoint t.B t.C; C = t.C}
     ]
 
-let triangleToPoints t =
-    [ t.a; t.b; t.c]
+let triangleToPolygon t =
+    [ t.A; t.B; t.C] |> Element.ofPolygon
 
 let rec recursiveTriangles t iteration =
     let it = t |> List.map insideTriangles |> List.concat;
@@ -36,8 +36,6 @@ let rec recursiveTriangles t iteration =
         recursiveTriangles it (iteration - 1)
     else
         it
-
-
 
 [<EntryPoint>]
 let main argv =
@@ -55,18 +53,18 @@ let main argv =
     let triangleLength = 1000.0
     let startingTriangle =
             [{
-                a = {x = Pixels(0.0); y = Pixels(0.0)};
-                b = {x = Pixels(triangleLength / 2.0); y = Pixels(sqrt (0.75 * triangleLength * triangleLength))};
-                c = {x = Pixels(triangleLength); y = Pixels(0.0)}
+                A = {x = Pixels(0.0); y = Pixels(0.0)};
+                B = {x = Pixels(triangleLength / 2.0); y = Pixels(sqrt (0.75 * triangleLength * triangleLength))};
+                C = {x = Pixels(triangleLength); y = Pixels(0.0)}
             }]
-    let style = { stroke = Name colors.Green; strokeWidth = Pixels 2.0; fill = Name colors.White; opacity = 1.0 }
+    let style = { stroke = Name colors.Green; strokeWidth = Pixels 1.0; fill = Name colors.White; opacity = 1.0 }
 
     // Execute
     recursiveTriangles startingTriangle iterations
-    |> List.map (triangleToPoints >> Element.ofPolygon >> Element.withStyle style)
+    |> List.map (triangleToPolygon >> Element.withStyle style)
     |> Svg.ofList
     |> Svg.withSize {height = Pixels 1000.0; width = Pixels 1000.0}
-    |> Svg.withViewbox {minimums = {x = Pixels 0.0; y = Pixels 0.0}; size = {height = Pixels 1000.0; width = Pixels 1000.0}}
+    |> Svg.withViewbox {Minimums = {x = Pixels 0.0; y = Pixels 0.0}; Size = {height = Pixels 1000.0; width = Pixels 1000.0}}
     |> Svg.toHtml "SVG Triangle Example"
     |> saveToFile fileName
 

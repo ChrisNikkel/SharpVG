@@ -1,9 +1,9 @@
 ﻿namespace SharpVG
 
 type group = {
-    body: body
-    upperLeft: point
-    transform: transform option
+    Body: body
+    UpperLeft: point option
+    Transform: transform option
 }
 and groupElement =
     | Group of group
@@ -12,13 +12,30 @@ and body =
     seq<groupElement>
 
 module Group =
+    let ofSeq seq =
+        {
+            Body = seq |> Seq.map (fun e -> Element(e));
+            UpperLeft = None;
+            Transform = None
+        }
+
+    let ofList list =
+        list |> Seq.ofList |> ofSeq
+
+    let withOffset upperLeft (group:group) =
+        { group with UpperLeft = upperLeft }
+
+    let withTransform transform (group:group) =
+        { group with Transform = transform }
+
     let rec toString group =
         let body =
-            group.body
+            group.Body
             |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> toString)
             |> String.concat ""
         let transform =
-            match group.transform with Some(transform) -> (Transform.toString transform) + " " | None -> ""
+            match group.Transform with Some(transform) -> (Transform.toString transform) + " " | None -> ""
         let upperLeft =
-             Point.toString group.upperLeft
+             match group.UpperLeft with | Some(upperLeft) -> Point.toString upperLeft | None -> ""
+
         "<g " + upperLeft + transform + ">" + body + "</g>"

@@ -1,44 +1,44 @@
 namespace SharpVG
 
 type viewbox = {
-    minimums: point
-    size: area
+    Minimums: point
+    Size: area
 }
 
 type svg = {
-    body: body
-    size: area option
-    viewbox: viewbox option
+    Body: body
+    Size: area option
+    Viewbox: viewbox option
 }
 
 module Svg =
     let ofSeq seq =
         {
-            body = seq |> Seq.map (fun e -> Element(e));
-            size = None;
-            viewbox = None
+            Body = seq |> Seq.map (fun e -> Element(e));
+            Size = None;
+            Viewbox = None
         }
 
     let ofList list =
         list |> Seq.ofList |> ofSeq
 
     let withSize size (svg:svg) =
-        { svg with size = Some(size) }
+        { svg with Size = Some(size) }
 
     let withViewbox viewbox (svg:svg) =
-        { svg with viewbox = Some(viewbox) }
+        { svg with Viewbox = Some(viewbox) }
 
     let toString svg =
         let viewbox =
-            match svg.viewbox with
-                | Some(viewbox) -> " viewBox=" + Tag.quote ((Point.toString viewbox.minimums) + " " + (Area.toString viewbox.size))
+            match svg.Viewbox with
+                | Some(viewbox) -> " viewBox=" + Tag.quote ((Point.toString viewbox.Minimums) + " " + (Area.toString viewbox.Size))
                 | None -> ""
         let size =
-            match svg.size with
+            match svg.Size with
                 | Some(size) -> Area.toDescriptiveString size 
                 | None -> ""
         let body =
-            svg.body
+            svg.Body
             |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> Group.toString)
             |> String.concat ""
 
