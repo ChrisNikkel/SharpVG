@@ -11,7 +11,7 @@ module Rect =
     let toTag rect =
         {
             name = "rect";
-            attribute = Some(Point.toDescriptiveString rect.upperLeft + " " + Area.toString rect.size)
+            attribute = Some(Point.toDescriptiveString rect.upperLeft + " " + Area.toDescriptiveString rect.size)
             body = None
         }
 

@@ -12,7 +12,7 @@ module Image =
     let toTag image =
         {
             name = "image";
-            attribute = Some((Point.toDescriptiveString image.upperLeft) + " " + Area.toString image.size);
+            attribute = Some((Point.toDescriptiveString image.upperLeft) + " " + Area.toDescriptiveString image.size);
             body = None
         }
 

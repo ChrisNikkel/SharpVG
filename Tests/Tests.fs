@@ -60,7 +60,7 @@ let ``do lots and don't fail`` () =
     let transform = Scale(2, 5)
 
     let graphics = seq {
-        yield { UpperLeft = point; Size = size; Source = "myimage.jpg" }, None).toString
+        yield { UpperLeft = point; Length = size; Source = "myimage.jpg" }, None).toString
         yield { UpperLeft = point; Body = "Hello World!" }, Some style1).toString
         yield SvgText({ UpperLeft = point; Body =  "Hello World!" }, Some style2).toString
         // TODO: Add: yield group "MyGroup" transform point { Element = Polygon(Polygon { Points = points; Style = Some(style) }) }.toString
@@ -68,7 +68,7 @@ let ``do lots and don't fail`` () =
         yield SvgLine({ Point1 = point; Point2 = point }, Some style1).toString
         yield SvgCircle({ Center = point; Radius = (Pixels(2)) }, Some style2).toString
         yield SvgEllipse({ Center = point; Radius = point }, Some style1).toString
-        yield SvgRect({ UpperLeft = point; Size = size }, Some style2).toString
+        yield SvgRect({ UpperLeft = point; Length = size }, Some style2).toString
 // TODO: Add this
 //            yield Script { Body = """
 //            function circle_click(evt) {

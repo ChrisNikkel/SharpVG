@@ -2,11 +2,15 @@ namespace SharpVG
 
 type area =
     {
-        width : size;
-        height : size;
+        width : length;
+        height : length;
     }
 
 module Area =
+
+    let toDescriptiveString area =
+        "height=" + Tag.quote (Length.toString area.height) + " " +
+        "width=" + Tag.quote (Length.toString area.width)
+
     let toString area =
-        "height=" + Tag.quote (Size.toString area.height) + " " +
-        "width=" + Tag.quote (Size.toString area.width)
+        Length.toString area.height + "," + Length.toString area.width

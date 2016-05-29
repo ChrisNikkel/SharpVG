@@ -4,14 +4,14 @@ type style =
     {
         fill : color;
         stroke : color;
-        strokeWidth : size;
+        strokeWidth : length;
         opacity: double;
     }
 
 module Style =
     let toString style =
         "stroke=" + Tag.quote (Color.toString style.stroke) + " " +
-        "stroke-width=" + Tag.quote (Size.toString style.strokeWidth) + " " +
+        "stroke-width=" + Tag.quote (Length.toString style.strokeWidth) + " " +
         "fill=" + Tag.quote (Color.toString style.fill) + " " +
         "opacity=" + Tag.quote (string style.opacity) + " "
 
@@ -19,7 +19,7 @@ module Style =
         let stylePartToString name value =
            name + ":" + value + ";"
         (stylePartToString "stroke" <| Color.toString style.stroke)
-        + (stylePartToString "stroke-width" <| Size.toString style.strokeWidth)
+        + (stylePartToString "stroke-width" <| Length.toString style.strokeWidth)
         + (stylePartToString "fill"  <| Color.toString style.fill)
         + (stylePartToString "opacity" <| string style.opacity)
 

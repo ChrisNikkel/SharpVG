@@ -23,9 +23,11 @@ module Core =
         "</style>\n"
 
     // TODO: Make object and allow things lie fromSeq, fromList, etc.
-    let svg size body =
-        "<svg " + Area.toString size + ">\n  " +
+    let svg svgsize minimums size body =
+        "<svg " + Area.toDescriptiveString svgsize + " viewBox=" + Tag.quote ((Point.toString minimums) + " " + (Area.toString size)) + ">\n  " +
+        "<g id=\"cartesian\" transform=\"translate(0," + (Length.toString size.width) + ") scale(1,-1)\">\n" +
         body +
+        "<\g>\n" +
         "\n</svg>\n"
 
     let group id transform point body =

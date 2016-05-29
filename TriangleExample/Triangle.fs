@@ -2,6 +2,9 @@ module Triangle
 
 open SharpVG
 open SharpVG.Core
+open System
+open System.Diagnostics
+open System.IO
 
 type Triangle =
     {
@@ -11,12 +14,12 @@ type Triangle =
     }
 
 let midpoint a b =
-    let ax = Size.toFloat a.x
-    let ay = Size.toFloat a.y
-    let bx = Size.toFloat b.x
-    let by = Size.toFloat b.y
+    let ax = Length.toFloat a.x
+    let ay = Length.toFloat a.y
+    let bx = Length.toFloat b.x
+    let by = Length.toFloat b.y
 
-    { x = Ems((ax + bx) / 2.0); y = Ems((ay + by) / 2.0) }
+    {x = Pixels((ax + bx) / 2.0); y = Pixels((ay + by) / 2.0)}
 
 let insideTriangles t =
     [
@@ -26,7 +29,7 @@ let insideTriangles t =
     ]
 
 let triangleToPoints t =
-    [ t.a; t.b; t.c; t.a]
+    [ t.a; t.b; t.c]
 
 let rec recursiveTriangles t iteration =
     let it = t |> List.map insideTriangles |> List.concat;
@@ -35,21 +38,26 @@ let rec recursiveTriangles t iteration =
     else
         it
 
-let triangleSize = 100.0
-let iterations = 2
+let triangleLength = 1000.0
+let iterations = 7
 let startingTriangle =
         [{
-            a = { x = Ems(-1.0 * triangleSize); y = Ems(0.0)};
-            b = { x = Ems(0.0); y = Ems(triangleSize * sqrt triangleSize)};
-            c = { x = Ems(triangleSize); y = Ems(0.0) }
+            a = {x = Pixels(0.0); y = Pixels(0.0)};
+            b = {x = Pixels(triangleLength / 2.0); y = Pixels(sqrt (0.75 * triangleLength * triangleLength))};
+            c = {x = Pixels(triangleLength); y = Pixels(0.0)}
         }]
 
-let allTriangles = recursiveTriangles startingTriangle iterations |> List.map triangleToPoints |> List.concat
 
 [<EntryPoint>]
 let main argv = 
-    let size = {height = Pixels 30; width = Pixels 30}
-    let style = { stroke = Hex 0x00ff00; strokeWidth = Pixels 2; fill = Hex 0x000000; opacity = 1.0 }
-    let svgData = allTriangles |> Element.ofPolygon |> Element.withStyle style |>  Element.toString |> (svg size) |> html "SVG Demo"
-    svgData |> printfn "%A"
+    let svgsize = {height = Pixels 1000.0; width = Pixels 1000.0}
+    let minimums = {x = Pixels 0.0; y = Pixels 100.0}
+    let size = {height = Pixels 1000.0; width = Pixels 1000.0}    
+    let style = { stroke = Name colors.Green; strokeWidth = Pixels 2.0; fill =  Name colors.White; opacity = 1.0 }
+    let allTriangles = recursiveTriangles startingTriangle iterations |> List.map triangleToPoints
+    let triangleToSvgString = Element.ofPolygon >> (Element.withStyle style) >> Element.toString
+    let svgData = allTriangles |> List.map triangleToSvgString |> List.fold (+) "" |> (svg svgsize minimums size) |> html "SVG Demo"
+    let fileName = ".\\triangle.html"
+    File.WriteAllLines(fileName, [svgData]);
+    Process.Start(fileName) |> ignore
     0
