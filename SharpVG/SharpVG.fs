@@ -5,5 +5,6 @@
 // TODO: Add anchor, stroke, font, decorator, spacing, and writing mode to text
 // TODO: Add id to all svg tags
 // TODO: Add def and use to make reusable elements
+// TODO: (Maybe) add `[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]` to the `MySeq` module and use `MySeq` as the type name as well
 
 namespace SharpVG

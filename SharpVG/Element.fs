@@ -47,7 +47,7 @@ module Element =
                     match oldAttribute with
                         | None -> Some(style |> Style.toString)
                         | Some(attribute) -> Some(attribute + " " + (style |> Style.toString))
-                { elementTag with attribute = newAttribute elementTag.attribute }
+                { elementTag with Attribute = newAttribute elementTag.Attribute }
             | PlainElement(element) -> baseElementToTag element
 
     let toString element = element |> toTag |> Tag.toString

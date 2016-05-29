@@ -2,27 +2,60 @@ namespace SharpVG
 
 type style =
     {
-        fill : color;
-        stroke : color;
-        strokeWidth : length;
-        opacity: double;
+        Fill : color option;
+        Stroke : color option;
+        StrokeWidth : length option;
+        Opacity: double option;
     }
 
 module Style =
+    let empty =
+        { Fill = None; Stroke = None; StrokeWidth = None; Opacity = None }
+
+    let withFill fill style =
+        { style with Fill = Some(fill) }
+
+    let withStroke stroke style =
+        { style with Stroke = Some(stroke) }
+
+    let withStrokeWidth strokeWidth style =
+        { style with StrokeWidth = Some(strokeWidth) }
+
+    let withOpacity opacity style =
+        { style with Opacity = Some(opacity) }
+
+    let init fill stroke strokeWidth opacity =
+        { Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity) }
+
+    let initWithFill fill =
+        empty |> withFill fill
+
+    let initWithStroke stroke =
+        empty |> withStroke stroke
+
+    let initWithStrokeWidth strokeWidth =
+        empty |> withStrokeWidth strokeWidth
+
+    let initWithOpacity opacity =
+        empty |> withOpacity opacity
+
+
+    let private mapToString f style =
+        let stroke = f "stroke" (match style.Stroke with | Some(stroke) -> Color.toString stroke | None -> "")
+        let strokeWidth = f "stroke-width" (match style.StrokeWidth with | Some(strokeWidth) -> Length.toString strokeWidth | None -> "")
+        let fill = f "fill" (match style.Fill with | Some(fill) -> Color.toString fill | None -> "")
+        let opacity = f "opacity" (match style.Opacity with | Some(opacity) -> string opacity | None -> "")
+        stroke + strokeWidth + fill + opacity
+
     let toString style =
-        "stroke=" + Tag.quote (Color.toString style.stroke) + " " +
-        "stroke-width=" + Tag.quote (Length.toString style.strokeWidth) + " " +
-        "fill=" + Tag.quote (Color.toString style.fill) + " " +
-        "opacity=" + Tag.quote (string style.opacity) + " "
+        let stylePartToString name value =
+            name + "=" + Tag.quote value + " "
+        mapToString stylePartToString style
 
     let toCssString style =
         let stylePartToString name value =
            name + ":" + value + ";"
-        (stylePartToString "stroke" <| Color.toString style.stroke)
-        + (stylePartToString "stroke-width" <| Length.toString style.strokeWidth)
-        + (stylePartToString "fill"  <| Color.toString style.fill)
-        + (stylePartToString "opacity" <| string style.opacity)
-
+        mapToString stylePartToString style
 
     let toStyleString style =
         "style=" + (Tag.quote <| toCssString style)

@@ -159,6 +159,22 @@ type color =
 
 module Color =
     open System
+
+    let initWithName =
+        Name
+
+    let initWithSmallHex =
+        SmallHex
+
+    let initWithHex =
+        Hex
+
+    let initWithValues =
+        Values
+
+    let initWithPercents =
+        Percents
+
     let toString color =
         match color with
             | Name n -> Enum.GetName(typeof<colors>, n).ToLower()

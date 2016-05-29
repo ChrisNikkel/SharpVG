@@ -22,6 +22,9 @@ module Svg =
     let ofList list =
         list |> Seq.ofList |> ofSeq
 
+    let ofArray array =
+        array |> Seq.ofArray |> ofSeq
+
     let withSize size (svg:svg) =
         { svg with Size = Some(size) }
 

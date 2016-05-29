@@ -2,17 +2,19 @@ namespace SharpVG
 
 type ellipse =
     {
-        center: point
-        radius: point
+        Center: point
+        Radius: point
     }
 
 module Ellipse =
+    let init center radius =
+        { Center = center; Radius = radius }
 
     let toTag ellipse =
         {
-            name = "ellipse";
-            attribute = Some((Point.toDescriptiveStringWithModifier ellipse.center "c" "") + " r=" + Tag.quote (Point.toString ellipse.radius));
-            body = None
+            Name = "ellipse";
+            Attribute = Some((Point.toDescriptiveStringWithModifier ellipse.Center "c" "") + " r=" + Tag.quote (Point.toString ellipse.Radius));
+            Body = None
         }
 
     let toString = toTag >> Tag.toString

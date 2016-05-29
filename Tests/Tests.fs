@@ -14,10 +14,10 @@ type Positive =
 [<Property>]
 let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p) =
     configureLogs
-    let point1 = { x = Pixels x1; y = Pixels y1 }
-    let point2 = { x = Pixels x2; y = Pixels y2 }
-    let style = { stroke = Values(r, g, b); strokeWidth = Pixels p; fill = Hex c; opacity = 1.0 }
-    let line = { point1 = point1; point2 = point2; }
+    let point1 = { X = Pixels x1; Y = Pixels y1 }
+    let point2 = { X = Pixels x2; Y = Pixels y2 }
+    let style = { Stroke = Some(Values(r, g, b)); StrokeWidth = Some(Pixels p); Fill = Some(Hex c); Opacity = Some(1.0) }
+    let line = Line.init point1 point2
     let tagString = line |> Element.ofLine |> Element.withStyle style |> Element.toString
 
     basicChecks "line" tagString
@@ -25,10 +25,10 @@ let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p) =
 [<Property>]
 let ``draw rectangles`` (x, y, h, w, c, r, g, b, p) =
     configureLogs
-    let point = { x = Pixels x; y = Pixels y }
-    let area = { height = Pixels h; width = Pixels w }
-    let style = { stroke = Values(r, g, b); strokeWidth = Pixels p; fill = Hex c; opacity = 1.0 }
-    let (rect : rect) = { upperLeft = point; size = area }
+    let point = { X = Pixels x; Y = Pixels y }
+    let area = { Height = Pixels h; Width = Pixels w }
+    let style = { Stroke = Some(Values(r, g, b)); StrokeWidth = Some(Pixels p); Fill = Some(Hex c); Opacity = Some(1.0) }
+    let rect = Rect.init point area
     let tagString = rect |> Element.ofRect |> Element.withStyle style |> Element.toString
 
     basicChecks "rect" tagString
@@ -36,9 +36,9 @@ let ``draw rectangles`` (x, y, h, w, c, r, g, b, p) =
 [<Property>]
 let ``draw circles`` (x, y, radius, c, r, g, b, p) =
     configureLogs
-    let point = { x = Pixels x; y = Pixels y }
-    let style = { stroke = Values(r, g, b); strokeWidth = Pixels p; fill = Hex c; opacity = 1.0 }
-    let circle = { center = point; radius = radius }
+    let point = { X = Pixels x; Y = Pixels y }
+    let style = { Stroke = Some(Values(r, g, b)); StrokeWidth = Some(Pixels p); Fill = Some(Hex c); Opacity = Some(1.0) }
+    let circle = { Center = point; Radius = radius }
     let tagString = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
 
     basicChecks "circle" tagString

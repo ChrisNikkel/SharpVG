@@ -2,17 +2,19 @@ namespace SharpVG
 
 type rect =
     {
-        upperLeft: point
-        size: area
+        UpperLeft: point
+        Size: area
     }
 
 module Rect =
+    let init upperLeft size =
+        { UpperLeft = upperLeft; Size = size }
 
     let toTag rect =
         {
-            name = "rect";
-            attribute = Some(Point.toDescriptiveString rect.upperLeft + " " + Area.toDescriptiveString rect.size)
-            body = None
+            Name = "rect";
+            Attribute = Some(Point.toDescriptiveString rect.UpperLeft + " " + Area.toDescriptiveString rect.Size)
+            Body = None
         }
 
     let toString = toTag >> Tag.toString

@@ -4,9 +4,9 @@ module Polyline =
 
     let toTag points =
         {
-            name = "polyline";
-            attribute = Some("points=" + Tag.quote (Points.toString points))
-            body = None
+            Name = "polyline";
+            Attribute = Some("points=" + Tag.quote (Points.toString points))
+            Body = None
         }
 
     let toString points = points |> toTag |> Tag.toString

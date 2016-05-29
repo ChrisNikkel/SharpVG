@@ -2,17 +2,17 @@ namespace SharpVG
 
 type circle =
     {
-        center: point
-        radius: length
+        Center: point
+        Radius: length
     }
 
 module Circle =
 
     let toTag circle =
         {
-            name = "circle";
-            attribute = Some((Point.toDescriptiveStringWithModifier circle.center "c" "") + " r=" + Tag.quote (Length.toString circle.radius));
-            body = None
+            Name = "circle";
+            Attribute = Some((Point.toDescriptiveStringWithModifier circle.Center "c" "") + " r=" + Tag.quote (Length.toString circle.Radius));
+            Body = None
         }
 
     let toString = toTag >> Tag.toString

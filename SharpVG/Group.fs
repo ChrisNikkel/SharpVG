@@ -22,6 +22,10 @@ module Group =
     let ofList list =
         list |> Seq.ofList |> ofSeq
 
+    let ofArray array =
+        array |> Seq.ofArray |> ofSeq
+
+
     let withOffset upperLeft (group:group) =
         { group with UpperLeft = upperLeft }
 

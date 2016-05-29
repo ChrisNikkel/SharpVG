@@ -2,18 +2,27 @@ namespace SharpVG
 
 type tag =
     {
-        name: string;
-        attribute: string option;
-        body: string option;
+        Name: string;
+        Attribute: string option;
+        Body: string option;
     }
 
 module Tag =
+    let init name attribute body =
+        { Name = name; Attribute = Some(attribute); Body = Some(body) }
+
+    let withAttribute attribute tag =
+        { tag with Attribute = attribute }
+
+    let withBody body tag =
+        { tag with Body = body }
+
     let toString tag =
         match tag with
-        | { name = n; attribute = Some(a); body = Some(b) } -> "<" + n + " " + a + ">" + b + "</" + n + ">"
-        | { name = n; attribute = None; body = Some(b) } -> "<" + n + ">" + b + "</" + n + ">"
-        | { name = n; attribute = Some(a); body = None } -> "<" + n + " " + a + "/>"
-        | { name = n; attribute = None; body = None } -> "<" + n + "/>"
+        | { Name = n; Attribute = Some(a); Body = Some(b) } -> "<" + n + " " + a + ">" + b + "</" + n + ">"
+        | { Name = n; Attribute = None; Body = Some(b) } -> "<" + n + ">" + b + "</" + n + ">"
+        | { Name = n; Attribute = Some(a); Body = None } -> "<" + n + " " + a + "/>"
+        | { Name = n; Attribute = None; Body = None } -> "<" + n + "/>"
 
 // TODO: Move quote and other string helpers out or do it better
     let inline quote i = "\"" + string i + "\""

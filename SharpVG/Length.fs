@@ -6,6 +6,15 @@ type length =
     | Percent of double
 
 module Length =
+    let initWithPixels =
+        Pixels
+
+    let initWithEms =
+        Ems
+    
+    let initWithPercent =
+        Percent
+
     let toString length =
         match length with
             | Pixels p -> string p
