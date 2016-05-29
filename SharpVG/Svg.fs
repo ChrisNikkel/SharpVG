@@ -1,15 +1,53 @@
 namespace SharpVG
 
-module Core =
+type viewbox = {
+    minimums: point
+    size: area
+}
 
-    let html title body =
-        "<!DOCTYPE html>\n<html>\n<head>\n  <title>" +
-        title +
-        "</title>\n</head>\n<body>\n" +
-        body +
-        "</body>\n</html>\n"
+type svg = {
+    body: body
+    size: area option
+    viewbox: viewbox option
+}
 
-    // TODO: 
+module Svg =
+    let ofSeq seq =
+        {
+            body = seq |> Seq.map (fun e -> Element(e));
+            size = None;
+            viewbox = None
+        }
+
+    let ofList list =
+        list |> Seq.ofList |> ofSeq
+
+    let withSize size (svg:svg) =
+        { svg with size = Some(size) }
+
+    let withViewbox viewbox (svg:svg) =
+        { svg with viewbox = Some(viewbox) }
+
+    let toString svg =
+        let viewbox =
+            match svg.viewbox with
+                | Some(viewbox) -> " viewBox=" + Tag.quote ((Point.toString viewbox.minimums) + " " + (Area.toString viewbox.size))
+                | None -> ""
+        let size =
+            match svg.size with
+                | Some(size) -> Area.toDescriptiveString size 
+                | None -> ""
+        let body =
+            svg.body
+            |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> Group.toString)
+            |> String.concat ""
+
+        "<svg " + size + viewbox + ">\n" +  body + "\n</svg>\n"
+
+    let toHtml title svg =
+        "<!DOCTYPE html>\n<html>\n<head>\n<title>" + title + "</title>\n</head>\n<body>\n" + (toString svg) + "</body>\n</html>\n"
+
+    // TODO: Add styles that can be referred to in later elements
     let style =
         "<style>
         circle {
@@ -21,18 +59,3 @@ module Core =
         fill  : #000000;
         }\n" +
         "</style>\n"
-
-    // TODO: Make object and allow things lie fromSeq, fromList, etc.
-    let svg svgsize minimums size body =
-        "<svg " + Area.toDescriptiveString svgsize + " viewBox=" + Tag.quote ((Point.toString minimums) + " " + (Area.toString size)) + ">\n  " +
-        "<g id=\"cartesian\" transform=\"translate(0," + (Length.toString size.width) + ") scale(1,-1)\">\n" +
-        body +
-        "<\g>\n" +
-        "\n</svg>\n"
-
-    let group id transform point body =
-        "<g id=" + Tag.quote id +
-        Transform.toString transform +
-        Point.toString point + ">" +
-        body +
-        "</g>"

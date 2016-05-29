@@ -1,7 +1,6 @@
 module Tests
 open LogHelpers
 open SharpVG
-open SharpVG.Core
 open Xunit
 open FsCheck
 open FsCheck.Xunit
@@ -43,7 +42,7 @@ let ``draw circles`` (x, y, radius, c, r, g, b, p) =
     let tagString = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
 
     basicChecks "circle" tagString
-// TODO: Reenable test
+// TODO: Reenable do everything test
 (*
 [<Fact>]
 let ``do lots and don't fail`` () =

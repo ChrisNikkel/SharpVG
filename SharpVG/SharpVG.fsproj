@@ -70,8 +70,9 @@
     <Compile Include="Polygon.fs" />
     <Compile Include="Polyline.fs" />
     <Compile Include="Element.fs" />
-    <Compile Include="SharpVG.fs" />
+    <Compile Include="Group.fs" />
     <Compile Include="Svg.fs" />
+    <Compile Include="SharpVG.fs" />
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>

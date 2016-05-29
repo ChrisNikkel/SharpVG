@@ -1,7 +1,6 @@
 module Triangle
 
 open SharpVG
-open SharpVG.Core
 open System
 open System.Diagnostics
 open System.IO
@@ -38,26 +37,38 @@ let rec recursiveTriangles t iteration =
     else
         it
 
-let triangleLength = 1000.0
-let iterations = 7
-let startingTriangle =
-        [{
-            a = {x = Pixels(0.0); y = Pixels(0.0)};
-            b = {x = Pixels(triangleLength / 2.0); y = Pixels(sqrt (0.75 * triangleLength * triangleLength))};
-            c = {x = Pixels(triangleLength); y = Pixels(0.0)}
-        }]
 
 
 [<EntryPoint>]
-let main argv = 
-    let svgsize = {height = Pixels 1000.0; width = Pixels 1000.0}
-    let minimums = {x = Pixels 0.0; y = Pixels 100.0}
-    let size = {height = Pixels 1000.0; width = Pixels 1000.0}    
-    let style = { stroke = Name colors.Green; strokeWidth = Pixels 2.0; fill =  Name colors.White; opacity = 1.0 }
-    let allTriangles = recursiveTriangles startingTriangle iterations |> List.map triangleToPoints
-    let triangleToSvgString = Element.ofPolygon >> (Element.withStyle style) >> Element.toString
-    let svgData = allTriangles |> List.map triangleToSvgString |> (String.concat " ") |> (svg svgsize minimums size) |> html "SVG Demo"
+let main argv =
+
+    // Helper Functions
+    let saveToFile name lines =
+        File.WriteAllLines(name, [lines]);
+
+    let openFile (name:string) =
+        Process.Start(name) |> ignore
+
+    // Initialization
     let fileName = ".\\triangle.html"
-    File.WriteAllLines(fileName, [svgData]);
-    Process.Start(fileName) |> ignore
+    let iterations = 7
+    let triangleLength = 1000.0
+    let startingTriangle =
+            [{
+                a = {x = Pixels(0.0); y = Pixels(0.0)};
+                b = {x = Pixels(triangleLength / 2.0); y = Pixels(sqrt (0.75 * triangleLength * triangleLength))};
+                c = {x = Pixels(triangleLength); y = Pixels(0.0)}
+            }]
+    let style = { stroke = Name colors.Green; strokeWidth = Pixels 2.0; fill = Name colors.White; opacity = 1.0 }
+
+    // Execute
+    recursiveTriangles startingTriangle iterations
+    |> List.map (triangleToPoints >> Element.ofPolygon >> Element.withStyle style)
+    |> Svg.ofList
+    |> Svg.withSize {height = Pixels 1000.0; width = Pixels 1000.0}
+    |> Svg.withViewbox {minimums = {x = Pixels 0.0; y = Pixels 0.0}; size = {height = Pixels 1000.0; width = Pixels 1000.0}}
+    |> Svg.toHtml "SVG Triangle Example"
+    |> saveToFile fileName
+
+    openFile fileName
     0

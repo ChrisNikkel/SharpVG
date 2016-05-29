@@ -15,7 +15,7 @@ module Tag =
         | { name = n; attribute = Some(a); body = None } -> "<" + n + " " + a + "/>"
         | { name = n; attribute = None; body = None } -> "<" + n + "/>"
 
-// TODO: Move out or do it better
+// TODO: Move quote and other string helpers out or do it better
     let inline quote i = "\"" + string i + "\""
 
     let addSpace needsSpace =

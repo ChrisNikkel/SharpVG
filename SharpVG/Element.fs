@@ -1,6 +1,5 @@
 namespace SharpVG
 
-// TODO: Remove file or figure out what needs to be here
 type baseElement =
     | Line of line
     | Text of text
@@ -11,7 +10,6 @@ type baseElement =
     | Polygon of points
     | Polyline of points
 
-// TODO: Re-add Style
 type element =
     | StyledElement of baseElement * style
     | PlainElement of baseElement
