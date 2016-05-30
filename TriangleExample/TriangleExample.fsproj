@@ -50,8 +50,8 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
-    <Compile Include="Triangle.fs" />
     <None Include="paket.references" />
+    <Compile Include="Triangle.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SharpVG\SharpVG.fsproj">

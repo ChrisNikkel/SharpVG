@@ -27,10 +27,10 @@ module Group =
 
 
     let withOffset upperLeft (group:group) =
-        { group with UpperLeft = upperLeft }
+        { group with UpperLeft = Some upperLeft }
 
     let withTransform transform (group:group) =
-        { group with Transform = transform }
+        { group with Transform = Some transform }
 
     let rec toString group =
         let body =

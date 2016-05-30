@@ -25,6 +25,13 @@ module Svg =
     let ofArray array =
         array |> Seq.ofArray |> ofSeq
 
+    let ofGroup group =
+        {
+            Body = seq { yield Group(group) }
+            Size = None;
+            Viewbox = None
+        }
+
     let withSize size (svg:svg) =
         { svg with Size = Some(size) }
 
