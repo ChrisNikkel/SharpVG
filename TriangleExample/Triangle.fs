@@ -44,7 +44,7 @@ let main argv =
 
     // Initialization
     let fileName = ".\\triangle.html"
-    let style = { Stroke = Some(Name colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = Some(Name colors.White); Opacity = None }
+    let style = { Name = None; Stroke = Some(Name colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = Some(Name colors.White); Opacity = None }
     let (iterations, triangleLength, margin) = (7, 1000.0, 100.0)
     let startingTriangle =
             [{

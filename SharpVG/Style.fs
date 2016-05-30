@@ -2,6 +2,7 @@ namespace SharpVG
 
 type style =
     {
+        Name : string option;
         Fill : color option;
         Stroke : color option;
         StrokeWidth : length option;
@@ -10,7 +11,7 @@ type style =
 
 module Style =
     let empty =
-        { Fill = None; Stroke = None; StrokeWidth = None; Opacity = None }
+        { Name = None; Fill = None; Stroke = None; StrokeWidth = None; Opacity = None }
 
     let withFill fill style =
         { style with Fill = Some(fill) }
@@ -24,8 +25,8 @@ module Style =
     let withOpacity opacity style =
         { style with Opacity = Some(opacity) }
 
-    let init fill stroke strokeWidth opacity =
-        { Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity) }
+    let init name fill stroke strokeWidth opacity =
+        { Name = Some(name); Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity) }
 
     let initWithFill fill =
         empty |> withFill fill
@@ -43,11 +44,11 @@ module Style =
         [
             style.Stroke |> Option.map (Color.toString >> (f "stroke"));
             style.StrokeWidth |> Option.map (Length.toString >> (f "stroke-width"));
-            style.Fill |> Option.map (Color.toString >> (f "fill");
+            style.Fill |> Option.map (Color.toString >> (f "fill"));
             style.Opacity |> Option.map (string >> (f "opacity"))
         ] |> List.choose id |> String.concat separator
 
-    let toString style =
+    let toAttributeString style =
         let stylePartToString name value =
             name + "=" + Tag.quote value
         mapToString stylePartToString " " style
@@ -59,3 +60,12 @@ module Style =
 
     let toStyleString style =
         "style=" + (Tag.quote <| toCssString style)
+
+    let toTag style =
+        {
+            Name = "style";
+            Attribute = Some("type=" + (Tag.quote "text/css"));
+            Body = Some("<![CDATA[" + match style.Name with | Some(name) -> name | None -> "" + "{" + (style |> toCssString) + "}]]>")
+        }
+
+    let toString = toTag >> Tag.toString

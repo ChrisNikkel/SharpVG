@@ -60,6 +60,7 @@
     <Compile Include="Script.fs" />
     <Compile Include="Transform.fs" />
     <Compile Include="Style.fs" />
+    <Compile Include="Styles.fs" />
     <Compile Include="Line.fs" />
     <Compile Include="Text.fs" />
     <Compile Include="Image.fs" />

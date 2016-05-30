@@ -58,7 +58,5 @@ module Transform =
                 yield match transform.Rotate with | Some(a, x, y) -> Some("rotate(" + string a + "," + string x + "," + string y + ")") | None -> None
                 yield match transform.SkewX with | Some(a) -> Some("skewX(" + string a + ")") | None -> None
                 yield match transform.SkewY with | Some(a) -> Some("skewY(" + string a + ")") | None -> None
-            }
-            |> Seq.choose id
-            |> String.concat " "
+            } |> Seq.choose id |> String.concat " "
         )

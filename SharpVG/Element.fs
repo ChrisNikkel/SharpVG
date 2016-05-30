@@ -73,7 +73,7 @@ module Element =
             [
                 element.Id |> Option.map (fun id -> "id=" + (Tag.quote id))
                 element.Class |> Option.map (fun className -> "class=" + (Tag.quote className))
-                element.Style  |> Option.map Style.toString
+                element.Style  |> Option.map Style.toAttributeString
                 element.Transform |> Option.map Transform.toString
             ] |> List.choose id |>  String.concat " "
         elementTag |> Tag.addAttribute attribute
