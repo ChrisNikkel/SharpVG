@@ -40,13 +40,12 @@ module Style =
         empty |> withOpacity opacity
 
     let private mapToString f separator style =
-        seq {
-            yield f "stroke" (match style.Stroke with | Some(stroke) -> Color.toString stroke | None -> "")
-            yield f "stroke-width" (match style.StrokeWidth with | Some(strokeWidth) -> Length.toString strokeWidth | None -> "")
-            yield f "fill" (match style.Fill with | Some(fill) -> Color.toString fill | None -> "")
-            yield f "opacity" (match style.Opacity with | Some(opacity) -> string opacity | None -> "")
-        } |> String.concat separator
-
+        [
+            style.Stroke |> Option.map (Color.toString >> (f "stroke"));
+            style.StrokeWidth |> Option.map (Length.toString >> (f "stroke-width"));
+            style.Fill |> Option.map (Color.toString >> (f "fill");
+            style.Opacity |> Option.map (string >> (f "opacity"))
+        ] |> List.choose id |> String.concat separator
 
     let toString style =
         let stylePartToString name value =

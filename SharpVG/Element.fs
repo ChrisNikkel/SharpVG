@@ -70,12 +70,12 @@ module Element =
                 | Polygon polygon -> polygon |> Polygon.toTag
                 | Polyline polyline -> polyline |> Polyline.toTag
         let attribute =
-            seq {
-                yield match element.Id with | Some id -> Some("id=" + (Tag.quote element.Id)) | None -> None;
-                yield match element.Class with | Some className -> Some("class=" + (Tag.quote element.Class)) | None -> None;
-                yield match element.Style with | Some style -> Some(style |> Style.toString) | None -> None;
-                yield match element.Transform with | Some style -> Some(style |> Transform.toString) | None -> None
-            } |> Seq.choose id |>  String.concat " "
+            [
+                element.Id |> Option.map (fun id -> "id=" + (Tag.quote id))
+                element.Class |> Option.map (fun className -> "class=" + (Tag.quote className))
+                element.Style  |> Option.map Style.toString
+                element.Transform |> Option.map Transform.toString
+            ] |> List.choose id |>  String.concat " "
         elementTag |> Tag.addAttribute attribute
 
     let toString element = element |> toTag |> Tag.toString
