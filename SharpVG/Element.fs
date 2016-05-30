@@ -11,14 +11,18 @@ type baseElement =
     | Polyline of points
 
 type element = {
+        Id: string option;
+        Class: string option;
         Element: baseElement;
         Style: style option;
-        Transform: transform option;
+        Transform: transform option
     }
 
 module Element =
-    let init style transform element =
+    let init id className style transform element =
         {
+            Id = id;
+            Class = className;
             Element = element;
             Style = Some style;
             Transform = Some transform
@@ -26,6 +30,8 @@ module Element =
 
     let initWithElement element =
         {
+            Id = None;
+            Class = None;
             Element = element;
             Style = None;
             Transform = None
@@ -36,6 +42,12 @@ module Element =
 
     let withTransform transform element =
         { element with Transform = Some transform }
+
+    let withId id element =
+        { element with Id = Some id }
+
+    let withClass className element =
+        { element with Class = Some className }
 
     let ofLine line = initWithElement (Line line)
     let ofText text = initWithElement (Text text)
@@ -58,11 +70,12 @@ module Element =
                 | Polygon polygon -> polygon |> Polygon.toTag
                 | Polyline polyline -> polyline |> Polyline.toTag
         let attribute =
-            match element.Style, element.Transform with
-                | None, None -> ""
-                | Some style, None -> style |> Style.toString
-                | None, Some transform -> transform |> Transform.toString
-                | Some style, Some transform -> [style |> Style.toString; transform |> Transform.toString] |> String.concat " "
+            seq {
+                yield match element.Id with | Some id -> Some("id=" + (Tag.quote element.Id)) | None -> None;
+                yield match element.Class with | Some className -> Some("class=" + (Tag.quote element.Class)) | None -> None;
+                yield match element.Style with | Some style -> Some(style |> Style.toString) | None -> None;
+                yield match element.Transform with | Some style -> Some(style |> Transform.toString) | None -> None
+            } |> Seq.choose id |>  String.concat " "
         elementTag |> Tag.addAttribute attribute
 
     let toString element = element |> toTag |> Tag.toString
