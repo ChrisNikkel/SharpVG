@@ -39,23 +39,24 @@ module Style =
     let initWithOpacity opacity =
         empty |> withOpacity opacity
 
+    let private mapToString f separator style =
+        seq {
+            yield f "stroke" (match style.Stroke with | Some(stroke) -> Color.toString stroke | None -> "")
+            yield f "stroke-width" (match style.StrokeWidth with | Some(strokeWidth) -> Length.toString strokeWidth | None -> "")
+            yield f "fill" (match style.Fill with | Some(fill) -> Color.toString fill | None -> "")
+            yield f "opacity" (match style.Opacity with | Some(opacity) -> string opacity | None -> "")
+        } |> String.concat separator
 
-    let private mapToString f style =
-        let stroke = f "stroke" (match style.Stroke with | Some(stroke) -> Color.toString stroke | None -> "")
-        let strokeWidth = f "stroke-width" (match style.StrokeWidth with | Some(strokeWidth) -> Length.toString strokeWidth | None -> "")
-        let fill = f "fill" (match style.Fill with | Some(fill) -> Color.toString fill | None -> "")
-        let opacity = f "opacity" (match style.Opacity with | Some(opacity) -> string opacity | None -> "")
-        stroke + strokeWidth + fill + opacity
 
     let toString style =
         let stylePartToString name value =
-            name + "=" + Tag.quote value + " "
-        mapToString stylePartToString style
+            name + "=" + Tag.quote value
+        mapToString stylePartToString " " style
 
     let toCssString style =
         let stylePartToString name value =
-           name + ":" + value + ";"
-        mapToString stylePartToString style
+           name + ":" + value
+        mapToString stylePartToString ";" style
 
     let toStyleString style =
         "style=" + (Tag.quote <| toCssString style)

@@ -8,7 +8,6 @@ type transform =
     | SkewX of int
     | SkewY of int
 
-// TODO: Make this similar to style so you can transform any SVG element.  (eg. http://www.svgbasics.com/rotate.html)
 module Transform =
     let toString transform =
          match transform with

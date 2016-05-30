@@ -12,10 +12,18 @@ module Tag =
         { Name = name; Attribute = Some(attribute); Body = Some(body) }
 
     let withAttribute attribute tag =
-        { tag with Attribute = attribute }
+        { tag with Attribute = Some(attribute) }
 
     let withBody body tag =
         { tag with Body = body }
+
+    let addAttribute attribute tag =
+        tag 
+        |> withAttribute (
+            match tag.Attribute with
+                | Some(a) -> a + attribute
+                | None -> attribute
+        )
 
     let toString tag =
         match tag with
@@ -26,8 +34,3 @@ module Tag =
 
 // TODO: Move quote and other string helpers out or do it better
     let inline quote i = "\"" + string i + "\""
-
-    let addSpace needsSpace =
-        (if needsSpace then " " else "")
-
-    let addSpaces strings = (strings |> Seq.reduce (fun acc str -> acc + " " + str)).TrimStart()

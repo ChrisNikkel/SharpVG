@@ -10,44 +10,59 @@ type baseElement =
     | Polygon of points
     | Polyline of points
 
-type element =
-    | StyledElement of baseElement * style
-    | PlainElement of baseElement
+type element = {
+        Element: baseElement;
+        Style: style option;
+        Transform: transform option;
+    }
 
 module Element =
-    let ofLine line = PlainElement(Line(line))
-    let ofText text = PlainElement(Text(text))
-    let ofImage image = PlainElement(Image(image))
-    let ofCircle circle = PlainElement(Circle(circle))
-    let ofEllipse ellipse = PlainElement(Ellipse(ellipse))
-    let ofRect rect = PlainElement(Rect(rect))
-    let ofPolygon polygon = PlainElement(Polygon(polygon))
-    let ofPolyline polyline = PlainElement(Polyline(polyline))
+    let init style transform element =
+        {
+            Element = element;
+            Style = Some style;
+            Transform = Some transform
+        }
+
+    let initWithElement element =
+        {
+            Element = element;
+            Style = None;
+            Transform = None
+        }
 
     let withStyle style element =
-        match element with
-            | StyledElement(element, _) -> StyledElement(element, style)
-            | PlainElement(element) -> StyledElement(element, style)
+        { element with Style = Some style }
+
+    let withTransform transform element =
+        { element with Transform = Some transform }
+
+    let ofLine line = initWithElement (Line line)
+    let ofText text = initWithElement (Text text)
+    let ofImage image = initWithElement (Image image)
+    let ofCircle circle = initWithElement (Circle circle)
+    let ofEllipse ellipse = initWithElement (Ellipse ellipse)
+    let ofRect rect = initWithElement (Rect rect)
+    let ofPolygon polygon = initWithElement (Polygon polygon)
+    let ofPolyline polyline = initWithElement (Polyline polyline)
 
     let toTag element =
-        let baseElementToTag baseElement =
-            match baseElement with
-                | Line(line) -> line |> Line.toTag
-                | Text(text) -> text |> Text.toTag
-                | Image(image) -> image |> Image.toTag
-                | Circle(circle) -> circle |> Circle.toTag
-                | Ellipse(ellipse) -> ellipse |> Ellipse.toTag
-                | Rect(rect) -> rect |> Rect.toTag
-                | Polygon(polygon) -> polygon |> Polygon.toTag
-                | Polyline(polyline) -> polyline |> Polyline.toTag
-        match element with
-            | StyledElement(element, style) ->
-                let elementTag = baseElementToTag element
-                let newAttribute oldAttribute =
-                    match oldAttribute with
-                        | None -> Some(style |> Style.toString)
-                        | Some(attribute) -> Some(attribute + " " + (style |> Style.toString))
-                { elementTag with Attribute = newAttribute elementTag.Attribute }
-            | PlainElement(element) -> baseElementToTag element
+        let elementTag =
+            match element.Element with
+                | Line line -> line |> Line.toTag
+                | Text text -> text |> Text.toTag
+                | Image image -> image |> Image.toTag
+                | Circle circle -> circle |> Circle.toTag
+                | Ellipse ellipse -> ellipse |> Ellipse.toTag
+                | Rect rect -> rect |> Rect.toTag
+                | Polygon polygon -> polygon |> Polygon.toTag
+                | Polyline polyline -> polyline |> Polyline.toTag
+        let attribute =
+            match element.Style, element.Transform with
+                | None, None -> ""
+                | Some style, None -> style |> Style.toString
+                | None, Some transform -> transform |> Transform.toString
+                | Some style, Some transform -> [style |> Style.toString; transform |> Transform.toString] |> String.concat " "
+        elementTag |> Tag.addAttribute attribute
 
     let toString element = element |> toTag |> Tag.toString
