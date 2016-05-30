@@ -30,22 +30,22 @@ module Transform =
     let withSkewY skewY transform =
         { transform with SkewY = Some skewY }
 
-    let initWithMatrix matrix =
+    let createWithMatrix matrix =
         empty |> withMatrix matrix
 
-    let initWithTranslate translate =
+    let createWithTranslate translate =
         empty |> withTranslate translate
 
-    let initWithScale scale =
+    let createWithScale scale =
         empty |> withScale scale
 
-    let initWithRotate rotate =
+    let createWithRotate rotate =
         empty |> withRotate rotate
 
-    let initWithSkewX skewX =
+    let createWithSkewX skewX =
         empty |> withSkewX skewX
 
-    let initWithSkewY skewY =
+    let createWithSkewY skewY =
         empty |> withSkewY skewY
 
     let toString transform =

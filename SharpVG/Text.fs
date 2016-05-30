@@ -7,7 +7,7 @@ type text =
     }
 
 module Text =
-    let init upperLeft body =
+    let create upperLeft body =
         { UpperLeft = upperLeft; Body = body }
 
     let toTag text =

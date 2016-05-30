@@ -57,7 +57,7 @@ let main argv =
     recursiveTriangles startingTriangle iterations
     |> List.map (triangleToPolygon >> Element.withStyle style)
     |> Group.ofList
-    |> Group.withTransform (Transform.initWithScale (1.0, -1.0) |> Transform.withTranslate (margin, triangleLength))
+    |> Group.withTransform (Transform.createWithScale (1.0, -1.0) |> Transform.withTranslate (margin, triangleLength))
     |> Svg.ofGroup
     |> Svg.withSize {Height = Pixels triangleLength; Width = Pixels (triangleLength + margin)}
     |> Svg.withViewbox {Minimums = { X = Pixels 0.0; Y = Pixels 0.0}; Size = {Height = Pixels triangleLength; Width = Pixels (triangleLength + margin) }}

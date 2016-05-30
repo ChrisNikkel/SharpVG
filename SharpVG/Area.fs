@@ -7,7 +7,7 @@ type area =
     }
 
 module Area =
-    let init width height =
+    let create width height =
         { Width = width; Height = height }
 
     let toDescriptiveString area =

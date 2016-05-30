@@ -8,7 +8,7 @@ type tag =
     }
 
 module Tag =
-    let init name attribute body =
+    let create name attribute body =
         { Name = name; Attribute = Some(attribute); Body = Some(body) }
 
     let withAttribute attribute tag =

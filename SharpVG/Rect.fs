@@ -7,7 +7,7 @@ type rect =
     }
 
 module Rect =
-    let init upperLeft size =
+    let create upperLeft size =
         { UpperLeft = upperLeft; Size = size }
 
     let toTag rect =

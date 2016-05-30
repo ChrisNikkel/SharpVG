@@ -19,7 +19,7 @@ type element = {
     }
 
 module Element =
-    let init id className style transform element =
+    let create id className style transform element =
         {
             Id = id;
             Class = className;
@@ -28,7 +28,7 @@ module Element =
             Transform = Some transform
         }
 
-    let initWithElement element =
+    let createWithElement element =
         {
             Id = None;
             Class = None;
@@ -49,14 +49,14 @@ module Element =
     let withClass className element =
         { element with Class = Some className }
 
-    let ofLine line = initWithElement (Line line)
-    let ofText text = initWithElement (Text text)
-    let ofImage image = initWithElement (Image image)
-    let ofCircle circle = initWithElement (Circle circle)
-    let ofEllipse ellipse = initWithElement (Ellipse ellipse)
-    let ofRect rect = initWithElement (Rect rect)
-    let ofPolygon polygon = initWithElement (Polygon polygon)
-    let ofPolyline polyline = initWithElement (Polyline polyline)
+    let ofLine line = createWithElement (Line line)
+    let ofText text = createWithElement (Text text)
+    let ofImage image = createWithElement (Image image)
+    let ofCircle circle = createWithElement (Circle circle)
+    let ofEllipse ellipse = createWithElement (Ellipse ellipse)
+    let ofRect rect = createWithElement (Rect rect)
+    let ofPolygon polygon = createWithElement (Polygon polygon)
+    let ofPolyline polyline = createWithElement (Polyline polyline)
 
     let toTag element =
         let elementTag =

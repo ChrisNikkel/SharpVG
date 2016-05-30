@@ -9,7 +9,7 @@ type image =
 
 module Image =
 
-    let init upperLeft size source =
+    let create upperLeft size source =
         { UpperLeft = upperLeft; Size = size; Source = source }
 
     let toTag image =

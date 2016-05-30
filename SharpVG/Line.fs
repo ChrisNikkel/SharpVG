@@ -7,7 +7,7 @@ type line =
     }
 
 module Line =
-    let init point1 point2 =
+    let create point1 point2 =
         { Point1 = point1; Point2 = point2 }
 
     let toTag line =

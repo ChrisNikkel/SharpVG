@@ -7,7 +7,7 @@ type point =
     }
 
 module Point =
-    let init x y =
+    let create x y =
         { X = x; Y = y }
 
     let toFloats point =

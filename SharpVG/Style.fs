@@ -25,19 +25,19 @@ module Style =
     let withOpacity opacity style =
         { style with Opacity = Some(opacity) }
 
-    let init name fill stroke strokeWidth opacity =
+    let create name fill stroke strokeWidth opacity =
         { Name = Some(name); Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity) }
 
-    let initWithFill fill =
+    let createWithFill fill =
         empty |> withFill fill
 
-    let initWithStroke stroke =
+    let createWithStroke stroke =
         empty |> withStroke stroke
 
-    let initWithStrokeWidth strokeWidth =
+    let createWithStrokeWidth strokeWidth =
         empty |> withStrokeWidth strokeWidth
 
-    let initWithOpacity opacity =
+    let createWithOpacity opacity =
         empty |> withOpacity opacity
 
     let private mapToString f separator style =
