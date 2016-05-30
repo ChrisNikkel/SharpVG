@@ -41,5 +41,11 @@ module Group =
             match group.Transform with Some(transform) -> (Transform.toString transform) + " " | None -> ""
         let upperLeft =
              match group.UpperLeft with | Some(upperLeft) -> Point.toString upperLeft | None -> ""
-
         "<g " + upperLeft + transform + ">" + body + "</g>"
+    // TODO: Integrate tag into recursive function for Group.toString
+    // let toTag group =
+    //    {
+    //        Name = "g";
+    //        Attribute = ??;
+    //        Body = body
+    //    }

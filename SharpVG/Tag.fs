@@ -32,5 +32,5 @@ module Tag =
         | { Name = n; Attribute = Some(a); Body = None } -> "<" + n + " " + a + "/>"
         | { Name = n; Attribute = None; Body = None } -> "<" + n + "/>"
 
-// TODO: Move quote and other string helpers out or do it better
+// TODO: Move quote or do it better
     let inline quote i = "\"" + string i + "\""

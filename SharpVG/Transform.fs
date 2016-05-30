@@ -17,5 +17,3 @@ module Transform =
             | Rotate(a, x, y) -> "rotate(" + string a + " " + string x + " " + string y + ")"
             | SkewX(a) -> "skewX(" + string a + ")"
             | SkewY(a) -> "skewY(" + string a + ")"
-
-
