@@ -44,7 +44,8 @@ let main argv =
 
     // Initialization
     let fileName = ".\\triangle.html"
-    let style = { Name = None; Stroke = Some(Name colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = Some(Name colors.White); Opacity = None }
+    let style = { Stroke = Some(Name colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = Some(Name colors.White); Opacity = None }
+    let namedStyle = style |> NamedStyle.ofStyle "standard"
     let (iterations, triangleLength, margin) = (7, 1000.0, 100.0)
     let startingTriangle =
             [{
@@ -55,10 +56,11 @@ let main argv =
 
     // Execute
     recursiveTriangles startingTriangle iterations
-    |> List.map (triangleToPolygon >> Element.withStyle style)
+    |> List.map (triangleToPolygon >> (Element.withNamedStyle namedStyle))
     |> Group.ofList
     |> Group.withTransform (Transform.createWithScale (1.0, -1.0) |> Transform.withTranslate (margin, triangleLength))
     |> Svg.ofGroup
+    |> Svg.withStyle namedStyle
     |> Svg.withSize {Height = Pixels triangleLength; Width = Pixels (triangleLength + margin)}
     |> Svg.withViewbox {Minimums = { X = Pixels 0.0; Y = Pixels 0.0}; Size = {Height = Pixels triangleLength; Width = Pixels (triangleLength + margin) }}
     |> Svg.toHtml "SVG Triangle Example"

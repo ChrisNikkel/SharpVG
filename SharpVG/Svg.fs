@@ -7,7 +7,7 @@ type viewbox = {
 
 type svg = {
     Body: body
-    Styles: seq<style> option
+    Styles: seq<namedStyle> option
     Size: area option
     Viewbox: viewbox option
 }
@@ -43,6 +43,9 @@ module Svg =
 
     let withStyles styles (svg:svg) =
         { svg with Styles = Some(styles) }
+
+    let withStyle namedStyle (svg:svg) =
+        { svg with Styles = Some(Seq.singleton namedStyle) }
 
 
     let toString svg =

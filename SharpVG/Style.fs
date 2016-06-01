@@ -2,7 +2,6 @@ namespace SharpVG
 
 type style =
     {
-        Name : string option;
         Fill : color option;
         Stroke : color option;
         StrokeWidth : length option;
@@ -11,7 +10,7 @@ type style =
 
 module Style =
     let empty =
-        { Name = None; Fill = None; Stroke = None; StrokeWidth = None; Opacity = None }
+        { Fill = None; Stroke = None; StrokeWidth = None; Opacity = None }
 
     let withFill fill style =
         { style with Fill = Some(fill) }
@@ -25,8 +24,8 @@ module Style =
     let withOpacity opacity style =
         { style with Opacity = Some(opacity) }
 
-    let create name fill stroke strokeWidth opacity =
-        { Name = Some(name); Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity) }
+    let create fill stroke strokeWidth opacity =
+        { Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity) }
 
     let createWithFill fill =
         empty |> withFill fill
@@ -60,12 +59,3 @@ module Style =
 
     let toStyleString style =
         "style=" + (Tag.quote <| toCssString style)
-
-    let toTag style =
-        {
-            Name = "style";
-            Attribute = Some("type=" + (Tag.quote "text/css"));
-            Body = Some("<![CDATA[" + match style.Name with | Some(name) -> name | None -> "" + "{" + (style |> toCssString) + "}]]>")
-        }
-
-    let toString = toTag >> Tag.toString

@@ -12,7 +12,7 @@ type baseElement =
 
 type element = {
         Id: string option;
-        Class: string option;
+        Class: string option;  // TODO: Auto fill this for named styles
         Element: baseElement;
         Style: style option;
         Transform: transform option
@@ -37,7 +37,7 @@ module Element =
             Transform = None
         }
 
-    let withStyle style element =
+    let withStyle style (element:element) =
         { element with Style = Some style }
 
     let withTransform transform element =
@@ -48,6 +48,9 @@ module Element =
 
     let withClass className element =
         { element with Class = Some className }
+
+    let withNamedStyle namedStyle =
+        withClass namedStyle.Name
 
     let ofLine line = createWithElement (Line line)
     let ofText text = createWithElement (Text text)

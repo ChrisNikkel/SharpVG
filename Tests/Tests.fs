@@ -16,7 +16,7 @@ let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p) =
     configureLogs
     let point1 = { X = Pixels x1; Y = Pixels y1 }
     let point2 = { X = Pixels x2; Y = Pixels y2 }
-    let style = { Name = None; Stroke = Some(Values(r, g, b)); StrokeWidth = Some(Pixels p); Fill = Some(Hex c); Opacity = Some(1.0) }
+    let style = { Stroke = Some(Values(r, g, b)); StrokeWidth = Some(Pixels p); Fill = Some(Hex c); Opacity = Some(1.0) }
     let line = Line.create point1 point2
     let tagString = line |> Element.ofLine |> Element.withStyle style |> Element.toString
 
@@ -27,7 +27,7 @@ let ``draw rectangles`` (x, y, h, w, c, r, g, b, p) =
     configureLogs
     let point = { X = Pixels x; Y = Pixels y }
     let area = { Height = Pixels h; Width = Pixels w }
-    let style = { Name = None; Stroke = Some(Values(r, g, b)); StrokeWidth = Some(Pixels p); Fill = Some(Hex c); Opacity = Some(1.0) }
+    let style = { Stroke = Some(Values(r, g, b)); StrokeWidth = Some(Pixels p); Fill = Some(Hex c); Opacity = Some(1.0) }
     let rect = Rect.create point area
     let tagString = rect |> Element.ofRect |> Element.withStyle style |> Element.toString
 
@@ -37,7 +37,7 @@ let ``draw rectangles`` (x, y, h, w, c, r, g, b, p) =
 let ``draw circles`` (x, y, radius, c, r, g, b, p) =
     configureLogs
     let point = { X = Pixels x; Y = Pixels y }
-    let style = { Name = None; Stroke = Some(Values(r, g, b)); StrokeWidth = Some(Pixels p); Fill = Some(Hex c); Opacity = Some(1.0) }
+    let style = { Stroke = Some(Values(r, g, b)); StrokeWidth = Some(Pixels p); Fill = Some(Hex c); Opacity = Some(1.0) }
     let circle = { Center = point; Radius = radius }
     let tagString = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
 

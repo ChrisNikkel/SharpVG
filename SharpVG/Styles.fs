@@ -5,8 +5,8 @@ module Styles =
         {
             Name = "style";
             Attribute = Some("type=" + (Tag.quote "text/css"));
-            Body = Some("<![CDATA[" + (styles |> Seq.map Style.toString |> String.concat "") + "]]>")
+            Body = Some("<![CDATA[" + (styles |> Seq.map NamedStyle.toCssString |> String.concat " ") + "]]>")
         }
 
-    let toString (styles:seq<style>) =
+    let toString (styles:seq<namedStyle>) =
         styles |> toTag |> Tag.toString
