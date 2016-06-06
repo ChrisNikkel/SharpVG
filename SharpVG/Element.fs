@@ -9,6 +9,7 @@ type baseElement =
     | Rect of rect
     | Polygon of points
     | Polyline of points
+    | Path of path
 
 type element = {
         Id: string option;
@@ -72,6 +73,7 @@ module Element =
                 | Rect rect -> rect |> Rect.toTag
                 | Polygon polygon -> polygon |> Polygon.toTag
                 | Polyline polyline -> polyline |> Polyline.toTag
+                | Path path -> path |> Path.toTag
         let attribute =
             [
                 element.Id |> Option.map (fun id -> "id=" + (Tag.quote id))

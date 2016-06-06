@@ -71,6 +71,7 @@
     <Compile Include="Points.fs" />
     <Compile Include="Polygon.fs" />
     <Compile Include="Polyline.fs" />
+    <Compile Include="Path.fs" />
     <Compile Include="Element.fs" />
     <Compile Include="Group.fs" />
     <Compile Include="Svg.fs" />
