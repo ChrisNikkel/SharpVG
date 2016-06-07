@@ -16,16 +16,31 @@ type PathPositioning =
     | Absolute
 
 type PathPart =
-    | LengthPart of PathType*PathPositioning*point
+    | LengthPart of PathPositioning*PathType*point
     | ClosePath
 
 type path = seq<PathPart>
 
 module Path =
+
+    let empty = Seq.empty
+
+    let add pathPositioning pathType point path =
+        Seq.append path (Seq.singleton (LengthPart(pathPositioning, pathType, point)))
+
+    let addRelative pathType point path =
+        add Relative pathType point path
+
+    let addAbsolute pathType point path =
+        add Absolute pathType point path
+    
+    let addClosePath path =
+        Seq.append path (Seq.singleton ClosePath)
+
     let toTag path =
         let pathTypeToString pathType =
             match pathType with
-                    | LengthPart(style, positioning, point) ->
+                    | LengthPart(positioning, style, point) ->
                         let letter =
                             match style with
                                 | MoveTo -> "M"
