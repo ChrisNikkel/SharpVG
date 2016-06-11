@@ -1,7 +1,6 @@
 module SharpVGTests
 open LogHelpers
 open SharpVG
-open Xunit
 open FsCheck
 open FsCheck.Xunit
 open BasicChecks
@@ -12,33 +11,36 @@ type Positive =
         |> Arb.mapFilter abs (fun t -> t > 0)
 
 [<Property>]
-let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p) =
+let ``draw lines`` (x1 : NormalFloat, y1 : NormalFloat, x2 : NormalFloat, y2 : NormalFloat, c, r, g, b, p, o) =
     configureLogs
-    let point1 = { X = Pixels x1; Y = Pixels y1 }
-    let point2 = { X = Pixels x2; Y = Pixels y2 }
-    let style = { Stroke = Some(Values(r, g, b)); StrokeWidth = Some(Pixels p); Fill = Some(Hex c); Opacity = Some(1.0) }
+    let point1 = { X = Pixels (x1 |> double); Y = Pixels (y1 |> double) }
+    let point2 = { X = Pixels (x2 |> double); Y = Pixels (y2 |> double) }
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
+    let style = Style.create fill stroke strokeWidth opacity
     let line = Line.create point1 point2
     let tagString = line |> Element.ofLine |> Element.withStyle style |> Element.toString
 
     basicChecks "line" tagString
 
 [<Property>]
-let ``draw rectangles`` (x, y, h, w, c, r, g, b, p) =
+let ``draw rectangles`` (x : NormalFloat, y : NormalFloat, h : NormalFloat, w : NormalFloat, c, r, g, b, p, o) =
     configureLogs
-    let point = { X = Pixels x; Y = Pixels y }
-    let area = { Height = Pixels h; Width = Pixels w }
-    let style = { Stroke = Some(Values(r, g, b)); StrokeWidth = Some(Pixels p); Fill = Some(Hex c); Opacity = Some(1.0) }
+    let point = { X = Pixels (x |> double); Y = Pixels (y |> double)}
+    let area = { Height = Pixels (h |> double); Width = Pixels (w |> double) }
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
+    let style = Style.create fill stroke strokeWidth opacity
     let rect = Rect.create point area
     let tagString = rect |> Element.ofRect |> Element.withStyle style |> Element.toString
 
     basicChecks "rect" tagString
 
 [<Property>]
-let ``draw circles`` (x, y, radius, c, r, g, b, p) =
+let ``draw circles`` (x : NormalFloat, y : NormalFloat, radius : NormalFloat, c, r, g, b, p, o) =
     configureLogs
-    let point = { X = Pixels x; Y = Pixels y }
-    let style = { Stroke = Some(Values(r, g, b)); StrokeWidth = Some(Pixels p); Fill = Some(Hex c); Opacity = Some(1.0) }
-    let circle = { Center = point; Radius = radius }
+    let point = { X = Pixels (x |> double); Y = Pixels (y |> double) }
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
+    let style = Style.create fill stroke strokeWidth opacity
+    let circle = { Center = point; Radius = Pixels(radius |> double) }
     let tagString = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
 
     basicChecks "circle" tagString
