@@ -8,6 +8,12 @@ type circle =
 
 module Circle =
 
+    let create center radius =
+        {
+            Center = center;
+            Radius = radius
+        }
+
     let toTag circle =
         {
             Name = "circle";

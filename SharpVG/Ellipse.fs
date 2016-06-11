@@ -7,8 +7,12 @@ type ellipse =
     }
 
 module Ellipse =
+
     let create center radius =
-        { Center = center; Radius = radius }
+        {
+            Center = center;
+            Radius = radius
+        }
 
     let toTag ellipse =
         {
