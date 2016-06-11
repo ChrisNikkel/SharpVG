@@ -1,6 +1,0 @@
-source https://nuget.org/api/v2
-nuget FsCheck.Xunit
-nuget Xunit.Runner.Console
-nuget Xunit.Runner.VisualStudio
-nuget FAKE
-nuget log4net

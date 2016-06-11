@@ -1,4 +1,4 @@
-module Tests
+module SharpVGTests
 open LogHelpers
 open SharpVG
 open Xunit
