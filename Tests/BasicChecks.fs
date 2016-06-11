@@ -13,6 +13,19 @@ let happensEvenly chr (str:string) =
     |> (fun x -> x % 2 = 0)
     |> logResult "happensEvenly"
 
+let isDepthNoMoreThanOne left right (str:string) =
+    str.ToCharArray()
+    |> Array.scan
+        (fun acc c ->
+            match c with
+                | c when c = left -> acc + 1
+                | c when c = right -> acc - 1
+                | _ -> acc
+        ) 0
+    |> Array.max
+    |> (>=) 1
+    |> logResult "isDepthNoMoreThanOne"
+
 let isMatched left right (str:string) =
     str.ToCharArray()
     |> Array.fold
@@ -28,6 +41,7 @@ let isMatched left right (str:string) =
 let basicChecks name tag =
     info "%s: %s" name tag
     (isMatched '<' '>' tag)
+    && (isDepthNoMoreThanOne '<' '>' tag)
     && (happensEvenly '"' tag)
     && (happensEvenly ''' tag)
     && (tag.Contains name)
