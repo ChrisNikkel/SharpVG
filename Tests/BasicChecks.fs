@@ -28,6 +28,9 @@ let isMatched left right (str:string) =
 
 let basicChecks name tag =
     info "%s: %s" name tag
-    isTagEnclosed tag
-    && (isMatched '<' '>' tag)
+    (isMatched '<' '>' tag)
     && (tag.Contains name)
+
+let basicSingleTagChecks name tag =
+    (basicChecks name tag)
+    && (isTagEnclosed tag)
