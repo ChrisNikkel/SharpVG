@@ -9,9 +9,8 @@ let isTagEnclosed (tag:string) =
 
 let happensEvenly chr (str:string) =
     str.ToCharArray()
-    |> Array.fold
-        (fun acc c -> if chr = c then acc + 1 else acc) 0
-    |> (%) 2 = 0
+    |> Array.fold (fun acc c -> if chr = c then acc + 1 else acc) 0
+    |> (fun x -> x % 2 = 0)
     |> logResult "happensEvenly"
 
 let isMatched left right (str:string) =
@@ -29,6 +28,8 @@ let isMatched left right (str:string) =
 let basicChecks name tag =
     info "%s: %s" name tag
     (isMatched '<' '>' tag)
+    && (happensEvenly '"' tag)
+    && (happensEvenly ''' tag)
     && (tag.Contains name)
 
 let basicSingleTagChecks name tag =
