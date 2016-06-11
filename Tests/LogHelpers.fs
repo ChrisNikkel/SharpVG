@@ -1,10 +1,12 @@
 module LogHelpers
     open log4net
     open log4net.Config
+    open System.Xml
+    open System.IO
 
     let _log = LogManager.GetLogger "Tests"
 
-    let configureLogs = BasicConfigurator.Configure() |> ignore
+    let configureLogs = XmlConfigurator.ConfigureAndWatch(new FileInfo("log4net.config")) |> ignore
 
     let debug format = Printf.ksprintf _log.Debug format
     let info format = Printf.ksprintf _log.Info format

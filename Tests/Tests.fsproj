@@ -58,6 +58,9 @@
     <Compile Include="BasicChecks.fs" />
     <Compile Include="Tests.fs" />
     <Content Include="packages.config" />
+    <Content Include="log4net.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FsCheck">
@@ -85,6 +88,7 @@
       <Project>{b5154113-511a-4461-a276-6c7572a63050}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <Reference Include="System.Xml" />
     <Reference Include="xunit.abstractions">
       <HintPath>..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
       <Private>True</Private>
