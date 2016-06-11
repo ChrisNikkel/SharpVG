@@ -1,6 +1,7 @@
 module SharpVGTests
 open LogHelpers
 open SharpVG
+open Xunit
 open FsCheck
 open FsCheck.Xunit
 open BasicChecks
@@ -44,51 +45,32 @@ let ``draw circles`` (x : NormalFloat, y : NormalFloat, radius : NormalFloat, c,
     let tagString = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
 
     basicChecks "circle" tagString
-// TODO: Reenable do everything test
-(*
+
 [<Fact>]
 let ``do lots and don't fail`` () =
     configureLogs
+
     let points = seq {
-        yield {x = Pixels 1; y = Pixels 1}
-        yield {x = Pixels 4; y = Pixels 4}
-        yield {x = Pixels 10; y = Pixels 10}
+        yield Point.create (Pixels 1.0) (Pixels 1.0)
+        yield Point.create (Pixels 4.0) (Pixels 4.0)
+        yield Point.create (Pixels 8.0) (Pixels 8.0)
     }
-    let point = {x = Pixels 24; y = Pixels 15}
-    let size = {height = Pixels 30; width = Pixels 30}
-    let style1 = {stroke = Hex 0xff0000; strokeWidth = Pixels 3; fill = Name Colors.Red}
-    let style2 = {stroke = SmallHex 0xf00s; strokeWidth = Pixels 6; fill = Name Colors.Blue}
-    let transform = Scale(2, 5)
 
+    let point = Point.create (Pixels 24.0) (Pixels 15.0)
+    let style1 = Style.create (Name colors.Red) (Hex 0xff0000) (Pixels 3.0) 1.0
+    let style2 = Style.create (Name colors.Blue) (SmallHex 0xf00s) (Pixels 6.0) 1.0
+    let length = Length.createWithPixels 1.0
+    let area = Area.create length length
+
+    // TODO: Add transform, circle, ellipse, polygon, polyline, path, script
     let graphics = seq {
-        yield { UpperLeft = point; Length = size; Source = "myimage.jpg" }, None).toString
-        yield { UpperLeft = point; Body = "Hello World!" }, Some style1).toString
-        yield SvgText({ UpperLeft = point; Body =  "Hello World!" }, Some style2).toString
-        // TODO: Add: yield group "MyGroup" transform point { Element = Polygon(Polygon { Points = points; Style = Some(style) }) }.toString
-        yield SvgPolyline(points, Some style2 ).toString
-        yield SvgLine({ Point1 = point; Point2 = point }, Some style1).toString
-        yield SvgCircle({ Center = point; Radius = (Pixels(2)) }, Some style2).toString
-        yield SvgEllipse({ Center = point; Radius = point }, Some style1).toString
-        yield SvgRect({ UpperLeft = point; Length = size }, Some style2).toString
-// TODO: Add this
-//            yield Script { Body = """
-//            function circle_click(evt) {
-//                var circle = evt.target;
-//                var currentRadius = circle.getAttribute("r");
-//                if (currentRadius == 100)
-//                circle.setAttribute("r", currentRadius*2);
-//                else
-//                circle.setAttribute("r", currentRadius*0.5);
-//            }
-//            """ }
+        yield Image.create point area "myimage1.jpg" |> Element.ofImage
+        yield Image.create point area "myimage2.jpg" |> Element.ofImage |> Element.withStyle style1
+        yield Text.create point "Hello World!" |> Element.ofText |> Element.withStyle style2
+        yield Line.create point point |> Element.ofLine |> Element.withStyle style1
+        yield Rect.create point area |> Element.ofRect |> Element.withStyle style2
     }
 
-    let styleBody = style
-    let svgBody = graphics |> String.concat "\n  " |> (svg size)
-    let body = seq {
-        yield styleBody
-        yield svgBody
-    }
+    let svgBody = graphics |> Svg.ofSeq
 
-    body |> String.concat "\n" |> html "SVG Demo" |> isMatched '<' '>'
-*)
+    svgBody |> Svg.toHtml "SVG Demo" |> isMatched '<' '>'
