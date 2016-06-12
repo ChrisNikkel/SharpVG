@@ -21,7 +21,16 @@ type Element = {
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Element =
-    let create id className style transform element =
+    let create id className element =
+        {
+            Id = id;
+            Class = className;
+            Element = element;
+            Style = None;
+            Transform = None
+        }
+
+    let createFull id className style transform element =
         {
             Id = id;
             Class = className;
