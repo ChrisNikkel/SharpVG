@@ -5,6 +5,7 @@ open Xunit
 open FsCheck
 open FsCheck.Xunit
 open BasicChecks
+open Swensen.Unquote
 
 type Positive =
     static member Int() =
@@ -19,9 +20,14 @@ let ``draw lines`` (x1 : NormalFloat, y1 : NormalFloat, x2 : NormalFloat, y2 : N
     let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels (p |> double), o
     let style = Style.create fill stroke strokeWidth opacity
     let line = Line.create point1 point2
-    let tagString = line |> Element.ofLine |> Element.withStyle style |> Element.toString
+    let tag = line |> Element.ofLine |> Element.withStyle style |> Element.toString
 
-    basicSingleTagChecks "line" tagString
+    test <@ (isMatched '<' '>' tag)
+    && (isDepthNoMoreThanOne '<' '>' tag)
+    && (happensEvenly '"' tag)
+    && (happensEvenly ''' tag)
+    && (tag.Contains "line")
+    && (isTagEnclosed tag) @>
 
 [<Property>]
 let ``draw rectangles`` (x : NormalFloat, y : NormalFloat, h : NormalFloat, w : NormalFloat, c, r, g, b, p : NormalFloat, o) =
@@ -31,9 +37,14 @@ let ``draw rectangles`` (x : NormalFloat, y : NormalFloat, h : NormalFloat, w : 
     let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels (p |> double), o
     let style = Style.create fill stroke strokeWidth opacity
     let rect = Rect.create point area
-    let tagString = rect |> Element.ofRect |> Element.withStyle style |> Element.toString
+    let tag = rect |> Element.ofRect |> Element.withStyle style |> Element.toString
 
-    basicSingleTagChecks "rect" tagString
+    test <@ (isMatched '<' '>' tag)
+    && (isDepthNoMoreThanOne '<' '>' tag)
+    && (happensEvenly '"' tag)
+    && (happensEvenly ''' tag)
+    && (tag.Contains "rect")
+    && (isTagEnclosed tag) @>
 
 [<Property>]
 let ``draw circles`` (x : NormalFloat, y : NormalFloat, radius : NormalFloat, c, r, g, b, p : NormalFloat, o) =
@@ -42,9 +53,14 @@ let ``draw circles`` (x : NormalFloat, y : NormalFloat, radius : NormalFloat, c,
     let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels (p |> double), o
     let style = Style.create fill stroke strokeWidth opacity
     let circle = Circle.create point (Pixels (radius |> double))
-    let tagString = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
+    let tag = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
 
-    basicSingleTagChecks "circle" tagString
+    test <@ (isMatched '<' '>' tag)
+    && (isDepthNoMoreThanOne '<' '>' tag)
+    && (happensEvenly '"' tag)
+    && (happensEvenly ''' tag)
+    && (tag.Contains "circle")
+    && (isTagEnclosed tag) @>
 
 
 [<Property>]
@@ -55,9 +71,14 @@ let ``draw ellipses`` (x1 : NormalFloat, y1 : NormalFloat, x2 : NormalFloat, y2 
     let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels (p |> double), o
     let style = Style.create fill stroke strokeWidth opacity
     let ellipse = Ellipse.create point1 point2
-    let tagString = ellipse |> Element.ofEllipse |> Element.withStyle style |> Element.toString
+    let tag = ellipse |> Element.ofEllipse |> Element.withStyle style |> Element.toString
 
-    basicSingleTagChecks "ellipse" tagString
+    test <@ (isMatched '<' '>' tag)
+    && (isDepthNoMoreThanOne '<' '>' tag)
+    && (happensEvenly '"' tag)
+    && (happensEvenly ''' tag)
+    && (tag.Contains "ellipse")
+    && (isTagEnclosed tag) @>
 
 [<Property>]
 let ``draw images`` (x : NormalFloat, y : NormalFloat, h : NormalFloat, w : NormalFloat, i) =
@@ -65,9 +86,14 @@ let ``draw images`` (x : NormalFloat, y : NormalFloat, h : NormalFloat, w : Norm
     let point = { X = Pixels (x |> double); Y = Pixels (y |> double)}
     let area = { Height = Pixels (h |> double); Width = Pixels (w |> double) }
     let image = Image.create point area i
-    let tagString = image |> Element.ofImage |> Element.toString
+    let tag = image |> Element.ofImage |> Element.toString
 
-    basicChecks "image" tagString
+    test <@ (isMatched '<' '>' tag)
+    && (isDepthNoMoreThanOne '<' '>' tag)
+    && (happensEvenly '"' tag)
+    && (happensEvenly ''' tag)
+    && (tag.Contains "image")
+    && (isTagEnclosed tag) @>
 
 [<Property>]
 let ``draw texts`` (x : NormalFloat, y : NormalFloat, c, r, g, b, p : NormalFloat, o) =
@@ -76,9 +102,14 @@ let ``draw texts`` (x : NormalFloat, y : NormalFloat, c, r, g, b, p : NormalFloa
     let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels (p |> double), o
     let style = Style.create fill stroke strokeWidth opacity
     let text = Text.create point "test"
-    let tagString = text |> Element.ofText |> Element.withStyle style |> Element.toString
+    let tag = text |> Element.ofText |> Element.withStyle style |> Element.toString
 
-    basicChecks "text" tagString
+    test <@ (isMatched '<' '>' tag)
+    && (isDepthNoMoreThanOne '<' '>' tag)
+    && (happensEvenly '"' tag)
+    && (happensEvenly ''' tag)
+    && (tag.Contains "text")
+    && (tag.Contains "test") @>
 
 [<Fact>]
 let ``do lots and don't fail`` () =
