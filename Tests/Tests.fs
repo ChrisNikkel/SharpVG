@@ -6,6 +6,7 @@ open FsCheck
 open FsCheck.Xunit
 open BasicChecks
 open Swensen.Unquote
+open System
 
 type Positive =
     static member Int() =
@@ -87,6 +88,23 @@ let ``draw texts`` (x, y, c, r, g, b, p, o) =
     let tag = text |> Element.ofText |> Element.withStyle style |> Element.toString
 
     test <| checkTag "text" tag
+
+[<SvgProperty>]
+let ``animate circles`` (x, y, radius, c, r, g, b, p, o) =
+    configureLogs
+    let p1 = Point.create (Pixels 100.0) (Pixels 100.0)
+    let p2 = Point.create (Pixels 500.0) (Pixels 500.0)
+    let p3 = Point.create (Pixels 200.0) (Pixels 400.0)
+    let point = Point.create (Pixels x) (Pixels y)
+    let path = Path.empty |> (Path.addAbsolute CurveTo p1) |> (Path.addAbsolute LineTo p2) |> (Path.addAbsolute CurveTo p3)
+    let timing = Timing.create <| TimeSpan.FromSeconds(0.0)
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
+    let style = Style.create fill stroke strokeWidth opacity
+    let circle = Circle.create point (Pixels radius)
+    let animation = Animation.createMotion timing path None
+    let tag = circle |> Element.ofCircle |> Element.withStyle style |> Element.withAnimation animation |> Element.toString
+
+    test <| checkTag "circle" tag
 
 [<Fact>]
 let ``do lots and don't fail`` () =

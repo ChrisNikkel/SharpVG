@@ -1,6 +1,7 @@
 module BasicChecks
 
 open LogHelpers
+open Swensen.Unquote
 
 let isTagEnclosed (tag:string) =
     let trimmedTag = tag.Trim()

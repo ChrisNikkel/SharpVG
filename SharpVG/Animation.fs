@@ -35,6 +35,12 @@ type Animation =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Animation =
+    let createMotion timing path calculationMode =
+        {
+            AnimationType = Motion {Path = path; CalculationMode = calculationMode};
+            Timing = timing
+        }
+
     let toTag animation =
         let name, attribute =
             match animation.AnimationType with 

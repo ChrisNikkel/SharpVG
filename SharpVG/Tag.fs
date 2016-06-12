@@ -12,9 +12,6 @@ module Tag =
     let create name =
         { Name = name; Attribute = None; Body = None }
 
-    let createFull name attribute body =
-        { Name = name; Attribute = Some(attribute); Body = Some(body) }
-
     let withAttribute attribute tag =
         { tag with Attribute = Some(attribute) }
 

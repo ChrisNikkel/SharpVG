@@ -13,9 +13,6 @@ module Text =
     let create upperLeft body =
         { UpperLeft = upperLeft; Body = body; FontFamily = None; FontSize = None }
 
-    let createFull upperLeft body fontFamily fontSize =
-        { UpperLeft = upperLeft; Body = body; FontFamily = Some(fontFamily); FontSize = Some(fontSize) }
-
     let withFont family size text =
         { text with FontFamily = Some(family); FontSize = Some(size) }
 

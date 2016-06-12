@@ -32,16 +32,6 @@ module Element =
             Animations = None;
         }
 
-    let createFull id className style transform element animations =
-        {
-            Id = id;
-            Class = className;
-            Element = element;
-            Style = Some style;
-            Transform = Some transform;
-            Animations = Some animations
-        }
-
     let createWithElement element =
         {
             Id = None;
@@ -57,6 +47,12 @@ module Element =
 
     let withTransform transform element =
         { element with Transform = Some transform }
+
+    let withAnimation animation element =
+        { element with Animations = Some (Seq.singleton animation) }
+
+    let withAnimations animations element =
+        { element with Animations = Some animations }
 
     let withId id element =
         { element with Id = Some id }

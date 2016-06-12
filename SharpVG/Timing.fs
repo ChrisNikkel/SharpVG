@@ -43,6 +43,18 @@ type Timing =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Timing =
+    let create b =
+        {
+            Begin = b;
+            Duration = None;
+            End = None;
+            Minimum = None;
+            Maximum = None;
+            Restart = None;
+            Repetition = None;
+            FinalState = None;
+        }
+
     let toString timing =
         let timeSpanToString (timeSpan:TimeSpan) =
             timeSpan.ToString("hh:mm:ss")
