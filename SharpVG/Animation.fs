@@ -8,6 +8,12 @@ type CalculationMode =
     | Paced
     | Spline
 
+type Change =
+    {
+        AttributeName: string
+        AttributeValue: string
+    }
+
 type Motion =
     {
         Path: Path
@@ -15,7 +21,7 @@ type Motion =
     }
 
 type AnimationType =
-    | Change // set
+    | Change of Change
     | Adjust // animate
     | Transform
     | Motion of Motion
@@ -32,7 +38,7 @@ module Animation =
     let toTag animation =
         let name, attribute =
             match animation.AnimationType with 
-                | Change -> "set", ""
+                | Change c -> "set", "attributeName=" + Tag.quote(c.AttributeName) + " attributeType=\"XML\" to=" + Tag.quote(c.AttributeValue)
                 | Adjust -> "animate", ""
                 | Transform -> "animateTransform", ""
                 | Motion m -> "animateMotion", (m.Path |> Path.toAttributeString) + match m.CalculationMode with | Some(c) -> " " + Enum.GetName(typeof<CalculationMode>, c).ToLower() | None -> ""
