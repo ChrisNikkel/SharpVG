@@ -115,4 +115,5 @@ let ``do lots and don't fail`` () =
         yield Ellipse.create point point |> Element.ofEllipse |> Element.withStyle style1
     }
 
-    graphics |> Svg.ofSeq |> Svg.toHtml "SVG Demo" |> isMatched '<' '>'
+    let html = graphics|> Svg.ofSeq |> Svg.toHtml "SVG Demo"
+    test <| checkTag "SVG Demo" html
