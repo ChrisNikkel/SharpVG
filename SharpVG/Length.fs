@@ -1,9 +1,9 @@
 namespace SharpVG
 
 type length =
-    | Pixels of double
-    | Ems of double
-    | Percent of double
+    | Pixels of float
+    | Ems of float
+    | Percent of float
 
 module Length =
     let createWithPixels =
@@ -30,5 +30,5 @@ module Length =
     let toDouble length =
         match length with
             | Pixels p -> p
-            | Ems e -> double e
-            | Percent p -> double p
+            | Ems e -> float e
+            | Percent p -> float p

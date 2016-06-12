@@ -12,12 +12,20 @@ type Positive =
         Arb.Default.Int32()
         |> Arb.mapFilter abs (fun t -> t > 0)
 
-[<Property>]
-let ``draw lines`` (x1 : NormalFloat, y1 : NormalFloat, x2 : NormalFloat, y2 : NormalFloat, c, r, g, b, p : NormalFloat, o) =
+type PositiveFloat =
+    static member Float() =
+        Arb.Default.Float()
+        |> Arb.mapFilter abs (fun t -> t > 0.0)
+
+type SvgProperty() =
+    inherit PropertyAttribute(Arbitrary = [| typeof<PositiveFloat> |])
+
+[<SvgProperty>]
+let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p, o) =
     configureLogs
-    let point1 = { X = Pixels (x1 |> double); Y = Pixels (y1 |> double) }
-    let point2 = { X = Pixels (x2 |> double); Y = Pixels (y2 |> double) }
-    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels (p |> double), o
+    let point1 = { X = Pixels x1; Y = Pixels y1 }
+    let point2 = { X = Pixels x2; Y = Pixels y2 }
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
     let style = Style.create fill stroke strokeWidth opacity
     let line = Line.create point1 point2
     let tag = line |> Element.ofLine |> Element.withStyle style |> Element.toString
@@ -29,12 +37,12 @@ let ``draw lines`` (x1 : NormalFloat, y1 : NormalFloat, x2 : NormalFloat, y2 : N
     && (tag.Contains "line")
     && (isTagEnclosed tag) @>
 
-[<Property>]
-let ``draw rectangles`` (x : NormalFloat, y : NormalFloat, h : NormalFloat, w : NormalFloat, c, r, g, b, p : NormalFloat, o) =
+[<SvgProperty>]
+let ``draw rectangles`` (x, y, h, w, c, r, g, b, p, o) =
     configureLogs
-    let point = { X = Pixels (x |> double); Y = Pixels (y |> double)}
-    let area = { Height = Pixels (h |> double); Width = Pixels (w |> double) }
-    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels (p |> double), o
+    let point = { X = Pixels x; Y = Pixels y}
+    let area = { Height = Pixels h; Width = Pixels w }
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
     let style = Style.create fill stroke strokeWidth opacity
     let rect = Rect.create point area
     let tag = rect |> Element.ofRect |> Element.withStyle style |> Element.toString
@@ -46,13 +54,13 @@ let ``draw rectangles`` (x : NormalFloat, y : NormalFloat, h : NormalFloat, w : 
     && (tag.Contains "rect")
     && (isTagEnclosed tag) @>
 
-[<Property>]
-let ``draw circles`` (x : NormalFloat, y : NormalFloat, radius : NormalFloat, c, r, g, b, p : NormalFloat, o) =
+[<SvgProperty>]
+let ``draw circles`` (x, y, radius, c, r, g, b, p, o) =
     configureLogs
-    let point = { X = Pixels (x |> double); Y = Pixels (y |> double) }
-    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels (p |> double), o
+    let point = { X = Pixels x; Y = Pixels y }
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
     let style = Style.create fill stroke strokeWidth opacity
-    let circle = Circle.create point (Pixels (radius |> double))
+    let circle = Circle.create point (Pixels radius)
     let tag = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
 
     test <@ (isMatched '<' '>' tag)
@@ -63,12 +71,12 @@ let ``draw circles`` (x : NormalFloat, y : NormalFloat, radius : NormalFloat, c,
     && (isTagEnclosed tag) @>
 
 
-[<Property>]
-let ``draw ellipses`` (x1 : NormalFloat, y1 : NormalFloat, x2 : NormalFloat, y2 : NormalFloat, c, r, g, b, p : NormalFloat, o) =
+[<SvgProperty>]
+let ``draw ellipses`` (x1, y1, x2, y2, c, r, g, b, p, o) =
     configureLogs
-    let point1 = { X = Pixels (x1 |> double); Y = Pixels (y1 |> double) }
-    let point2 = { X = Pixels (x2 |> double); Y = Pixels (y2 |> double) }
-    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels (p |> double), o
+    let point1 = { X = Pixels x1; Y = Pixels y1 }
+    let point2 = { X = Pixels x2; Y = Pixels y2 }
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
     let style = Style.create fill stroke strokeWidth opacity
     let ellipse = Ellipse.create point1 point2
     let tag = ellipse |> Element.ofEllipse |> Element.withStyle style |> Element.toString
@@ -81,10 +89,10 @@ let ``draw ellipses`` (x1 : NormalFloat, y1 : NormalFloat, x2 : NormalFloat, y2 
     && (isTagEnclosed tag) @>
 
 [<Property>]
-let ``draw images`` (x : NormalFloat, y : NormalFloat, h : NormalFloat, w : NormalFloat, i) =
+let ``draw images`` (x, y, h, w, i) =
     configureLogs
-    let point = { X = Pixels (x |> double); Y = Pixels (y |> double)}
-    let area = { Height = Pixels (h |> double); Width = Pixels (w |> double) }
+    let point = { X = Pixels x; Y = Pixels y }
+    let area = { Height = Pixels h; Width = Pixels w }
     let image = Image.create point area i
     let tag = image |> Element.ofImage |> Element.toString
 
@@ -95,11 +103,11 @@ let ``draw images`` (x : NormalFloat, y : NormalFloat, h : NormalFloat, w : Norm
     && (tag.Contains "image")
     && (isTagEnclosed tag) @>
 
-[<Property>]
-let ``draw texts`` (x : NormalFloat, y : NormalFloat, c, r, g, b, p : NormalFloat, o) =
+[<SvgProperty>]
+let ``draw texts`` (x, y, c, r, g, b, p, o) =
     configureLogs
-    let point = { X = Pixels (x |> double); Y = Pixels (y |> double)}
-    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels (p |> double), o
+    let point = { X = Pixels (x |> float); Y = Pixels (y |> float)}
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
     let style = Style.create fill stroke strokeWidth opacity
     let text = Text.create point "test"
     let tag = text |> Element.ofText |> Element.withStyle style |> Element.toString

@@ -5,7 +5,7 @@ type style =
         Fill : color option;
         Stroke : color option;
         StrokeWidth : length option;
-        Opacity: double option;
+        Opacity: float option;
     }
 
 module Style =

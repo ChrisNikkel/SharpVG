@@ -155,7 +155,7 @@ type color =
     | SmallHex of int16  // #rgb
     | Hex of int  // #rrggbb
     | Values of byte * byte * byte // 0 - 255
-    | Percents of double * double * double // 0.0% - 100.0%
+    | Percents of float * float * float // 0.0% - 100.0%
 
 module Color =
     open System

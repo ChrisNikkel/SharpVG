@@ -1,12 +1,12 @@
 namespace SharpVG
 
 type transform = {
-    Matrix: (double * double * double * double * double * double) option
-    Translate: (double * double) option
-    Scale: (double * double) option
-    Rotate: (double * double * double) option
-    SkewX: double option
-    SkewY: double option
+    Matrix: (float * float * float * float * float * float) option
+    Translate: (float * float) option
+    Scale: (float * float) option
+    Rotate: (float * float * float) option
+    SkewX: float option
+    SkewY: float option
  }
 
 module Transform =
