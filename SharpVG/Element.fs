@@ -1,24 +1,25 @@
 namespace SharpVG
 
-type baseElement =
-    | Line of line
-    | Text of text
-    | Image of image
-    | Circle of circle
-    | Ellipse of ellipse
-    | Rect of rect
-    | Polygon of points
-    | Polyline of points
-    | Path of path
+type BaseElement =
+    | Line of Line
+    | Text of Text
+    | Image of Image
+    | Circle of Circle
+    | Ellipse of Ellipse
+    | Rect of Rect
+    | Polygon of Points
+    | Polyline of Points
+    | Path of Path
 
-type element = {
+type Element = {
         Id: string option;
         Class: string option;  // TODO: Auto fill this for named styles
-        Element: baseElement;
-        Style: style option;
-        Transform: transform option
+        Element: BaseElement;
+        Style: Style option;
+        Transform: Transform option
     }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Element =
     let create id className style transform element =
         {
@@ -38,7 +39,7 @@ module Element =
             Transform = None
         }
 
-    let withStyle style (element:element) =
+    let withStyle style (element:Element) =
         { element with Style = Some style }
 
     let withTransform transform element =

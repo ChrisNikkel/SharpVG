@@ -1,13 +1,14 @@
 namespace SharpVG
 
-type style =
+type Style =
     {
-        Fill : color option;
-        Stroke : color option;
-        StrokeWidth : length option;
+        Fill : Color option;
+        Stroke : Color option;
+        StrokeWidth : Length option;
         Opacity: float option;
     }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Style =
     let empty =
         { Fill = None; Stroke = None; StrokeWidth = None; Opacity = None }

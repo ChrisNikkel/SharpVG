@@ -1,6 +1,6 @@
 namespace SharpVG
 
-type transform = {
+type Transform = {
     Matrix: (float * float * float * float * float * float) option
     Translate: (float * float) option
     Scale: (float * float) option
@@ -9,6 +9,7 @@ type transform = {
     SkewY: float option
  }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Transform =
     let empty = { Matrix = None; Translate = None; Scale = None; Rotate = None; SkewX = None; SkewY = None }
 

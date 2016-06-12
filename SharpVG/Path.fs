@@ -16,11 +16,12 @@ type PathPositioning =
     | Absolute
 
 type PathPart =
-    | LengthPart of PathPositioning*PathType*point
+    | LengthPart of PathPositioning*PathType*Point
     | ClosePath
 
-type path = seq<PathPart>
+type Path = seq<PathPart>
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Path =
 
     let empty = Seq.empty

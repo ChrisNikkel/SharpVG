@@ -1,13 +1,13 @@
 namespace SharpVG
 
-type circle =
+type Circle =
     {
-        Center: point
-        Radius: length
+        Center: Point
+        Radius: Length
     }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Circle =
-
     let create center radius =
         {
             Center = center;

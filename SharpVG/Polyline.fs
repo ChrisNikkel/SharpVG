@@ -1,7 +1,6 @@
 namespace SharpVG
 
 module Polyline =
-
     let toTag points =
         {
             Name = "polyline";

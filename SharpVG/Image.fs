@@ -1,12 +1,13 @@
 namespace SharpVG
 
-type image =
+type Image =
     {
-        UpperLeft: point
-        Size: area
+        UpperLeft: Point
+        Size: Area
         Source: string
     }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Image =
 
     let create upperLeft size source =

@@ -1,11 +1,12 @@
 namespace SharpVG
 
-type line =
+type Line =
     {
-        Point1: point
-        Point2: point
+        Point1: Point
+        Point2: Point
     }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Line =
     let create point1 point2 =
         { Point1 = point1; Point2 = point2 }

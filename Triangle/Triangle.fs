@@ -6,9 +6,9 @@ open System.IO
 
 type Triangle =
     {
-        A : point
-        B : point
-        C : point
+        A : Point
+        B : Point
+        C : Point
     }
 
 let midpoint a b =
@@ -44,7 +44,7 @@ let main argv =
 
     // Initialization
     let fileName = ".\\triangle.html"
-    let style = { Stroke = Some(Name colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = Some(Name colors.White); Opacity = None }
+    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = Some(Name Colors.White); Opacity = None }
     let namedStyle = style |> NamedStyle.ofStyle "standard"
     let (iterations, triangleLength, margin) = (7, 1000.0, 100.0)
     let startingTriangle =

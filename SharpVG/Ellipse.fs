@@ -1,13 +1,13 @@
 namespace SharpVG
 
-type ellipse =
+type Ellipse =
     {
-        Center: point
-        Radius: point
+        Center: Point
+        Radius: Point
     }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Ellipse =
-
     let create center radius =
         {
             Center = center;

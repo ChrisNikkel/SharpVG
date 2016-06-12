@@ -1,10 +1,11 @@
 namespace SharpVG
 
-type length =
+type Length =
     | Pixels of float
     | Ems of float
     | Percent of float
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Length =
     let createWithPixels =
         Pixels

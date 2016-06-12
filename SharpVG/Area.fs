@@ -1,11 +1,12 @@
 namespace SharpVG
 
-type area =
+type Area =
     {
-        Width : length;
-        Height : length;
+        Width : Length;
+        Height : Length;
     }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Area =
     let create width height =
         { Width = width; Height = height }

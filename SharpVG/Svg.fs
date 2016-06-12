@@ -1,17 +1,18 @@
 namespace SharpVG
 
-type viewbox = {
-    Minimums: point
-    Size: area
+type Viewbox = {
+    Minimums: Point
+    Size: Area
 }
 
-type svg = {
-    Body: body
-    Styles: seq<namedStyle> option
-    Size: area option
-    Viewbox: viewbox option
+type Svg = {
+    Body: Body
+    Styles: seq<NamedStyle> option
+    Size: Area option
+    Viewbox: Viewbox option
 }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Svg =
     let ofSeq seq =
         {
@@ -35,16 +36,16 @@ module Svg =
             Viewbox = None
         }
 
-    let withSize size (svg:svg) =
+    let withSize size (svg:Svg) =
         { svg with Size = Some(size) }
 
-    let withViewbox viewbox (svg:svg) =
+    let withViewbox viewbox (svg:Svg) =
         { svg with Viewbox = Some(viewbox) }
 
-    let withStyles styles (svg:svg) =
+    let withStyles styles (svg:Svg) =
         { svg with Styles = Some(styles) }
 
-    let withStyle namedStyle (svg:svg) =
+    let withStyle namedStyle (svg:Svg) =
         { svg with Styles = Some(Seq.singleton namedStyle) }
 
 

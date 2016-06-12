@@ -1,9 +1,10 @@
 namespace SharpVG
 
-type points = seq<point>
+type Points = seq<Point>
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Points =
-    let toString (points:points) =
+    let toString (points:Points) =
         points
         |> Seq.map Point.toString
         |> String.concat " "

@@ -1,11 +1,12 @@
 namespace SharpVG
 
-type rect =
+type Rect =
     {
-        UpperLeft: point
-        Size: area
+        UpperLeft: Point
+        Size: Area
     }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Rect =
     let create upperLeft size =
         { UpperLeft = upperLeft; Size = size }

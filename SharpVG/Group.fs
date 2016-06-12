@@ -1,16 +1,17 @@
 ﻿namespace SharpVG
 
-type group = {
-    Body: body
-    UpperLeft: point option
-    Transform: transform option
+type Group = {
+    Body: Body
+    UpperLeft: Point option
+    Transform: Transform option
 }
-and groupElement =
-    | Group of group
-    | Element of element
-and body =
-    seq<groupElement>
+and GroupElement =
+    | Group of Group
+    | Element of Element
+and Body =
+    seq<GroupElement>
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Group =
     let ofSeq seq =
         {
@@ -26,10 +27,10 @@ module Group =
         array |> Seq.ofArray |> ofSeq
 
 
-    let withOffset upperLeft (group:group) =
+    let withOffset upperLeft (group:Group) =
         { group with UpperLeft = Some upperLeft }
 
-    let withTransform transform (group:group) =
+    let withTransform transform (group:Group) =
         { group with Transform = Some transform }
 
     let rec toString group =

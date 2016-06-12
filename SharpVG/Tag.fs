@@ -1,12 +1,13 @@
 namespace SharpVG
 
-type tag =
+type Tag =
     {
         Name: string;
         Attribute: string option;
         Body: string option;
     }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Tag =
     let create name attribute body =
         { Name = name; Attribute = Some(attribute); Body = Some(body) }

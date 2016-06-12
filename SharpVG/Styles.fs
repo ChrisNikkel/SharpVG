@@ -8,5 +8,5 @@ module Styles =
             Body = Some("<![CDATA[" + (styles |> Seq.map NamedStyle.toCssString |> String.concat " ") + "]]>")
         }
 
-    let toString (styles:seq<namedStyle>) =
+    let toString (styles:seq<NamedStyle>) =
         styles |> toTag |> Tag.toString

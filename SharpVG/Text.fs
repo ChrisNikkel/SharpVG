@@ -1,11 +1,12 @@
 namespace SharpVG
 
-type text =
+type Text =
     {
-        UpperLeft: point
+        UpperLeft: Point
         Body: string
     }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Text =
     let create upperLeft body =
         { UpperLeft = upperLeft; Body = body }

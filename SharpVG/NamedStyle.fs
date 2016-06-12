@@ -1,10 +1,11 @@
 ﻿namespace SharpVG
 
-type namedStyle = {
+type NamedStyle = {
     Name : string;
-    Style : style;
+    Style : Style;
 }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module NamedStyle =
     let ofStyle name style =
         { Name = name; Style = style }

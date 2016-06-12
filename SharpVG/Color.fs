@@ -1,6 +1,6 @@
 namespace SharpVG
 
-type colors =
+type Colors =
     | None = 0
     | AliceBlue = 1
     | AntiqueWhite = 2
@@ -150,13 +150,14 @@ type colors =
     | Yellow = 146
     | YellowGreen = 147
 
-type color =
-    | Name of colors
+type Color =
+    | Name of Colors
     | SmallHex of int16  // #rgb
     | Hex of int  // #rrggbb
     | Values of byte * byte * byte // 0 - 255
     | Percents of float * float * float // 0.0% - 100.0%
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Color =
     open System
 
@@ -177,7 +178,7 @@ module Color =
 
     let toString color =
         match color with
-            | Name n -> Enum.GetName(typeof<colors>, n).ToLower()
+            | Name n -> Enum.GetName(typeof<Colors>, n).ToLower()
             | SmallHex sh -> String.Format("0x{0:x}", sh)
             | Hex h -> String.Format("0x{0:x}", h)
             | Values (r, g, b) -> "(" + string r + ", " + string g + ", " + string b + ")"

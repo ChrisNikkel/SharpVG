@@ -1,11 +1,12 @@
 namespace SharpVG
 
-type point =
+type Point =
     {
-        X : length;
-        Y : length;
+        X : Length;
+        Y : Length;
     }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Point =
     let create x y =
         { X = x; Y = y }

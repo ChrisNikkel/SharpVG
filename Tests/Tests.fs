@@ -36,7 +36,7 @@ let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p, o) =
 let ``draw rectangles`` (x, y, h, w, c, r, g, b, p, o) =
     configureLogs
     let point = Point.create (Pixels x) (Pixels y)
-    let area = Area.create h w
+    let area = Area.create (Pixels h) (Pixels w)
     let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
     let style = Style.create fill stroke strokeWidth opacity
     let rect = Rect.create point area
@@ -99,8 +99,8 @@ let ``do lots and don't fail`` () =
     }
 
     let point = Point.create (Pixels 24.0) (Pixels 15.0)
-    let style1 = Style.create (Name colors.Red) (Hex 0xff0000) (Pixels 3.0) 1.0
-    let style2 = Style.create (Name colors.Blue) (SmallHex 0xf00s) (Pixels 6.0) 1.0
+    let style1 = Style.create (Name Colors.Red) (Hex 0xff0000) (Pixels 3.0) 1.0
+    let style2 = Style.create (Name Colors.Blue) (SmallHex 0xf00s) (Pixels 6.0) 1.0
     let length = Length.createWithPixels 1.0
     let area = Area.create length length
 
