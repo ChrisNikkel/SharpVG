@@ -25,7 +25,7 @@ module Tag =
         tag 
         |> withAttribute (
             match tag.Attribute with
-                | Some(a) -> a + attribute
+                | Some(a) -> a + " " + attribute
                 | None -> attribute
         )
 
