@@ -16,7 +16,8 @@ type Element = {
         Class: string option;  // TODO: Auto fill this for named styles
         Element: BaseElement;
         Style: Style option;
-        Transform: Transform option
+        Transform: Transform option;
+        Animations: seq<Animation> option
     }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
@@ -27,16 +28,18 @@ module Element =
             Class = className;
             Element = element;
             Style = None;
-            Transform = None
+            Transform = None;
+            Animations = None;
         }
 
-    let createFull id className style transform element =
+    let createFull id className style transform element animations =
         {
             Id = id;
             Class = className;
             Element = element;
             Style = Some style;
-            Transform = Some transform
+            Transform = Some transform;
+            Animations = Some animations
         }
 
     let createWithElement element =
@@ -45,7 +48,8 @@ module Element =
             Class = None;
             Element = element;
             Style = None;
-            Transform = None
+            Transform = None;
+            Animations = None
         }
 
     let withStyle style (element:Element) =
@@ -73,24 +77,28 @@ module Element =
     let ofPolyline polyline = createWithElement (Polyline polyline)
 
     let toTag element =
-        let elementTag =
-            match element.Element with
-                | Line line -> line |> Line.toTag
-                | Text text -> text |> Text.toTag
-                | Image image -> image |> Image.toTag
-                | Circle circle -> circle |> Circle.toTag
-                | Ellipse ellipse -> ellipse |> Ellipse.toTag
-                | Rect rect -> rect |> Rect.toTag
-                | Polygon polygon -> polygon |> Polygon.toTag
-                | Polyline polyline -> polyline |> Polyline.toTag
-                | Path path -> path |> Path.toTag
-        let attribute =
-            [
-                element.Id |> Option.map (fun id -> "id=" + (Tag.quote id))
-                element.Class |> Option.map (fun className -> "class=" + (Tag.quote className))
-                element.Style  |> Option.map Style.toAttributeString
-                element.Transform |> Option.map Transform.toString
-            ] |> List.choose id |>  String.concat " "
-        elementTag |> Tag.addAttribute attribute
+        match element.Element with
+            | Line line -> line |> Line.toTag
+            | Text text -> text |> Text.toTag
+            | Image image -> image |> Image.toTag
+            | Circle circle -> circle |> Circle.toTag
+            | Ellipse ellipse -> ellipse |> Ellipse.toTag
+            | Rect rect -> rect |> Rect.toTag
+            | Polygon polygon -> polygon |> Polygon.toTag
+            | Polyline polyline -> polyline |> Polyline.toTag
+            | Path path -> path |> Path.toTag
+        |> Tag.addAttribute
+            (
+                [
+                    element.Id |> Option.map (fun id -> "id=" + (Tag.quote id))
+                    element.Class |> Option.map (fun className -> "class=" + (Tag.quote className))
+                    element.Style  |> Option.map Style.toAttributeString
+                    element.Transform |> Option.map Transform.toString
+                ]
+                |> List.choose id |>  String.concat " "
+            )
+        |> match element.Animations with
+            | Some(a) -> Tag.addBody (a |> Seq.map Animation.toString |> String.concat "")
+            | None -> id
 
     let toString element = element |> toTag |> Tag.toString

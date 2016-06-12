@@ -19,7 +19,7 @@ module Tag =
         { tag with Attribute = Some(attribute) }
 
     let withBody body tag =
-        { tag with Body = body }
+        { tag with Body = Some(body) }
 
     let addAttribute attribute tag =
         tag 
@@ -27,6 +27,14 @@ module Tag =
             match tag.Attribute with
                 | Some(a) -> a + attribute
                 | None -> attribute
+        )
+
+    let addBody body tag =
+        tag
+        |> withBody (
+            match tag.Body with
+                | Some(b) -> b + body
+                | None -> body
         )
 
     let toString tag =

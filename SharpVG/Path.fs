@@ -38,7 +38,7 @@ module Path =
     let addClosePath path =
         Seq.append path (Seq.singleton ClosePath)
 
-    let toTag path =
+    let toDataString path =
         let pathTypeToString pathType =
             match pathType with
                     | LengthPart(positioning, style, point) ->
@@ -58,9 +58,17 @@ module Path =
                             | Relative -> letter.ToLower()
                         + " " + (Point.toString point)
                     | ClosePath -> "Z"
+        path
+        |> Seq.map pathTypeToString
+        |> String.concat " "
+
+    let toAttributeString path =
+        "path=" + (path |> toDataString)
+
+    let toTag path =
         {
             Name = "path";
-            Attribute = Some("d=" + Tag.quote (path |> Seq.map pathTypeToString |> String.concat " "))
+            Attribute = Some("d=" + Tag.quote (path |> toDataString))
             Body = None
         }
 
