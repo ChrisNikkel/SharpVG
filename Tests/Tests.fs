@@ -20,104 +20,73 @@ type PositiveFloat =
 type SvgProperty() =
     inherit PropertyAttribute(Arbitrary = [| typeof<PositiveFloat> |])
 
+
 [<SvgProperty>]
 let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p, o) =
     configureLogs
-    let point1 = { X = Pixels x1; Y = Pixels y1 }
-    let point2 = { X = Pixels x2; Y = Pixels y2 }
+    let point1, point2 = (Point.create (Pixels x1) (Pixels y1)), (Point.create (Pixels x2) (Pixels y2))
     let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
     let style = Style.create fill stroke strokeWidth opacity
     let line = Line.create point1 point2
     let tag = line |> Element.ofLine |> Element.withStyle style |> Element.toString
 
-    test <@ (isMatched '<' '>' tag)
-    && (isDepthNoMoreThanOne '<' '>' tag)
-    && (happensEvenly '"' tag)
-    && (happensEvenly ''' tag)
-    && (tag.Contains "line")
-    && (isTagEnclosed tag) @>
+    test <| checkBodylessTag "line" tag
 
 [<SvgProperty>]
 let ``draw rectangles`` (x, y, h, w, c, r, g, b, p, o) =
     configureLogs
-    let point = { X = Pixels x; Y = Pixels y}
-    let area = { Height = Pixels h; Width = Pixels w }
+    let point = Point.create (Pixels x) (Pixels y)
+    let area = Area.create h w
     let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
     let style = Style.create fill stroke strokeWidth opacity
     let rect = Rect.create point area
     let tag = rect |> Element.ofRect |> Element.withStyle style |> Element.toString
 
-    test <@ (isMatched '<' '>' tag)
-    && (isDepthNoMoreThanOne '<' '>' tag)
-    && (happensEvenly '"' tag)
-    && (happensEvenly ''' tag)
-    && (tag.Contains "rect")
-    && (isTagEnclosed tag) @>
+    test <| checkBodylessTag "rect" tag
 
 [<SvgProperty>]
 let ``draw circles`` (x, y, radius, c, r, g, b, p, o) =
     configureLogs
-    let point = { X = Pixels x; Y = Pixels y }
+    let point = Point.create (Pixels x) (Pixels y)
     let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
     let style = Style.create fill stroke strokeWidth opacity
     let circle = Circle.create point (Pixels radius)
     let tag = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
 
-    test <@ (isMatched '<' '>' tag)
-    && (isDepthNoMoreThanOne '<' '>' tag)
-    && (happensEvenly '"' tag)
-    && (happensEvenly ''' tag)
-    && (tag.Contains "circle")
-    && (isTagEnclosed tag) @>
+    test <| checkBodylessTag "circle" tag
 
 
 [<SvgProperty>]
 let ``draw ellipses`` (x1, y1, x2, y2, c, r, g, b, p, o) =
     configureLogs
-    let point1 = { X = Pixels x1; Y = Pixels y1 }
-    let point2 = { X = Pixels x2; Y = Pixels y2 }
+    let point1, point2 = (Point.create (Pixels x1) (Pixels y1)), (Point.create (Pixels x2) (Pixels y2))
     let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
     let style = Style.create fill stroke strokeWidth opacity
     let ellipse = Ellipse.create point1 point2
     let tag = ellipse |> Element.ofEllipse |> Element.withStyle style |> Element.toString
 
-    test <@ (isMatched '<' '>' tag)
-    && (isDepthNoMoreThanOne '<' '>' tag)
-    && (happensEvenly '"' tag)
-    && (happensEvenly ''' tag)
-    && (tag.Contains "ellipse")
-    && (isTagEnclosed tag) @>
+    test <| checkBodylessTag "ellipse" tag
 
 [<Property>]
 let ``draw images`` (x, y, h, w, i) =
     configureLogs
-    let point = { X = Pixels x; Y = Pixels y }
+    let point = Point.create (Pixels x) (Pixels y)
     let area = { Height = Pixels h; Width = Pixels w }
     let image = Image.create point area i
     let tag = image |> Element.ofImage |> Element.toString
 
-    test <@ (isMatched '<' '>' tag)
-    && (isDepthNoMoreThanOne '<' '>' tag)
-    && (happensEvenly '"' tag)
-    && (happensEvenly ''' tag)
-    && (tag.Contains "image")
-    && (isTagEnclosed tag) @>
+    test <| checkBodylessTag "image" tag
 
 [<SvgProperty>]
 let ``draw texts`` (x, y, c, r, g, b, p, o) =
     configureLogs
-    let point = { X = Pixels (x |> float); Y = Pixels (y |> float)}
+    let point = Point.create (Pixels x) (Pixels y)
     let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
     let style = Style.create fill stroke strokeWidth opacity
     let text = Text.create point "test"
     let tag = text |> Element.ofText |> Element.withStyle style |> Element.toString
 
-    test <@ (isMatched '<' '>' tag)
-    && (isDepthNoMoreThanOne '<' '>' tag)
-    && (happensEvenly '"' tag)
-    && (happensEvenly ''' tag)
-    && (tag.Contains "text")
-    && (tag.Contains "test") @>
+    test <| checkTag "text" tag
 
 [<Fact>]
 let ``do lots and don't fail`` () =

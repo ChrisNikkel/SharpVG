@@ -37,3 +37,18 @@ let isMatched left right (str:string) =
                 | _ -> acc
         ) 0 = 0
     |> logResult "isMatched"
+
+let checkBodylessTag name tag =
+    <@ (isMatched '<' '>' tag)
+    && (isDepthNoMoreThanOne '<' '>' tag)
+    && (happensEvenly '"' tag)
+    && (happensEvenly ''' tag)
+    && (tag.Contains name)
+    && (isTagEnclosed tag) @>
+
+let checkTag name tag =
+    <@ (isMatched '<' '>' tag)
+    && (isDepthNoMoreThanOne '<' '>' tag)
+    && (happensEvenly '"' tag)
+    && (happensEvenly ''' tag)
+    && (tag.Contains name) @>
