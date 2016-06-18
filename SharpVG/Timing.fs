@@ -55,9 +55,30 @@ module Timing =
             FinalState = None;
         }
 
+    let withDuration duration timing =
+        { timing with Duration = Some(duration) }
+
+    let withEnd e timing =
+        { timing with End = Some(e) }
+
+    let withMinimum minimum timing =
+        { timing with Minimum = Some(minimum) }
+
+    let withMaximum maximum timing =
+        { timing with Maximum = Some(maximum) }
+
+    let withResart restart timing =
+        { timing with Restart = Some(restart) }
+
+    let withRepetition repetition timing =
+        { timing with Repetition = Some(repetition) }
+
+    let withFinalState finalState timing =
+        { timing with FinalState = Some(finalState) }
+
     let toString timing =
         let timeSpanToString (timeSpan:TimeSpan) =
-            timeSpan.ToString("hh:mm:ss")
+            string timeSpan.TotalSeconds
 
         let durationToString duration =
             match duration with
@@ -88,12 +109,12 @@ module Timing =
                 | Hidden -> "remove"
 
         [
-            Some("begin=" + (timing.Begin |> timeSpanToString));
-            timing.Duration |> Option.map (fun d -> "dur=" + Tag.quote(d |> durationToString));
+            Some("begin=" + Tag.quote (timing.Begin |> timeSpanToString));
+            timing.Duration |> Option.map (fun d -> "dur=" + Tag.quote (d |> durationToString));
             timing.End |> Option.map (fun e -> "end=" + Tag.quote(e |> timeSpanToString));
-            timing.Minimum |> Option.map (fun m -> "min=" + Tag.quote(m |> timeSpanToString));
-            timing.Maximum |> Option.map (fun m -> "max=" + Tag.quote(m |> timeSpanToString));
+            timing.Minimum |> Option.map (fun m -> "min=" + Tag.quote (m |> timeSpanToString));
+            timing.Maximum |> Option.map (fun m -> "max=" + Tag.quote (m |> timeSpanToString));
             timing.Restart |> Option.map (fun r -> Enum.GetName(typeof<Restart>, r).ToLower() |> Tag.quote);
             timing.Repetition |> Option.map (fun r -> r |> repetitionToString);
-            timing.FinalState |> Option.map (fun f -> "fill=" + Tag.quote(f |> finalStateToString));
+            timing.FinalState |> Option.map (fun f -> "fill=" + Tag.quote (f |> finalStateToString));
         ] |> List.choose id |> String.concat " "

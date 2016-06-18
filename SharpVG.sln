@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{A7
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Triangle", "Triangle\Triangle.fsproj", "{58DDE05F-0D65-483F-A091-E684A66790C6}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Life", "Life\Life.fsproj", "{FD5D0925-D128-4858-9C02-A5C06B031D80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,11 +31,16 @@ Global
 		{58DDE05F-0D65-483F-A091-E684A66790C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58DDE05F-0D65-483F-A091-E684A66790C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58DDE05F-0D65-483F-A091-E684A66790C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD5D0925-D128-4858-9C02-A5C06B031D80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD5D0925-D128-4858-9C02-A5C06B031D80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD5D0925-D128-4858-9C02-A5C06B031D80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD5D0925-D128-4858-9C02-A5C06B031D80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{58DDE05F-0D65-483F-A091-E684A66790C6} = {A77A1550-1934-4901-A691-A07CB3C80D27}
+		{FD5D0925-D128-4858-9C02-A5C06B031D80} = {A77A1550-1934-4901-A691-A07CB3C80D27}
 	EndGlobalSection
 EndGlobal

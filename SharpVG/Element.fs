@@ -22,17 +22,8 @@ type Element = {
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Element =
-    let create id className element =
-        {
-            Id = id;
-            Class = className;
-            Element = element;
-            Style = None;
-            Transform = None;
-            Animations = None;
-        }
 
-    let createWithElement element =
+    let create element =
         {
             Id = None;
             Class = None;
@@ -63,14 +54,14 @@ module Element =
     let withNamedStyle namedStyle =
         withClass namedStyle.Name
 
-    let ofLine line = createWithElement (Line line)
-    let ofText text = createWithElement (Text text)
-    let ofImage image = createWithElement (Image image)
-    let ofCircle circle = createWithElement (Circle circle)
-    let ofEllipse ellipse = createWithElement (Ellipse ellipse)
-    let ofRect rect = createWithElement (Rect rect)
-    let ofPolygon polygon = createWithElement (Polygon polygon)
-    let ofPolyline polyline = createWithElement (Polyline polyline)
+    let ofLine line = create (Line line)
+    let ofText text = create (Text text)
+    let ofImage image = create (Image image)
+    let ofCircle circle = create (Circle circle)
+    let ofEllipse ellipse = create (Ellipse ellipse)
+    let ofRect rect = create (Rect rect)
+    let ofPolygon polygon = create (Polygon polygon)
+    let ofPolyline polyline = create (Polyline polyline)
 
     let toTag element =
         match element.Element with
