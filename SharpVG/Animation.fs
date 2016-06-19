@@ -38,7 +38,6 @@ type AnimationType =
     | Animate of Change
     | Transform of AnimateTransform
     | Motion of Motion
-    | Color of From : Color * To : Color
 
 type Animation =
     {
@@ -73,7 +72,6 @@ module Animation =
                 | Animate c -> "animate", "attributeName=" + Tag.quote(c.AttributeName) + " attributeType=" + Tag.quote (Enum.GetName(typeof<AttributeType>, c.AttributeType)) + " to=" + Tag.quote(c.AttributeValue)
                 | Transform _ -> "animateTransform", ""
                 | Motion m -> "animateMotion", (m.Path |> Path.toAttributeString) + match m.CalculationMode with | Some(c) -> " " + Enum.GetName(typeof<CalculationMode>, c).ToLower() | None -> ""
-                | Color _ -> "animateColor", ""
         Tag.create name 
         |> Tag.addAttribute attribute
         |> Tag.addAttribute (animation.Timing |> Timing.toString)
