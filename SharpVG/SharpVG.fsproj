@@ -64,8 +64,8 @@
     <Compile Include="NamedStyle.fs" />
     <Compile Include="Styles.fs" />
     <Compile Include="Timing.fs" />
-    <Compile Include="Animation.fs" />
     <Compile Include="Transform.fs" />
+    <Compile Include="Animation.fs" />
     <Compile Include="Element.fs" />
     <Compile Include="Group.fs" />
     <Compile Include="Svg.fs" />

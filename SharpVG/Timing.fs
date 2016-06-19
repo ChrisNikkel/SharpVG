@@ -26,8 +26,8 @@ type Repetition =
     }
 
 type FinalState = // fill
-    | Frozen // freeze
-    | Hidden // remove
+    | Freeze
+    | Remove
 
 type Timing =
     {
@@ -105,8 +105,8 @@ module Timing =
 
         let finalStateToString finalState =
             match finalState with
-                | Frozen -> "freeze"
-                | Hidden -> "remove"
+                | Freeze -> "freeze"
+                | Remove -> "remove"
 
         [
             Some("begin=" + Tag.quote (timing.Begin |> timeSpanToString));
@@ -114,7 +114,7 @@ module Timing =
             timing.End |> Option.map (fun e -> "end=" + Tag.quote(e |> timeSpanToString));
             timing.Minimum |> Option.map (fun m -> "min=" + Tag.quote (m |> timeSpanToString));
             timing.Maximum |> Option.map (fun m -> "max=" + Tag.quote (m |> timeSpanToString));
-            timing.Restart |> Option.map (fun r -> Enum.GetName(typeof<Restart>, r).ToLower() |> Tag.quote);
+            timing.Restart |> Option.map (fun r -> "restart=" + Tag.quote (Enum.GetName(typeof<Restart>, r).ToLower()));
             timing.Repetition |> Option.map (fun r -> r |> repetitionToString);
             timing.FinalState |> Option.map (fun f -> "fill=" + Tag.quote (f |> finalStateToString));
         ] |> List.choose id |> String.concat " "

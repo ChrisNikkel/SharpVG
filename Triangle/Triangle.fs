@@ -46,7 +46,7 @@ let main argv =
     let fileName = ".\\triangle.html"
     let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = Some(Name Colors.White); Opacity = None }
     let namedStyle = style |> NamedStyle.ofStyle "standard"
-    let (iterations, triangleLength, margin) = (7, 1000.0, 100.0)
+    let iterations, triangleLength, margin = 7, 1000.0, 100.0
     let startingTriangle =
             [{
                 A = { X = Pixels(0.0); Y = Pixels(0.0) };
@@ -58,7 +58,7 @@ let main argv =
     recursiveTriangles startingTriangle iterations
     |> List.map (triangleToPolygon >> (Element.withNamedStyle namedStyle))
     |> Group.ofList
-    |> Group.withTransform (Transform.createWithScale (1.0, -1.0) |> Transform.withTranslate (margin, triangleLength))
+    |> Group.withTransform (Transform.createWithScale (1.0, -1.0) |> Transform.withTranslate (margin, triangleLength))  // TODO: Make Group.useCartesian or something to make this easier
     |> Svg.ofGroup
     |> Svg.withStyle namedStyle
     |> Svg.withSize {Height = Pixels triangleLength; Width = Pixels (triangleLength + margin)}

@@ -8,10 +8,9 @@ open System.IO
 let combine (a, b) = (fst a + fst b, snd a + snd b) 
 
 let surrounding = 
-    [for i in -1..1 -> [for j in -1..1 -> (i, j) ] ] 
+    [for i in -1..1 -> [for j in -1..1 -> (i, j)]] 
     |> List.concat
 
-//TODO: use collect instead of this
 let findSurrounding d = 
     surrounding 
     |> List.map(fun cell -> combine(d, cell)) 
@@ -33,10 +32,10 @@ let survives neighborCount =
         | 2 | 3 -> true
         | _ -> false
 
-let born neighborCount = if neighborCount = 3 then true else false
+let born neighborCount = neighborCount = 3
 
 let iterateDeadGeneration previousData deadCells =
-    deadCells |> List.filter(fun deadCell -> born (countNeighbors previousData deadCell))
+    deadCells |> List.filter(fun deadCell -> (countNeighbors previousData deadCell) |> born)
 
 let removeDups data = data |> Set.ofList |> Set.toList
 
@@ -85,14 +84,17 @@ let main argv =
         |> addItem blockItem 50 35 |> addItem beaconItem 70 60 |> addItem beaconItem 30 30
         |> addItem beaconItem 10 60 |> addItem beaconItem 30 10 |> removeDups
             
-    let iterations, delay, size = 10, 1.0, 10.0
+    let iterations, delay, cellSize, boardSize = 300, 0.25, 15.0, 1000.0
 
     let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = Some(Name Colors.White); Opacity = None }
+    
+    let namedStyle = style |> NamedStyle.ofStyle "standard"
+
     // Execute
     
     let makeElement x y =
-        let point = Point.create <| Pixels (float x * size) <| Pixels (float y * size)
-        Circle.create point <| Pixels size |> Element.ofCircle 
+        let point = Point.create <| Pixels (float x * cellSize) <| Pixels (float y * cellSize)
+        Circle.create point <| Pixels (cellSize / 2.0) |> Element.ofCircle 
 
     let addAnimation element times =
         let duration = Duration (TimeSpan.FromSeconds(delay))
@@ -100,34 +102,25 @@ let main argv =
             let start = TimeSpan.FromSeconds(t)        
             let timing = Timing.create start |> (Timing.withDuration duration)
             Animation.createSet timing AttributeType.CSS "display" "inline"
-        let initial = Animation.createSet (Timing.create (TimeSpan.FromSeconds(0.0))) AttributeType.CSS "display" "none" |> Seq.singleton
-        let animations = initial |> Seq.append (times |> Seq.map (fun t -> ((createAnimation (t * delay)))))
-        element |> (Element.withAnimations animations)
+        let animations =
+            Animation.createSet (Timing.create (TimeSpan.FromSeconds(0.0))) AttributeType.CSS "display" "none"
+            |> Seq.singleton
+            |> Seq.append (times |> Seq.map ((*) delay >> createAnimation))
+        element |> Element.withAnimations animations
 
     seq { 1 .. iterations }
     |> Seq.scan (fun (d, t) _ -> (doIteration d, t + delay)) (initialData, 0.0)
     |> Seq.collect (fun (p, t) -> p |> List.map (fun (x, y) -> ((x, y), t)))
     |> Seq.groupBy (fun ((x, y), t) -> (x, y))
-    |> Seq.map (fun ((x, y), d) -> ((x, y), d |> Seq.map snd))
-    |> Seq.map (fun ((x, y), times) -> addAnimation (makeElement x y) times)
-    |> Seq.map (Element.withStyle style)
+    |> Seq.map (fun ((x, y), times) -> addAnimation (makeElement x y) (times |> Seq.map snd) |> Element.withNamedStyle namedStyle)
     |> Group.ofSeq
-    |> Group.withTransform (Transform.createWithScale (1.0, -1.0) |> Transform.withTranslate (0.0, 1000.0))
+    |> Group.withTransform (Transform.createWithScale (1.0, -1.0) |> Transform.withTranslate (0.0, boardSize))
     |> Svg.ofGroup
-    |> Svg.withSize {Height = Pixels 1000.0; Width = Pixels 1000.0}
-    |> Svg.withViewbox {Minimums = { X = Pixels 0.0; Y = Pixels 0.0}; Size = {Height = Pixels 1000.0; Width = Pixels 1000.0 }}
+    |> Svg.withStyle namedStyle
+    |> Svg.withSize {Height = Pixels boardSize; Width = Pixels boardSize}
+    |> Svg.withViewbox {Minimums = { X = Pixels 0.0; Y = Pixels 0.0}; Size = {Height = Pixels boardSize; Width = Pixels boardSize }}
     |> Svg.toHtml "SVG Life Example"
     |> saveToFile fileName
 
-
-//    seq { 1 .. iterations }
-//    |> Seq.scan (fun (d, t) _ -> (doIteration d, t + delay)) (initialData, 0.0)
-//    |> Seq.map (fun (p, t) -> p |> List.map (fun (x, y) -> ((x, y), t)))
-//    |> Seq.map (fun d -> d |> List.groupBy (fun ((x, y), t) -> (x, y)))
-//    |> Seq.map (fun d -> d |> List.map (fun (p, d) -> (p, d |> List.map (fun (p, t) -> t))))
-//    |> Seq.map (fun d -> d |> List.map (fun ((x, y), t) -> addAnimation (makeElement x y) t))
-//    |> Svg.ofSeq
-//    |> Svg.toHtml "Life"
-//    |> saveToFile fileName
     openFile fileName
     0 // return an integer exit code

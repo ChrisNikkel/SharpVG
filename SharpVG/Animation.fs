@@ -25,12 +25,20 @@ type Motion =
         CalculationMode: CalculationMode option
     }
 
+// TODO: Combine with Transform.fs if possible
+type AnimateTransform =
+    | Translate of X: Length * Y: Length option
+    | Scale of X: Length * Y: Length option
+    | Rotate of Angle: float *  X: Length option * Y: Length option
+    | SkewX of Angle: float
+    | SkewY of Angle: float
+
 type AnimationType =
     | Set of Change
     | Animate of Change
-    | Transform
+    | Transform of AnimateTransform
     | Motion of Motion
-    | Color
+    | Color of From : Color * To : Color
 
 type Animation =
     {
@@ -63,9 +71,9 @@ module Animation =
             match animation.AnimationType with 
                 | Set c -> "set", "attributeName=" + Tag.quote(c.AttributeName) + " attributeType=" + Tag.quote (Enum.GetName(typeof<AttributeType>, c.AttributeType)) + " to=" + Tag.quote(c.AttributeValue)
                 | Animate c -> "animate", "attributeName=" + Tag.quote(c.AttributeName) + " attributeType=" + Tag.quote (Enum.GetName(typeof<AttributeType>, c.AttributeType)) + " to=" + Tag.quote(c.AttributeValue)
-                | Transform -> "animateTransform", ""
+                | Transform _ -> "animateTransform", ""
                 | Motion m -> "animateMotion", (m.Path |> Path.toAttributeString) + match m.CalculationMode with | Some(c) -> " " + Enum.GetName(typeof<CalculationMode>, c).ToLower() | None -> ""
-                | Color -> "animateColor", ""
+                | Color _ -> "animateColor", ""
         Tag.create name 
         |> Tag.addAttribute attribute
         |> Tag.addAttribute (animation.Timing |> Timing.toString)
