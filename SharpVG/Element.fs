@@ -62,6 +62,7 @@ module Element =
     let ofRect rect = create (Rect rect)
     let ofPolygon polygon = create (Polygon polygon)
     let ofPolyline polyline = create (Polyline polyline)
+    let ofPath path = create (Path path)
 
     let toTag element =
         match element.Element with
