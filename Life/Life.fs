@@ -114,7 +114,7 @@ let main argv =
     |> Seq.groupBy (fun ((x, y), t) -> (x, y))
     |> Seq.map (fun ((x, y), times) -> addAnimation (makeElement x y) (times |> Seq.map snd) |> Element.withNamedStyle namedStyle)
     |> Group.ofSeq
-    |> Group.withTransform (Transform.createWithScale (1.0, -1.0) |> Transform.withTranslate (0.0, boardSize))
+    |> Group.asCartesian 0.0 boardSize
     |> Svg.ofGroup
     |> Svg.withStyle namedStyle
     |> Svg.withSize {Height = Pixels boardSize; Width = Pixels boardSize}

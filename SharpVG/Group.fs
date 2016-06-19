@@ -26,12 +26,15 @@ module Group =
     let ofArray array =
         array |> Seq.ofArray |> ofSeq
 
-
     let withOffset upperLeft (group:Group) =
         { group with UpperLeft = Some upperLeft }
 
     let withTransform transform (group:Group) =
         { group with Transform = Some transform }
+
+    let asCartesian x y (group:Group) =
+        group
+        |> withTransform (Transform.createWithScale (1.0, -1.0) |> Transform.withTranslate (x, y))
 
     let rec toString group =
         let body =
