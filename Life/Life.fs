@@ -56,12 +56,23 @@ let doIteration initialData = (iterateAliveGeneration initialData [] 0)
 
 let setItemPosition x y item = item |> List.map (fun (ix, iy) -> (ix + x, iy + y))
 let addItem item x y map = map |> List.append (item |> setItemPosition x y)
+
 let crossItem = [(1, 1); (1, 2); (1, 3)]
 let gliderItem = [(1, 1); (2, 1); (3, 1); (3, 2); (2, 3)]
 let toadItem = [(1, 1); (2, 1); (3, 1); (2, 2); (3, 2); (4, 2)]
 let blockItem = [(1, 1); (1, 2); (2, 1); (2, 2)]
 let beaconItem = [(4, 1); (4, 2); (3, 1); (1, 3); (1, 4); (2, 4)]
 
+let randomGenerator = Random()
+let randomsBetween min max = Seq.initInfinite (fun _ -> randomGenerator.Next(min,  max+1))
+
+let itemByNumber number =
+    match number with
+        | 1 -> gliderItem
+        | 2 -> crossItem
+        | 3 -> toadItem
+        | 4 -> beaconItem
+        | _ -> blockItem
 
 [<EntryPoint>]
 let main argv = 
@@ -75,23 +86,31 @@ let main argv =
 
     // Initalize
     let fileName = ".\\life.html"
+    
+    let iterations, delay, cellSize = 100, 0.25, 15.0
+    let size = 70
+    let boardSize = cellSize * float size
 
-    let initialData = 
-        blockItem |> setItemPosition 25 46
-        |> addItem gliderItem 5 65 |> addItem gliderItem 25 52 |> addItem gliderItem 25 65
-        |> addItem gliderItem 5 52 |> addItem crossItem 20 50 |> addItem toadItem 50 50
-        |> addItem gliderItem 22 22 |> addItem crossItem 44 11 |> addItem toadItem 23 55
-        |> addItem blockItem 50 35 |> addItem beaconItem 70 60 |> addItem beaconItem 30 30
-        |> addItem beaconItem 10 60 |> addItem beaconItem 30 10 |> removeDups
-            
-    let iterations, delay, cellSize, boardSize = 300, 0.25, 15.0, 1000.0
+    let randomItems =
+        let quantity = randomsBetween 20 40 |> Seq.take 1 |> Seq.head
+        let randomPositions = randomsBetween 0 (size - 5)
+        let randomXs = randomPositions |> Seq.take quantity
+        let randomYs = randomPositions |> Seq.skip quantity |> Seq.take quantity
+        let randomItemTypes = randomsBetween 1 5 |> Seq.take quantity
+        Seq.zip3 randomItemTypes randomXs randomYs |> List.ofSeq
+
+    let initialData =
+        randomItems
+        |> List.scan (fun board (itemType, x, y) -> board |> addItem (itemByNumber itemType) x y) []
+        |> List.concat
+        |> removeDups
 
     let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = Some(Name Colors.White); Opacity = None }
     
     let namedStyle = style |> NamedStyle.ofStyle "standard"
 
     // Execute
-    
+
     let makeElement x y =
         let point = Point.create <| Pixels (float x * cellSize) <| Pixels (float y * cellSize)
         Circle.create point <| Pixels (cellSize / 2.0) |> Element.ofCircle 
