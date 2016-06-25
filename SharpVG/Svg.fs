@@ -14,6 +14,11 @@ type Svg = {
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Svg =
+    /// <summary>
+    /// This function takes seqence of elements and creates a simple svg object.
+    /// </summary>
+    /// <param name="seq">The sequence of elements</param>
+    /// <returns>The svg object containing the elements.</returns>
     let ofSeq seq =
         {
             Body = seq |> Seq.map (fun e -> Element(e));
