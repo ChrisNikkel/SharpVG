@@ -45,3 +45,4 @@ module Tag =
         | { Name = n; Attributes = a; Body = Some(b) } when a = Set.empty -> "<" + n + ">" + b + "</" + n + ">"
         | { Name = n; Attributes = a; Body = None } when a <> Set.empty  -> "<" + n + " " + (attributesToString a) + "/>"
         | { Name = n; Attributes = a; Body = None } when a = Set.empty  -> "<" + n + "/>"
+        | _ -> failwith "Unmatched tag"
