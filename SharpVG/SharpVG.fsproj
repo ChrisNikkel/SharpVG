@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Attribute.fs" />
     <Compile Include="Tag.fs" />
     <Compile Include="Length.fs" />
     <Compile Include="Area.fs" />

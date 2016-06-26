@@ -3,28 +3,32 @@ namespace SharpVG
 type Tag =
     {
         Name: string;
-        Attribute: string option;
+        Attributes: Set<Attribute>;
         Body: string option;
     }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Tag =
+
     let create name =
-        { Name = name; Attribute = None; Body = None }
+        { Name = name; Attributes = Set.empty; Body = None }
 
     let withAttribute attribute tag =
-        { tag with Attribute = Some(attribute) }
+        { tag with Attributes = set [attribute] }
+
+    let withAttributes attributes tag =
+        { tag with Attributes = attributes }
 
     let withBody body tag =
         { tag with Body = Some(body) }
 
     let addAttribute attribute tag =
         tag 
-        |> withAttribute (
-            match tag.Attribute with
-                | Some(a) -> a + " " + attribute
-                | None -> attribute
-        )
+        |> withAttributes (Set.add attribute tag.Attributes)
+
+    let addAttributes attributes tag =
+        tag
+        |> withAttributes (attributes + tag.Attributes)
 
     let addBody body tag =
         tag
@@ -35,11 +39,9 @@ module Tag =
         )
 
     let toString tag =
+        let attributesToString attributes = (attributes |> Set.map Attribute.toString |> Set.toSeq |> String.concat " ")
         match tag with
-        | { Name = n; Attribute = Some(a); Body = Some(b) } -> "<" + n + " " + a + ">" + b + "</" + n + ">"
-        | { Name = n; Attribute = None; Body = Some(b) } -> "<" + n + ">" + b + "</" + n + ">"
-        | { Name = n; Attribute = Some(a); Body = None } -> "<" + n + " " + a + "/>"
-        | { Name = n; Attribute = None; Body = None } -> "<" + n + "/>"
-
-// TODO: Move quote or do it better
-    let inline quote i = "\"" + string i + "\""
+        | { Name = n; Attributes = a; Body = Some(b) } when a <> Set.empty -> "<" + n + " " + (attributesToString a) + ">" + b + "</" + n + ">"
+        | { Name = n; Attributes = a; Body = Some(b) } when a = Set.empty -> "<" + n + ">" + b + "</" + n + ">"
+        | { Name = n; Attributes = a; Body = None } when a <> Set.empty  -> "<" + n + " " + (attributesToString a) + "/>"
+        | { Name = n; Attributes = a; Body = None } when a = Set.empty  -> "<" + n + "/>"

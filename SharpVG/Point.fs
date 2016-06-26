@@ -17,12 +17,11 @@ module Point =
     let toDoubles point =
         (Length.toDouble point.X, Length.toDouble point.Y)
 
-    let toDescriptiveStringWithModifier point pre post =
-        pre + "x" + post + "=" + Tag.quote (Length.toString point.X) + " " +
-        pre + "y" + post + "=" + Tag.quote (Length.toString point.Y)
+    let toAttributesWithModifier point pre post =
+        set [Attribute.create (pre + "x" + post) (Length.toString point.X); Attribute.create (pre + "y" + post) (Length.toString point.Y)]
 
-    let toDescriptiveString point =
-        toDescriptiveStringWithModifier point "" ""
+    let toAttributes point =
+        toAttributesWithModifier point "" ""
 
     let toStringWithSeparator separator point =
         Length.toString point.X + separator + Length.toString point.Y

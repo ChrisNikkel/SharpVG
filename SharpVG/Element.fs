@@ -75,15 +75,16 @@ module Element =
             | Polygon polygon -> polygon |> Polygon.toTag
             | Polyline polyline -> polyline |> Polyline.toTag
             | Path path -> path |> Path.toTag
-        |> Tag.addAttribute
+        |> Tag.addAttributes
             (
                 [
-                    element.Id |> Option.map (fun id -> "id=" + (Tag.quote id))
-                    element.Class |> Option.map (fun className -> "class=" + (Tag.quote className))
-                    element.Style  |> Option.map Style.toAttributeString
-                    element.Transform |> Option.map Transform.toString
+                    element.Id |> Option.map (Attribute.create "id" >> Set.singleton)
+                    element.Class |> Option.map (Attribute.create "class" >> Set.singleton)
+                    element.Style  |> Option.map Style.toAttributes
+                    element.Transform |> Option.map (Transform.toAttribute >> Set.singleton)
+                    Some Set.empty // To prevent an empty list for the reduce
                 ]
-                |> List.choose id |>  String.concat " "
+                |> List.choose id |> List.reduce (+)
             )
         |> match element.Animations with
             | Some(a) -> Tag.addBody (a |> Seq.map Animation.toString |> String.concat "")

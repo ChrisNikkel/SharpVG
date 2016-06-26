@@ -62,14 +62,12 @@ module Path =
         |> Seq.map pathTypeToString
         |> String.concat " "
 
-    let toAttributeString path =
-        "path=" + (path |> toDataString)
+    let toAttribute path =
+        Attribute.create "path" (path |> toDataString)
 
     let toTag path =
-        {
-            Name = "path";
-            Attribute = Some("d=" + Tag.quote (path |> toDataString))
-            Body = None
-        }
+        Tag.create "path"
+        |> Tag.withAttribute (Attribute.create "d" (path |> toDataString))
 
-    let toString path = path |> toTag |> Tag.toString
+    let toString path =
+        path |> toTag |> Tag.toString

@@ -66,14 +66,18 @@ module Animation =
         }
 
     let toTag animation =
-        let name, attribute =
+        let calculationModeToAttribute c =
+            match c with
+                | Some(c) -> set [Attribute.create "calculationMode" (Enum.GetName(typeof<CalculationMode>, c).ToLower())]
+                | None -> set []
+        let name, attributes =
             match animation.AnimationType with 
-                | Set c -> "set", "attributeName=" + Tag.quote(c.AttributeName) + " attributeType=" + Tag.quote (Enum.GetName(typeof<AttributeType>, c.AttributeType)) + " to=" + Tag.quote(c.AttributeValue)
-                | Animate c -> "animate", "attributeName=" + Tag.quote(c.AttributeName) + " attributeType=" + Tag.quote (Enum.GetName(typeof<AttributeType>, c.AttributeType)) + " to=" + Tag.quote(c.AttributeValue)
-                | Transform _ -> "animateTransform", ""
-                | Motion m -> "animateMotion", (m.Path |> Path.toAttributeString) + match m.CalculationMode with | Some(c) -> " " + Enum.GetName(typeof<CalculationMode>, c).ToLower() | None -> ""
-        Tag.create name 
-        |> Tag.addAttribute attribute
-        |> Tag.addAttribute (animation.Timing |> Timing.toString)
+                | Set c -> "set", set [Attribute.create "attributeName" c.AttributeName; Attribute.create "attributeType" (Enum.GetName(typeof<AttributeType>, c.AttributeType)); Attribute.create "to" c.AttributeValue]
+                | Animate c -> "animate", set [Attribute.create "attributeName" c.AttributeName; Attribute.create "attributeType" (Enum.GetName(typeof<AttributeType>, c.AttributeType)); Attribute.create "to" c.AttributeValue]
+                | Transform _ -> "animateTransform", set []
+                | Motion m -> "animateMotion", set [m.Path |> Path.toAttribute] + (calculationModeToAttribute m.CalculationMode)
+        Tag.create name
+        |> Tag.addAttributes attributes
+        |> Tag.addAttributes (animation.Timing |> Timing.toAttributes)
 
     let toString animation = animation |> toTag |> Tag.toString

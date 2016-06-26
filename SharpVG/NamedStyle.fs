@@ -11,13 +11,11 @@ module NamedStyle =
         { Name = name; Style = style }
 
     let toCssString namedStyle =
-        "." + namedStyle.Name + "{" + (namedStyle.Style |> Style.toCssString) + "}"
+        "." + namedStyle.Name + "{" + (namedStyle.Style |> Style.toString) + "}"
 
     let toTag namedStyle =
-        {
-            Name = "style";
-            Attribute = Some("type=" + (Tag.quote "text/css"));
-            Body = Some("<![CDATA[" + (toCssString namedStyle) + "]]>")
-        }
+        Tag.create "style"
+        |> Tag.withAttribute (Attribute.create "type" "text/css")
+        |> Tag.withBody ("<![CDATA[" + (toCssString namedStyle) + "]]>")
 
     let toString = toTag >> Tag.toString

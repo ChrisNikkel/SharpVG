@@ -55,24 +55,24 @@ module Svg =
 
 
     let toString svg =
-        let viewbox =
-            match svg.Viewbox with
-                | Some(viewbox) -> " viewBox=" + Tag.quote ((Point.toString viewbox.Minimums) + " " + (Area.toString viewbox.Size))
-                | None -> ""
-        let size =
-            match svg.Size with
-                | Some(size) -> Area.toDescriptiveString size 
-                | None -> ""
+        let attributes =
+            match svg.Size with | Some size -> Area.toAttributes size | None -> set []
+            |> Set.union (match svg.Viewbox with | Some viewbox -> set [Attribute.create "viewBox" ((Point.toString viewbox.Minimums) + " " + (Area.toString viewbox.Size))] | None -> set [])
+
         let styles =
             match svg.Styles with
                 | Some(styles) -> styles |> Styles.toString 
                 | None -> ""
-        let body =            
+
+        let body =
             svg.Body
             |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> Group.toString)
             |> String.concat ""
 
-        "<svg " + size + viewbox + ">\n" + styles + body + "\n</svg>\n"
+        Tag.create "svg"
+        |> Tag.withAttributes attributes
+        |> Tag.withBody (styles + body)
+        |> Tag.toString
 
     let toHtml title svg =
         "<!DOCTYPE html>\n<html>\n<head>\n<title>" + title + "</title>\n</head>\n<body>\n" + (toString svg) + "</body>\n</html>\n"

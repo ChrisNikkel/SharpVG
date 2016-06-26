@@ -49,15 +49,15 @@ module Transform =
     let createWithSkewY skewY =
         empty |> withSkewY skewY
 
-    let toString transform =
-        "transform=" +
-        Tag.quote (
-            seq {
-                yield match transform.Matrix with | Some(a, b, c, d, e, f) -> Some("matrix(" + string a + ","  + string b + ","  + string c + ","  + string d + ","  + string e + ","  + string f + ")") | None -> None
-                yield match transform.Translate with | Some(x, y) -> Some("translate(" + string x + "," + string y + ")") | None -> None
-                yield match transform.Scale with | Some(x, y) -> Some("scale(" + string x + "," + string y + ")") | None -> None
-                yield match transform.Rotate with | Some(a, x, y) -> Some("rotate(" + string a + "," + string x + "," + string y + ")") | None -> None
-                yield match transform.SkewX with | Some(a) -> Some("skewX(" + string a + ")") | None -> None
-                yield match transform.SkewY with | Some(a) -> Some("skewY(" + string a + ")") | None -> None
-            } |> Seq.choose id |> String.concat " "
-        )
+    let toAttribute transform =
+        Attribute.create "transform"
+            (
+                seq {
+                    yield match transform.Matrix with | Some(a, b, c, d, e, f) -> Some("matrix(" + string a + ","  + string b + ","  + string c + ","  + string d + ","  + string e + ","  + string f + ")") | None -> None
+                    yield match transform.Translate with | Some(x, y) -> Some("translate(" + string x + "," + string y + ")") | None -> None
+                    yield match transform.Scale with | Some(x, y) -> Some("scale(" + string x + "," + string y + ")") | None -> None
+                    yield match transform.Rotate with | Some(a, x, y) -> Some("rotate(" + string a + "," + string x + "," + string y + ")") | None -> None
+                    yield match transform.SkewX with | Some(a) -> Some("skewX(" + string a + ")") | None -> None
+                    yield match transform.SkewY with | Some(a) -> Some("skewY(" + string a + ")") | None -> None
+                } |> Seq.choose id |> String.concat " "
+            )

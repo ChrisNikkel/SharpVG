@@ -10,15 +10,13 @@ type Ellipse =
 module Ellipse =
     let create center radius =
         {
-            Center = center;
+            Center = center
             Radius = radius
         }
 
-    let toTag ellipse =
-        {
-            Name = "ellipse";
-            Attribute = Some((Point.toDescriptiveStringWithModifier ellipse.Center "c" "") + " r=" + Tag.quote (Point.toString ellipse.Radius));
-            Body = None
-        }
+    let toTag circle =
+        Tag.create "ellipse"
+        |> Tag.withAttributes ((Point.toAttributesWithModifier circle.Center "c" "") + (Point.toAttributesWithModifier circle.Radius "r" ""))
 
-    let toString = toTag >> Tag.toString
+    let toString =
+        toTag >> Tag.toString

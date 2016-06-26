@@ -23,20 +23,19 @@ module Text =
         { text with FontSize = Some(size) }
 
     let toTag text =
-        {
-            Name = "text";
-            Attribute = 
-                Some(Point.toDescriptiveString text.UpperLeft +
+        Tag.create "text"
+        |> Tag.withAttributes (Point.toAttributes text.UpperLeft)
+        |> Tag.addAttributes
+            (
                     match text.FontFamily with
-                        | Some(family) -> " font-family=\"" + family + "\""
-                        | None -> ""
-                    +
+                        | Some(family) -> set [Attribute.create "font-family" family]
+                        | None -> set []
+            )
+        |> Tag.addAttributes
+            (
                     match text.FontSize with
-                        | Some(size) -> " font-size=\"" + (string size) + "\""
-                        | None -> ""
-                )
-
-            Body = Some(text.Body)
-        }
+                        | Some(size) -> set [Attribute.create "font-size" (string size)]
+                        | None -> set []
+            )
 
     let toString text = text |> toTag |> Tag.toString

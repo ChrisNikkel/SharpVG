@@ -42,7 +42,7 @@ module Group =
             |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> toString)
             |> String.concat ""
         let transform =
-            match group.Transform with Some(transform) -> (Transform.toString transform) + " " | None -> ""
+            match group.Transform with Some(transform) -> (Transform.toAttribute transform |> Attribute.toString) + " " | None -> ""
         let upperLeft =
              match group.UpperLeft with | Some(upperLeft) -> Point.toString upperLeft | None -> ""
         "<g " + upperLeft + transform + ">" + body + "</g>"

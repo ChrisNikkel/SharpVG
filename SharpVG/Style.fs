@@ -40,23 +40,23 @@ module Style =
     let createWithOpacity opacity =
         empty |> withOpacity opacity
 
-    let private mapToString f separator style =
+    let private mapToString f style =
         [
             style.Stroke |> Option.map (Color.toString >> (f "stroke"));
             style.StrokeWidth |> Option.map (Length.toString >> (f "stroke-width"));
             style.Fill |> Option.map (Color.toString >> (f "fill"));
             style.Opacity |> Option.map (string >> (f "opacity"))
-        ] |> List.choose id |> String.concat separator
+        ] |> List.choose id
 
-    let toAttributeString style =
-        let stylePartToString name value =
-            name + "=" + Tag.quote value
-        mapToString stylePartToString " " style
+    let toAttributes style =
+        let stylePartToAttribute name value =
+            Attribute.create name value
+        mapToString stylePartToAttribute style |> Set.ofList
 
-    let toCssString style =
+    let toString style =
         let stylePartToString name value =
            name + ":" + value
-        mapToString stylePartToString ";" style
+        mapToString stylePartToString style  |> String.concat ";"
 
-    let toStyleString style =
-        "style=" + (Tag.quote <| toCssString style)
+    let toAttribute style =
+        Attribute.create "style" (toString style)

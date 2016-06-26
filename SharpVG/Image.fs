@@ -14,10 +14,7 @@ module Image =
         { UpperLeft = upperLeft; Size = size; Source = source }
 
     let toTag image =
-        {
-            Name = "image";
-            Attribute = Some((Point.toDescriptiveString image.UpperLeft) + " " + Area.toDescriptiveString image.Size);
-            Body = None
-        }
+        Tag.create "image" |> Tag.withAttributes ((Point.toAttributes image.UpperLeft) + (Area.toAttributes image.Size))
 
-    let toString = toTag >> Tag.toString
+    let toString =
+        toTag >> Tag.toString
