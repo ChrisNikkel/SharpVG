@@ -58,7 +58,7 @@ let main argv =
     recursiveTriangles startingTriangle iterations
     |> List.map (triangleToPolygon >> (Element.withNamedStyle namedStyle))
     |> Group.ofList
-    |> Group.asCartesian margin triangleLength
+    |> Group.asCartesian (Pixels margin) (Pixels triangleLength)
     |> Svg.ofGroup
     |> Svg.withStyle namedStyle
     |> Svg.withSize {Height = Pixels triangleLength; Width = Pixels (triangleLength + margin)}

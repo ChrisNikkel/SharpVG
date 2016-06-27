@@ -2,8 +2,7 @@
 
 type Group = {
     Body: Body
-    UpperLeft: Point option
-    Transform: Transform option
+    Transforms: seq<Transform> option
 }
 and GroupElement =
     | Group of Group
@@ -15,9 +14,8 @@ and Body =
 module Group =
     let ofSeq seq =
         {
-            Body = seq |> Seq.map (fun e -> Element(e));
-            UpperLeft = None;
-            Transform = None
+            Body = seq |> Seq.map (fun e -> Element(e))
+            Transforms = None
         }
 
     let ofList list =
@@ -26,26 +24,34 @@ module Group =
     let ofArray array =
         array |> Seq.ofArray |> ofSeq
 
-    let withOffset upperLeft (group:Group) =
-        { group with UpperLeft = Some upperLeft }
+    let withTransforms transforms group =
+        { group with Transforms = Some transforms }
 
-    let withTransform transform (group:Group) =
-        { group with Transform = Some transform }
+    let withTransform transform group =
+        { group with Transforms = Some (Seq.singleton transform) }
 
-    let asCartesian x y (group:Group) =
+    let addTransform transform group =
         group
-        |> withTransform (Transform.createWithScale (1.0, -1.0) |> Transform.withTranslate (x, y))
+        |> match group.Transforms with
+            | Some (t) -> withTransforms (Seq.append (Seq.singleton transform) t)
+            | None -> withTransform transform
 
+    let asCartesian x y group =
+        group
+        |> withTransform (Transform.createScale (Pixels 1.0) |> Transform.withY (Pixels -1.0))
+        |> addTransform (Transform.createTranslate x |> Transform.withY y)
+
+    // TODO: Add Group.toTag
     let rec toString group =
         let body =
             group.Body
             |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> toString)
             |> String.concat ""
-        let transform =
-            match group.Transform with Some(transform) -> (Transform.toAttribute transform |> Attribute.toString) + " " | None -> ""
-        let upperLeft =
-             match group.UpperLeft with | Some(upperLeft) -> Point.toString upperLeft | None -> ""
-        "<g " + upperLeft + transform + ">" + body + "</g>"
+
+        (match group.Transforms with | Some(t) -> Tag.create "g" |> (Tag.withAttribute (t |> Transforms.toAttribute)) | None -> Tag.create "g")
+        |> Tag.withBody body
+        |> Tag.toString
+
     // TODO: Integrate tag into recursive function for Group.toString
     // let toTag group =
     //    {

@@ -33,18 +33,10 @@ type Motion =
         CalculationMode: CalculationMode option
     }
 
-// TODO: Combine with Transform.fs if possible
-type AnimateTransform =
-    | Translate of X: Length * Y: Length option
-    | Scale of X: Length * Y: Length option
-    | Rotate of Angle: float *  X: Length option * Y: Length option
-    | SkewX of Angle: float
-    | SkewY of Angle: float
-
 type AnimationType =
     | Set of SetChange
     | Animate of AnimateChange
-    | Transform of AnimateTransform
+    | Transform of From: Transform * To: Transform
     | Motion of Motion
 
 type Animation =
@@ -55,6 +47,8 @@ type Animation =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Animation =
+
+// TODO: Create createTransform
 
     let createSet timing attributeType attributeName attributeValue =
         {
@@ -84,7 +78,7 @@ module Animation =
             match animation.AnimationType with 
                 | Set c -> "set", set [Attribute.create "attributeName" c.AttributeName; Attribute.create "attributeType" (Enum.GetName(typeof<AttributeType>, c.AttributeType)); Attribute.create "to" c.AttributeValue]
                 | Animate c -> "animate", set [Attribute.create "attributeName" c.AttributeName; Attribute.create "attributeType" (Enum.GetName(typeof<AttributeType>, c.AttributeType)); Attribute.create "from" c.AttributeFromValue; Attribute.create "to" c.AttributeToValue]
-                | Transform _ -> "animateTransform", set []
+                | Transform (f, t) -> "animateTransform", set [Attribute.create "type" (Transform.getTypeName f); Attribute.create "from" (f |> Transform.toString); Attribute.create "to" (t |> Transform.toString)]
                 | Motion m -> "animateMotion", set [m.Path |> Path.toAttribute] + (calculationModeToAttribute m.CalculationMode)
         Tag.create name
         |> Tag.addAttributes attributes

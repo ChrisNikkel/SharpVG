@@ -7,6 +7,10 @@ type Length =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Length =
+
+    let empty =
+        Pixels 0.0
+
     let createWithPixels =
         Pixels
 

@@ -1,63 +1,76 @@
 namespace SharpVG
 
-type Transform = {
-    Matrix: (float * float * float * float * float * float) option
-    Translate: (float * float) option
-    Scale: (float * float) option
-    Rotate: (float * float * float) option
-    SkewX: float option
-    SkewY: float option
- }
+// TODO: Allow multi transforms for static transformations using a seq/list
+type Transform =
+    | Matrix of A: Length * B: Length * C: Length * D: Length * E: Length * F: Length
+    | Translate of X: Length * Y: Length option
+    | Scale of X: Length * Y: Length option
+    | Rotate of Angle: float * Point: ((Length * Length) option)
+    | SkewX of Angle: float
+    | SkewY of Angle: float
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Transform =
-    let empty = { Matrix = None; Translate = None; Scale = None; Rotate = None; SkewX = None; SkewY = None }
 
-    let withMatrix matrix transform =
-        { transform with Matrix = Some matrix }
+    let createMatrix matrix =
+        Matrix matrix
 
-    let withTranslate translate transform =
-        { transform with Translate = Some translate }
+    let createTranslate x =
+        Translate (x, None)
 
-    let withScale scale transform =
-        { transform with Scale = Some scale }
+    let createScale x =
+        Scale (x, None)
     
-    let withRotate rotate transform =
-        { transform with Rotate = Some rotate }
+    let createRotate angle =
+        Rotate (angle, None)
 
-    let withSkewX skewX transform =
-        { transform with SkewX = Some skewX }
+    let createSkewX angle =
+        SkewX angle
     
-    let withSkewY skewY transform =
-        { transform with SkewY = Some skewY }
+    let createSkewY angle =
+        SkewY angle
 
-    let createWithMatrix matrix =
-        empty |> withMatrix matrix
+    let getTypeName transform =
+        match transform with
+            | Matrix _ -> "matrix"
+            | Translate _ -> "translate"
+            | Scale _ -> "scale"
+            | Rotate _ -> "rotate"
+            | SkewX _ -> "skewX"
+            | SkewY _ -> "skewY"
 
-    let createWithTranslate translate =
-        empty |> withTranslate translate
+    let withX x transform =
+        match transform with
+            | Rotate (a, None) -> Rotate (a, Some (x, Length.empty))
+            | Rotate (a, Some (_, y)) -> Rotate (a, Some (x, y))
+            | _ -> failwith ("Not able to set x with transform of type: " + getTypeName transform)
 
-    let createWithScale scale =
-        empty |> withScale scale
+    let withY y transform =
+        match transform with
+            | Translate (x, _) -> Translate (x, Some y)
+            | Scale (x, _) -> Scale (x, Some y)
+            | Rotate (a, None) -> Rotate (a, Some (Length.empty, y))
+            | Rotate (a, Some (x, _)) -> Rotate (a, Some (x, y))
+            | _ -> failwith ("Not able to set y with transform of type: " + getTypeName transform)
 
-    let createWithRotate rotate =
-        empty |> withRotate rotate
+    let toStringWithSeparator separator transform =
+        let s = separator
+        match transform with
+            | Matrix (a, b, c, d, e, f) ->  Length.toString a + s + Length.toString b + s + Length.toString c + s + Length.toString d + s + Length.toString e + s + Length.toString f 
+            | Translate (x, None) | Scale (x, None) -> Length.toString x
+            | Translate (x, Some y) | Scale (x, Some y) -> Length.toString x + s + Length.toString y
+            | Rotate (a, None) | SkewX a | SkewY a -> string a
+            | Rotate (a, Some (x, y)) -> string a + "," + Length.toString x + s + Length.toString y
 
-    let createWithSkewX skewX =
-        empty |> withSkewX skewX
+    let toString =
+        toStringWithSeparator " "
 
-    let createWithSkewY skewY =
-        empty |> withSkewY skewY
+    let toStringWithStyle transform =
+        getTypeName transform + "(" + toStringWithSeparator "," transform + ")"
 
     let toAttribute transform =
-        Attribute.create "transform"
-            (
-                seq {
-                    yield match transform.Matrix with | Some(a, b, c, d, e, f) -> Some("matrix(" + string a + ","  + string b + ","  + string c + ","  + string d + ","  + string e + ","  + string f + ")") | None -> None
-                    yield match transform.Translate with | Some(x, y) -> Some("translate(" + string x + "," + string y + ")") | None -> None
-                    yield match transform.Scale with | Some(x, y) -> Some("scale(" + string x + "," + string y + ")") | None -> None
-                    yield match transform.Rotate with | Some(a, x, y) -> Some("rotate(" + string a + "," + string x + "," + string y + ")") | None -> None
-                    yield match transform.SkewX with | Some(a) -> Some("skewX(" + string a + ")") | None -> None
-                    yield match transform.SkewY with | Some(a) -> Some("skewY(" + string a + ")") | None -> None
-                } |> Seq.choose id |> String.concat " "
-            )
+        Attribute.create "transform" (toStringWithStyle transform)
+
+module Transforms =
+    let toAttribute transforms =
+        Attribute.create "transform" (transforms |> Seq.map Transform.toStringWithStyle |> String.concat " ")
