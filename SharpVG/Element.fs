@@ -7,8 +7,8 @@ type BaseElement =
     | Circle of Circle
     | Ellipse of Ellipse
     | Rect of Rect
-    | Polygon of Points
-    | Polyline of Points
+    | Polygon of seq<Point>
+    | Polyline of seq<Point>
     | Path of Path
 
 type Element = {

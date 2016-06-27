@@ -8,6 +8,11 @@ type Style =
         Opacity: float option;
     }
 
+type NamedStyle = {
+    Name : string;
+    Style : Style;
+}
+
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Style =
     let empty =
@@ -60,3 +65,28 @@ module Style =
 
     let toAttribute style =
         Attribute.create "style" (toString style)
+
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module NamedStyle =
+    let ofStyle name style =
+        { Name = name; Style = style }
+
+    let toCssString namedStyle =
+        "." + namedStyle.Name + "{" + (namedStyle.Style |> Style.toString) + "}"
+
+    let toTag namedStyle =
+        Tag.create "style"
+        |> Tag.withAttribute (Attribute.create "type" "text/css")
+        |> Tag.withBody ("<![CDATA[" + (toCssString namedStyle) + "]]>")
+
+    let toString = toTag >> Tag.toString
+
+
+module Styles =
+    let toTag styles =
+        Tag.create "style"
+        |> Tag.withAttribute (Attribute.create "type" "text/css")
+        |> Tag.withBody ("<![CDATA[" + (styles |> Seq.map NamedStyle.toCssString |> String.concat " ") + "]]>")
+
+    let toString (styles:seq<NamedStyle>) =
+        styles |> toTag |> Tag.toString

@@ -28,3 +28,9 @@ module Point =
 
     let toString =
         toStringWithSeparator ","
+
+module Points =
+    let toString (points:seq<Point>) =
+        points
+        |> Seq.map Point.toString
+        |> String.concat " "

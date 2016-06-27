@@ -50,7 +50,6 @@
     <Compile Include="Area.fs" />
     <Compile Include="Color.fs" />
     <Compile Include="Point.fs" />
-    <Compile Include="Points.fs" />
     <Compile Include="Path.fs" />
     <Compile Include="Polygon.fs" />
     <Compile Include="Polyline.fs" />
@@ -62,8 +61,6 @@
     <Compile Include="Text.fs" />
     <Compile Include="Script.fs" />
     <Compile Include="Style.fs" />
-    <Compile Include="NamedStyle.fs" />
-    <Compile Include="Styles.fs" />
     <Compile Include="Timing.fs" />
     <Compile Include="Transform.fs" />
     <Compile Include="Animation.fs" />
