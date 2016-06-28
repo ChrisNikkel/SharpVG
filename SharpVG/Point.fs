@@ -11,6 +11,9 @@ module Point =
     let create x y =
         { X = x; Y = y }
 
+    let fromFloats (x, y) =
+        create (Pixels x) (Pixels y)
+
     let toFloats point =
         (Length.toFloat point.X, Length.toFloat point.Y)
 

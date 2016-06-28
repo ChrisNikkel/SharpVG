@@ -56,7 +56,7 @@ module Path =
                         match positioning with
                             | Absolute -> letter
                             | Relative -> letter.ToLower()
-                        + " " + (Point.toString point)
+                        + (Point.toStringWithSeparator " " point)
                     | ClosePath -> "Z"
         path
         |> Seq.map pathTypeToString
