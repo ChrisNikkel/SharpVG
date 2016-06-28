@@ -13,6 +13,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Triangle", "Triangle\Triang
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Life", "Life\Life.fsproj", "{FD5D0925-D128-4858-9C02-A5C06B031D80}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Graph", "Graph\Graph.fsproj", "{66E7BA33-1073-4083-8D49-51BCE31B367C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{FD5D0925-D128-4858-9C02-A5C06B031D80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD5D0925-D128-4858-9C02-A5C06B031D80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD5D0925-D128-4858-9C02-A5C06B031D80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66E7BA33-1073-4083-8D49-51BCE31B367C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66E7BA33-1073-4083-8D49-51BCE31B367C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66E7BA33-1073-4083-8D49-51BCE31B367C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66E7BA33-1073-4083-8D49-51BCE31B367C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -42,5 +48,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{58DDE05F-0D65-483F-A091-E684A66790C6} = {A77A1550-1934-4901-A691-A07CB3C80D27}
 		{FD5D0925-D128-4858-9C02-A5C06B031D80} = {A77A1550-1934-4901-A691-A07CB3C80D27}
+		{66E7BA33-1073-4083-8D49-51BCE31B367C} = {A77A1550-1934-4901-A691-A07CB3C80D27}
 	EndGlobalSection
 EndGlobal

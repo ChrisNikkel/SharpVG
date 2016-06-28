@@ -41,6 +41,9 @@ module Svg =
             Viewbox = None
         }
 
+    let ofPlot =
+        Plot.toGroup >> ofGroup
+
     let withSize size (svg:Svg) =
         { svg with Size = Some(size) }
 

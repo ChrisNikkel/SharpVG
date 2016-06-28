@@ -107,7 +107,7 @@ let main argv =
 
     let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = Some(Name Colors.White); Opacity = None }
     
-    let namedStyle = style |> NamedStyle.ofStyle "standard"
+    let namedStyle = style |> NamedStyle.ofStyle "std"
 
     // Execute
 
