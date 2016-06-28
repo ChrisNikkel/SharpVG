@@ -78,8 +78,8 @@ module Element =
         |> Tag.addAttributes
             (
                 [
-                    element.Id |> Option.map (Attribute.create "id" >> Set.singleton)
-                    element.Class |> Option.map (Attribute.create "class" >> Set.singleton)
+                    element.Id |> Option.map (Attribute.createCSS "id" >> Set.singleton)
+                    element.Class |> Option.map (Attribute.createCSS "class" >> Set.singleton)
                     element.Style  |> Option.map Style.toAttributes
                     element.Transform |> Option.map (Transform.toAttribute >> Set.singleton)
                     Some Set.empty // To prevent an empty list for the reduce
@@ -91,3 +91,9 @@ module Element =
             | None -> id
 
     let toString element = element |> toTag |> Tag.toString
+
+    let setTo timing newElement element =
+        let attributesDiff = (newElement |> toTag).Attributes - (element |> toTag).Attributes
+        element |> withAnimations (attributesDiff |> Set.toSeq |> Seq.map (fun {Name = n; Value = v; Type = t} -> Animation.createSet timing t n v))
+
+    // TODO: Add more animations such as transform, path, animate, etc.

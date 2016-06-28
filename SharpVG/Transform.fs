@@ -69,8 +69,8 @@ module Transform =
         getTypeName transform + "(" + toStringWithSeparator "," transform + ")"
 
     let toAttribute transform =
-        Attribute.create "transform" (toStringWithStyle transform)
+        Attribute.createXML "transform" (toStringWithStyle transform)
 
 module Transforms =
     let toAttribute transforms =
-        Attribute.create "transform" (transforms |> Seq.map Transform.toStringWithStyle |> String.concat " ")
+        Attribute.createXML "transform" (transforms |> Seq.map Transform.toStringWithStyle |> String.concat " ")

@@ -57,7 +57,7 @@ module Svg =
     let toString svg =
         let attributes =
             match svg.Size with | Some size -> Area.toAttributes size | None -> set []
-            |> Set.union (match svg.Viewbox with | Some viewbox -> set [Attribute.create "viewBox" ((Point.toString viewbox.Minimums) + " " + (Area.toString viewbox.Size))] | None -> set [])
+            |> Set.union (match svg.Viewbox with | Some viewbox -> set [Attribute.createXML "viewBox" ((Point.toString viewbox.Minimums) + " " + (Area.toString viewbox.Size))] | None -> set [])
 
         let styles =
             match svg.Styles with

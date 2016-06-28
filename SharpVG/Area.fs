@@ -12,7 +12,7 @@ module Area =
         { Width = width; Height = height }
 
     let toAttributes area =
-        set[Attribute.create "height" <| Length.toString area.Height; Attribute.create "width" <| Length.toString area.Width]
+        set[Attribute.createXML "height" <| Length.toString area.Height; Attribute.createXML "width" <| Length.toString area.Width]
 
     let toString area =
         Length.toString area.Height + "," + Length.toString area.Width

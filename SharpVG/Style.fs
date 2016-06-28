@@ -54,9 +54,7 @@ module Style =
         ] |> List.choose id
 
     let toAttributes style =
-        let stylePartToAttribute name value =
-            Attribute.create name value
-        mapToString stylePartToAttribute style |> Set.ofList
+        mapToString Attribute.createCSS style |> Set.ofList
 
     let toString style =
         let stylePartToString name value =
@@ -64,7 +62,7 @@ module Style =
         mapToString stylePartToString style  |> String.concat ";"
 
     let toAttribute style =
-        Attribute.create "style" (toString style)
+        Attribute.createCSS "style" (toString style)
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module NamedStyle =
@@ -76,7 +74,7 @@ module NamedStyle =
 
     let toTag namedStyle =
         Tag.create "style"
-        |> Tag.withAttribute (Attribute.create "type" "text/css")
+        |> Tag.withAttribute (Attribute.createCSS "type" "text/css")
         |> Tag.withBody ("<![CDATA[" + (toCssString namedStyle) + "]]>")
 
     let toString = toTag >> Tag.toString
@@ -85,7 +83,7 @@ module NamedStyle =
 module Styles =
     let toTag styles =
         Tag.create "style"
-        |> Tag.withAttribute (Attribute.create "type" "text/css")
+        |> Tag.withAttribute (Attribute.createCSS "type" "text/css")
         |> Tag.withBody ("<![CDATA[" + (styles |> Seq.map NamedStyle.toCssString |> String.concat " ") + "]]>")
 
     let toString (styles:seq<NamedStyle>) =

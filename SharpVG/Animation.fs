@@ -8,10 +8,6 @@ type CalculationMode =
     | Paced = 3
     | Spline = 4
 
-type AttributeType =
-    | CSS = 1
-    | XML = 2
-
 type SetChange =
     {
         AttributeName: string
@@ -48,37 +44,40 @@ type Animation =
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Animation =
 
-// TODO: Create createTransform
-
-    let createSet timing attributeType attributeName attributeValue =
+    let createTransform timing fromTransform toTransform =
         {
-            AnimationType = Set {AttributeName = attributeName; AttributeValue = attributeValue; AttributeType = attributeType };
+            AnimationType = Transform (From = fromTransform, To = toTransform)
             Timing = timing
         }
 
-    // TODO: Use (-) with set [attribute] rather than requiring strings
+    let createSet timing attributeType attributeName attributeValue =
+        {
+            AnimationType = Set {AttributeName = attributeName; AttributeValue = attributeValue; AttributeType = attributeType }
+            Timing = timing
+        }
+
     let createAnimation timing attributeType attributeName attributeFromValue attributeToValue =
         {
-            AnimationType = Animate {AttributeName = attributeName; AttributeFromValue = attributeFromValue; AttributeToValue = attributeToValue; AttributeType = attributeType };
+            AnimationType = Animate {AttributeName = attributeName; AttributeFromValue = attributeFromValue; AttributeToValue = attributeToValue; AttributeType = attributeType }
             Timing = timing
         }
 
     let createMotion timing path calculationMode =
         {
-            AnimationType = Motion {Path = path; CalculationMode = calculationMode};
+            AnimationType = Motion {Path = path; CalculationMode = calculationMode}
             Timing = timing
         }
 
     let toTag animation =
         let calculationModeToAttribute c =
             match c with
-                | Some(c) -> set [Attribute.create "calculationMode" (Enum.GetName(typeof<CalculationMode>, c).ToLower())]
+                | Some(c) -> set [Attribute.createXML "calculationMode" (Enum.GetName(typeof<CalculationMode>, c).ToLower())]
                 | None -> set []
         let name, attributes =
             match animation.AnimationType with 
-                | Set c -> "set", set [Attribute.create "attributeName" c.AttributeName; Attribute.create "attributeType" (Enum.GetName(typeof<AttributeType>, c.AttributeType)); Attribute.create "to" c.AttributeValue]
-                | Animate c -> "animate", set [Attribute.create "attributeName" c.AttributeName; Attribute.create "attributeType" (Enum.GetName(typeof<AttributeType>, c.AttributeType)); Attribute.create "from" c.AttributeFromValue; Attribute.create "to" c.AttributeToValue]
-                | Transform (f, t) -> "animateTransform", set [Attribute.create "type" (Transform.getTypeName f); Attribute.create "from" (f |> Transform.toString); Attribute.create "to" (t |> Transform.toString)]
+                | Set c -> "set", set [Attribute.createXML "attributeName" c.AttributeName; Attribute.createXML "attributeType" (Enum.GetName(typeof<AttributeType>, c.AttributeType)); Attribute.createXML "to" c.AttributeValue]
+                | Animate c -> "animate", set [Attribute.createXML "attributeName" c.AttributeName; Attribute.createXML "attributeType" (Enum.GetName(typeof<AttributeType>, c.AttributeType)); Attribute.createXML "from" c.AttributeFromValue; Attribute.createXML "to" c.AttributeToValue]
+                | Transform (f, t) -> "animateTransform", set [Attribute.createXML "type" (Transform.getTypeName f); Attribute.createXML "from" (f |> Transform.toString); Attribute.createXML "to" (t |> Transform.toString)]
                 | Motion m -> "animateMotion", set [m.Path |> Path.toAttribute] + (calculationModeToAttribute m.CalculationMode)
         Tag.create name
         |> Tag.addAttributes attributes

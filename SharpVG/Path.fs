@@ -63,11 +63,11 @@ module Path =
         |> String.concat " "
 
     let toAttribute path =
-        Attribute.create "path" (path |> toDataString)
+        Attribute.createXML "path" (path |> toDataString)
 
     let toTag path =
         Tag.create "path"
-        |> Tag.withAttribute (Attribute.create "d" (path |> toDataString))
+        |> Tag.withAttribute (Attribute.createXML "d" (path |> toDataString))
 
     let toString path =
         path |> toTag |> Tag.toString

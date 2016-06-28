@@ -87,7 +87,7 @@ module Timing =
 
         let repetitionToAttributes repetition =
             let repetitionCountToAttribute repetitionCount =
-                Attribute.create "repeatCount"
+                Attribute.createXML "repeatCount"
                     (
                         match repetitionCount with
                             | RepeatCount c -> string c
@@ -95,7 +95,7 @@ module Timing =
                     )
 
             let repetitionDurationToAttribute repetitionDuration =
-                Attribute.create "repeatDuration"
+                Attribute.createXML "repeatDuration"
                     (
                         match repetitionDuration with
                             | RepeatDuration c -> c |> timeSpanToString
@@ -115,11 +115,11 @@ module Timing =
         let restartToString r = (Enum.GetName(typeof<Restart>, r).ToLower())
 
         ([
-            Some (Attribute.create "begin" (timing.Begin |> timeSpanToString))
-            timing.Duration |> Option.map (durationToString >> Attribute.create "dur")
-            timing.End |> Option.map (timeSpanToString >> Attribute.create "end")
-            timing.Minimum |> Option.map (timeSpanToString >> Attribute.create "min")
-            timing.Maximum |> Option.map (timeSpanToString >> Attribute.create "max")
-            timing.Restart |> Option.map (restartToString >> Attribute.create "restart")
-            timing.FinalState |> Option.map (finalStateToString >> Attribute.create "fill")
+            Some (Attribute.createXML "begin" (timing.Begin |> timeSpanToString))
+            timing.Duration |> Option.map (durationToString >> Attribute.createXML "dur")
+            timing.End |> Option.map (timeSpanToString >> Attribute.createXML "end")
+            timing.Minimum |> Option.map (timeSpanToString >> Attribute.createXML "min")
+            timing.Maximum |> Option.map (timeSpanToString >> Attribute.createXML "max")
+            timing.Restart |> Option.map (restartToString >> Attribute.createXML "restart")
+            timing.FinalState |> Option.map (finalStateToString >> Attribute.createXML "fill")
         ] |> List.choose id |> Set.ofList) + (repetitionToAttributes timing.Repetition)

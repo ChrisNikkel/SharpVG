@@ -28,13 +28,13 @@ module Text =
         |> Tag.addAttributes
             (
                     match text.FontFamily with
-                        | Some(family) -> set [Attribute.create "font-family" family]
+                        | Some(family) -> set [Attribute.createXML "font-family" family]
                         | None -> set []
             )
         |> Tag.addAttributes
             (
                     match text.FontSize with
-                        | Some(size) -> set [Attribute.create "font-size" (string size)]
+                        | Some(size) -> set [Attribute.createXML "font-size" (string size)]
                         | None -> set []
             )
 
