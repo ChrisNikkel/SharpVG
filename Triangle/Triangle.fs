@@ -12,8 +12,8 @@ type Triangle =
     }
 
 let midpoint a b =
-    let (ax, ay), (bx, by) = Point.toDoubles a, Point.toDoubles b
-    { X = Pixels((ax + bx) / 2.0); Y = Pixels((ay + by) / 2.0) }
+    let (ax, ay), (bx, by) = Point.toFloats a, Point.toFloats b
+    Point.ofFloats ((ax + bx) / 2.0, (ay + by) / 2.0)
 
 let insideTriangles t =
     [
@@ -44,25 +44,25 @@ let main argv =
 
     // Initialization
     let fileName = ".\\triangle.html"
-    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = Some(Name Colors.White); Opacity = None }
-    let namedStyle = style |> NamedStyle.ofStyle "standard"
+    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None }
+    let namedStyle = style |> NamedStyle.ofStyle "std"
     let iterations, triangleLength, margin = 7, 1000.0, 100.0
     let startingTriangle =
             [{
-                A = { X = Pixels(0.0); Y = Pixels(0.0) };
-                B = { X = Pixels(triangleLength / 2.0); Y = Pixels(sqrt (0.75 * triangleLength * triangleLength)) };
-                C = { X = Pixels(triangleLength); Y = Pixels(0.0) }
+                A = Point.origin
+                B = Point.ofFloats (triangleLength / 2.0, sqrt (0.75 * triangleLength * triangleLength))
+                C = Point.ofFloats (triangleLength, 0.0)
             }]
 
     // Execute
     recursiveTriangles startingTriangle iterations
     |> List.map (triangleToPolygon >> (Element.withNamedStyle namedStyle))
     |> Group.ofList
-    |> Group.asCartesian (Pixels margin) (Pixels triangleLength)
+    |> Group.asCartesian (Length.ofFloat margin) (Length.ofFloat triangleLength)
     |> Svg.ofGroup
     |> Svg.withStyle namedStyle
-    |> Svg.withSize {Height = Pixels triangleLength; Width = Pixels (triangleLength + margin)}
-    |> Svg.withViewbox {Minimums = { X = Pixels 0.0; Y = Pixels 0.0}; Size = {Height = Pixels triangleLength; Width = Pixels (triangleLength + margin) }}
+    |> Svg.withSize (Area.ofFloats (triangleLength, triangleLength + margin))
+    |> Svg.withViewbox {Minimums = Point.create (Percent 0.0) (Percent 0.0); Size = Area.full }
     |> Svg.toHtml "SVG Triangle Example"
     |> saveToFile fileName
 

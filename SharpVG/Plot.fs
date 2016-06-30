@@ -21,15 +21,15 @@ module Plot =
 
         let elements = 
             values
-            |> List.scan (fun acc (x, y) -> acc |> (Path.addAbsolute PathType.LineTo (Point.create (Pixels x) (Pixels y)))) Path.empty
+            |> List.scan (fun acc p -> acc |> (Path.addAbsolute PathType.LineTo (Point.ofFloats p))) Path.empty
             |> List.toSeq
             |> Seq.map Element.ofPath
 
-        create (Point.fromFloats minimum) (Point.fromFloats maximum) elements
+        create (Point.ofFloats minimum) (Point.ofFloats maximum) elements
 
     let toGroup plot =
         plot.Elements
-        |> Seq.map (Element.withStyle { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = None; Opacity = None })
+        |> Seq.map (Element.withStyle { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Pixel 1.0); Fill = None; Opacity = None })
         |> Group.ofSeq
-        |> Group.asCartesian Length.empty Length.empty
+        |> Group.asCartesian plot.Minimum.X plot.Maximum.Y
 

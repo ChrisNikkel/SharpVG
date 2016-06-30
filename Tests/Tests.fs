@@ -25,8 +25,8 @@ type SvgProperty() =
 [<SvgProperty>]
 let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p, o) =
     configureLogs
-    let point1, point2 = (Point.create (Pixels x1) (Pixels y1)), (Point.create (Pixels x2) (Pixels y2))
-    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
+    let point1, point2 = Point.ofFloats (x1, y1), Point.ofFloats (x2, y2)
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Length.ofFloat p, o
     let style = Style.create fill stroke strokeWidth opacity
     let line = Line.create point1 point2
     let tag = line |> Element.ofLine |> Element.withStyle style |> Element.toString
@@ -36,9 +36,9 @@ let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p, o) =
 [<SvgProperty>]
 let ``draw rectangles`` (x, y, h, w, c, r, g, b, p, o) =
     configureLogs
-    let point = Point.create (Pixels x) (Pixels y)
-    let area = Area.create (Pixels h) (Pixels w)
-    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
+    let point = Point.ofFloats (x, y)
+    let area = Area.ofFloats (h, w)
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Length.ofFloat p, o
     let style = Style.create fill stroke strokeWidth opacity
     let rect = Rect.create point area
     let tag = rect |> Element.ofRect |> Element.withStyle style |> Element.toString
@@ -48,10 +48,10 @@ let ``draw rectangles`` (x, y, h, w, c, r, g, b, p, o) =
 [<SvgProperty>]
 let ``draw circles`` (x, y, radius, c, r, g, b, p, o) =
     configureLogs
-    let point = Point.create (Pixels x) (Pixels y)
-    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
+    let point = Point.ofFloats (x, y)
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Length.ofFloat p, o
     let style = Style.create fill stroke strokeWidth opacity
-    let circle = Circle.create point (Pixels radius)
+    let circle = Circle.create point (Length.ofFloat radius)
     let tag = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
 
     test <| checkBodylessTag "circle" tag
@@ -60,8 +60,8 @@ let ``draw circles`` (x, y, radius, c, r, g, b, p, o) =
 [<SvgProperty>]
 let ``draw ellipses`` (x1, y1, x2, y2, c, r, g, b, p, o) =
     configureLogs
-    let point1, point2 = (Point.create (Pixels x1) (Pixels y1)), (Point.create (Pixels x2) (Pixels y2))
-    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
+    let point1, point2 = Point.ofFloats (x1, y1), Point.ofFloats (x2, y2)
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Length.ofFloat p, o
     let style = Style.create fill stroke strokeWidth opacity
     let ellipse = Ellipse.create point1 point2
     let tag = ellipse |> Element.ofEllipse |> Element.withStyle style |> Element.toString
@@ -71,8 +71,8 @@ let ``draw ellipses`` (x1, y1, x2, y2, c, r, g, b, p, o) =
 [<Property>]
 let ``draw images`` (x, y, h, w, i) =
     configureLogs
-    let point = Point.create (Pixels x) (Pixels y)
-    let area = { Height = Pixels h; Width = Pixels w }
+    let point = Point.ofFloats (x, y)
+    let area = Area.ofFloats (h, w)
     let image = Image.create point area i
     let tag = image |> Element.ofImage |> Element.toString
 
@@ -81,8 +81,8 @@ let ``draw images`` (x, y, h, w, i) =
 [<SvgProperty>]
 let ``draw texts`` (x, y, c, r, g, b, p, o) =
     configureLogs
-    let point = Point.create (Pixels x) (Pixels y)
-    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
+    let point = Point.ofFloats (x, y)
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Length.ofFloat p, o
     let style = Style.create fill stroke strokeWidth opacity
     let text = Text.create point "test"
     let tag = text |> Element.ofText |> Element.withStyle style |> Element.toString
@@ -92,15 +92,15 @@ let ``draw texts`` (x, y, c, r, g, b, p, o) =
 [<SvgProperty>]
 let ``animate circles`` (x, y, radius, c, r, g, b, p, o) =
     configureLogs
-    let p1 = Point.create (Pixels 100.0) (Pixels 100.0)
-    let p2 = Point.create (Pixels 500.0) (Pixels 500.0)
-    let p3 = Point.create (Pixels 200.0) (Pixels 400.0)
-    let point = Point.create (Pixels x) (Pixels y)
+    let p1 = Point.ofInts (100, 100)
+    let p2 = Point.ofInts (500, 500)
+    let p3 = Point.ofInts (200, 200)
+    let point = Point.ofFloats (x, y)
     let path = Path.empty |> (Path.addAbsolute CurveTo p1) |> (Path.addAbsolute LineTo p2) |> (Path.addAbsolute CurveTo p3)
     let timing = Timing.create <| TimeSpan.FromSeconds(0.0)
-    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Pixels p, o
+    let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Length.ofFloat p, o
     let style = Style.create fill stroke strokeWidth opacity
-    let circle = Circle.create point (Pixels radius)
+    let circle = Circle.create point (Length.ofFloat radius)
     let animation = Animation.createMotion timing path None
     let tag = circle |> Element.ofCircle |> Element.withStyle style |> Element.withAnimation animation |> Element.toString
 
@@ -111,15 +111,15 @@ let ``do lots and don't fail`` () =
     configureLogs
 
     let points = seq {
-        yield Point.create (Pixels 1.0) (Pixels 1.0)
-        yield Point.create (Pixels 4.0) (Pixels 4.0)
-        yield Point.create (Pixels 8.0) (Pixels 8.0)
+        yield Point.ofInts (1, 1)
+        yield Point.ofInts (4, 4)
+        yield Point.ofInts (8, 8)
     }
 
-    let point = Point.create (Pixels 24.0) (Pixels 15.0)
-    let style1 = Style.create (Name Colors.Red) (Hex 0xff0000) (Pixels 3.0) 1.0
-    let style2 = Style.create (Name Colors.Blue) (SmallHex 0xf00s) (Pixels 6.0) 1.0
-    let length = Length.createWithPixels 1.0
+    let point = Point.ofInts (24, 15)
+    let style1 = Style.create (Name Colors.Red) (Hex 0xff0000) (Length.ofFloat 3.0) 1.0
+    let style2 = Style.create (Name Colors.Blue) (SmallHex 0xf00s) (Length.ofFloat 6.0) 1.0
+    let length = Length.ofPixels 1.0
     let area = Area.create length length
 
     // TODO: Add transform, polygon, polyline, path, script

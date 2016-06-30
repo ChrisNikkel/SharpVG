@@ -17,8 +17,10 @@ let main argv =
     // Initalize
     let fileName = ".\\Graph.html"
 
-    Plot.line [ for i in 0.0 .. 0.02 .. 2.0 * Math.PI -> (sin i, cos i * sin i) ]
+    Plot.line [ for i in 0.0 .. 0.02 .. 2.0 * Math.PI -> (1000.0 * sin i, 1000.0 * cos i * sin i) ]
     |> Svg.ofPlot
+    |> Svg.withSize (Area.ofInts (1000, 1000))
+    |> Svg.withViewbox {Minimums = Point.ofInts (0, 0); Size = Area.ofInts (1000, 1000)}
     |> Svg.toHtml "SVG Graph Example"
     |> saveToFile fileName
 

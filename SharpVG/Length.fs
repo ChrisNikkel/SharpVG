@@ -1,39 +1,48 @@
 namespace SharpVG
+open System
 
 type Length =
-    | Pixels of float
-    | Ems of float
+    | Pixel of float
+    | Em of float
     | Percent of float
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Length =
 
     let empty =
-        Pixels 0.0
+        Pixel 0.0
 
-    let createWithPixels =
-        Pixels
+    let ofPixels =
+        Pixel
 
-    let createWithEms =
-        Ems
+    let ofFloat =
+        ofPixels
+
+    let ofInt =
+        float >> ofPixels
+
+    let ofEm =
+        Em
     
-    let createWithPercent =
+    let ofPercent =
         Percent
 
     let toString length =
+        // TODO: Not sure how smart it is to always round things, but this prevents extra un-needed data.
+        let round (n:float) = Math.Round(n, 4)
         match length with
-            | Pixels p -> string p
-            | Ems e -> string e + "em"
-            | Percent p -> string p + "%"
+            | Pixel p -> sprintf "%g" (round p)
+            | Em e -> sprintf "%g" (round e) + "em"
+            | Percent p -> sprintf "%g" (round p) + "%"
 
     let toFloat length =
         match length with
-            | Pixels p -> float p
-            | Ems e -> e
+            | Pixel p -> float p
+            | Em e -> e
             | Percent p -> p
 
     let toDouble length =
         match length with
-            | Pixels p -> p
-            | Ems e -> float e
+            | Pixel p -> p
+            | Em e -> float e
             | Percent p -> float p

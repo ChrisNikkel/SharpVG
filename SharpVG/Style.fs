@@ -30,6 +30,7 @@ module Style =
     let withOpacity opacity style =
         { style with Opacity = Some(opacity) }
 
+    // TODO: This isn't consistant with the other creates which only take required values as parameters
     let create fill stroke strokeWidth opacity =
         { Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity) }
 

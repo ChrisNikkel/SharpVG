@@ -90,6 +90,7 @@ let main argv =
     let iterations, delay, cellSize = 100, 0.25, 15.0
     let size = 70
     let boardSize = cellSize * float size
+    let boardLength = Length.ofFloat boardSize
 
     let randomItems =
         let quantity = randomsBetween 20 40 |> Seq.take 1 |> Seq.head
@@ -105,15 +106,15 @@ let main argv =
         |> List.concat
         |> removeDups
 
-    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Pixels 1.0); Fill = Some(Name Colors.White); Opacity = None }
+    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None }
     
     let namedStyle = style |> NamedStyle.ofStyle "std"
 
     // Execute
 
     let makeElement x y =
-        let point = Point.create <| Pixels (float x * cellSize) <| Pixels (float y * cellSize)
-        Circle.create point <| Pixels (cellSize / 2.0) |> Element.ofCircle 
+        let point = Point.create <| Length.ofFloat (float x * cellSize) <| Length.ofFloat (float y * cellSize)
+        Circle.create point <| Length.ofFloat (cellSize / 2.0) |> Element.ofCircle
 
     let addAnimation element times =
         let duration = Duration (TimeSpan.FromSeconds(delay))
@@ -133,11 +134,11 @@ let main argv =
     |> Seq.groupBy (fun ((x, y), t) -> (x, y))
     |> Seq.map (fun ((x, y), times) -> addAnimation (makeElement x y) (times |> Seq.map snd) |> Element.withNamedStyle namedStyle)
     |> Group.ofSeq
-    |> Group.asCartesian (Pixels 0.0) (Pixels boardSize)
+    |> Group.asCartesian Length.empty (Length.ofFloat boardSize)
     |> Svg.ofGroup
     |> Svg.withStyle namedStyle
-    |> Svg.withSize {Height = Pixels boardSize; Width = Pixels boardSize}
-    |> Svg.withViewbox {Minimums = { X = Pixels 0.0; Y = Pixels 0.0}; Size = {Height = Pixels boardSize; Width = Pixels boardSize }}
+    |> Svg.withSize {Height = boardLength; Width = boardLength}
+    |> Svg.withViewbox {Minimums = Point.ofInts (0, 0); Size = Area.full}
     |> Svg.toHtml "SVG Life Example"
     |> saveToFile fileName
 
