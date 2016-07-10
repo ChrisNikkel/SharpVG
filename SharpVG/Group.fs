@@ -24,6 +24,9 @@ module Group =
     let ofArray array =
         array |> Seq.ofArray |> ofSeq
 
+    let withBody body (group:Group) =
+        { group with Body = body }
+
     let withTransforms transforms group =
         { group with Transforms = Some transforms }
 
@@ -35,6 +38,12 @@ module Group =
         |> match group.Transforms with
             | Some (t) -> withTransforms (Seq.append (Seq.singleton transform) t)
             | None -> withTransform transform
+
+    let addElements elements group =
+        group |> withBody (Seq.append group.Body (elements |> Seq.map Element))
+
+    let addElement element group =
+        addElements (Seq.singleton element) group
 
     let asCartesian x y group =
         group

@@ -122,7 +122,6 @@ let ``do lots and don't fail`` () =
     let length = Length.ofPixels 1.0
     let area = Area.create length length
 
-    // TODO: Add transform, polygon, polyline, path, script
     let graphics = seq {
         yield Image.create point area "myimage1.jpg" |> Element.ofImage
         yield Image.create point area "myimage2.jpg" |> Element.ofImage |> Element.withStyle style1

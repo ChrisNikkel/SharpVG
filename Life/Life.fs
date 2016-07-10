@@ -107,7 +107,7 @@ let main argv =
         |> removeDups
 
     let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None }
-    
+
     let namedStyle = style |> NamedStyle.ofStyle "std"
 
     // Execute

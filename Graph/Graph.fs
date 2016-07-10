@@ -17,10 +17,16 @@ let main argv =
     // Initalize
     let fileName = ".\\Graph.html"
 
+    // TODO: Add style into plot somehow
+    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None }
+    let namedStyle = style |> NamedStyle.ofStyle "std"
+
+
     Plot.line [ for i in 0.0 .. 0.02 .. 2.0 * Math.PI -> (1000.0 * sin i, 1000.0 * cos i * sin i) ]
     |> Svg.ofPlot
-    |> Svg.withSize (Area.ofInts (1000, 1000))
+    |> Svg.withSize (Area.ofInts (2000, 1000))
     |> Svg.withViewbox {Minimums = Point.ofInts (0, 0); Size = Area.ofInts (1000, 1000)}
+    |> Svg.withStyle namedStyle
     |> Svg.toHtml "SVG Graph Example"
     |> saveToFile fileName
 
