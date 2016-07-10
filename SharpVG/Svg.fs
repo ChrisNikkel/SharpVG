@@ -1,7 +1,7 @@
 namespace SharpVG
 
 type Viewbox = {
-    Minimums: Point
+    Minimum: Point
     Size: Area
 }
 
@@ -14,6 +14,18 @@ type Svg = {
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Svg =
+    let withSize size (svg:Svg) =
+        { svg with Size = Some(size) }
+
+    let withViewbox minimum size (svg:Svg) =
+        { svg with Viewbox = Some({ Minimum = minimum; Size = size }) }
+
+    let withStyles styles (svg:Svg) =
+        { svg with Styles = Some(styles) }
+
+    let withStyle namedStyle (svg:Svg) =
+        { svg with Styles = Some(Seq.singleton namedStyle) }
+
     /// <summary>
     /// This function takes seqence of elements and creates a simple svg object.
     /// </summary>
@@ -37,30 +49,23 @@ module Svg =
         {
             Body = seq { yield Group(group) }
             Styles = None;
-            Size = None;
+            Size = Some(Area.full);
             Viewbox = None
         }
 
-    let ofPlot =
-        Plot.toGroup >> ofGroup
-
-    let withSize size (svg:Svg) =
-        { svg with Size = Some(size) }
-
-    let withViewbox viewbox (svg:Svg) =
-        { svg with Viewbox = Some(viewbox) }
-
-    let withStyles styles (svg:Svg) =
-        { svg with Styles = Some(styles) }
-
-    let withStyle namedStyle (svg:Svg) =
-        { svg with Styles = Some(Seq.singleton namedStyle) }
-
+    let ofPlot plot =
+        // TODO: Make general purpose function to translate points to area
+        let ySize = Length.ofFloat (((Length.toFloat plot.Maximum.Y) - (Length.toFloat plot.Minimum.Y)))
+        let xSize = Length.ofFloat (((Length.toFloat plot.Maximum.X) - (Length.toFloat plot.Minimum.X)))
+        plot
+        |> Plot.toGroup
+        |> ofGroup
+        |> withViewbox Point.origin (Area.create xSize ySize)
 
     let toString svg =
         let attributes =
             match svg.Size with | Some size -> Area.toAttributes size | None -> []
-            @ match svg.Viewbox with | Some viewbox -> [Attribute.createXML "viewBox" ((Point.toString viewbox.Minimums) + " " + (Area.toString viewbox.Size))] | None -> []
+            @ match svg.Viewbox with | Some viewbox -> [Attribute.createXML "viewBox" ((Point.toString viewbox.Minimum) + " " + (Area.toString viewbox.Size))] | None -> []
 
         let styles =
             match svg.Styles with

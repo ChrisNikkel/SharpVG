@@ -62,7 +62,7 @@ let main argv =
     |> Svg.ofGroup
     |> Svg.withStyle namedStyle
     |> Svg.withSize (Area.ofFloats (triangleLength, triangleLength + margin))
-    |> Svg.withViewbox {Minimums = Point.create (Percent 0.0) (Percent 0.0); Size = Area.full }
+    |> Svg.withViewbox Point.origin Area.full
     |> Svg.toHtml "SVG Triangle Example"
     |> saveToFile fileName
 

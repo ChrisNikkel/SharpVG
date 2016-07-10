@@ -1,6 +1,7 @@
 namespace SharpVG
 open System
 
+// TODO: Would it better to do something different here so that pixels could more magically be transformed to ems or percent.  Maybe even without ems if that is hard.
 type Length =
     | Pixel of float
     | Em of float
@@ -49,3 +50,5 @@ module Length =
             | Pixel p -> p
             | Em e -> float e
             | Percent p -> float p
+
+        // TODO: Make Lengths subtractable

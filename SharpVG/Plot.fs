@@ -31,13 +31,13 @@ module Plot =
     let toGroup plot =
         let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None }
         let namedStyle = style |> NamedStyle.ofStyle "std"
-        let diagonal = Line.create plot.Minimum plot.Maximum |> Element.ofLine |> Element.withNamedStyle namedStyle
-        let origin = Circle.create (Point.ofFloats (0.0, 0.0)) (Length.ofFloat 2.0) |>  Element.ofCircle |> Element.withNamedStyle namedStyle
-        let yOffset = match plot.Minimum.Y with | Pixel y -> Length.ofFloat (y * -1.0)
+        let yOffset =  Length.ofFloat (((Length.toFloat plot.Maximum.Y) - (Length.toFloat plot.Minimum.Y)))
+        let xAxis = Line.create (Point.create plot.Minimum.X Length.empty) (Point.create plot.Maximum.X Length.empty) |> Element.ofLine |> Element.withNamedStyle namedStyle
+        let yAxis = Line.create (Point.create Length.empty plot.Minimum.Y) (Point.create Length.empty plot.Maximum.Y) |> Element.ofLine |> Element.withNamedStyle namedStyle
         plot.Elements
         |> Seq.map (Element.withNamedStyle namedStyle)
         |> Group.ofSeq
-        |> Group.addElement diagonal
-        |> Group.addElement origin
+        |> Group.addElement xAxis
+        |> Group.addElement yAxis
         |> Group.asCartesian yOffset plot.Maximum.Y
 

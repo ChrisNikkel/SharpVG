@@ -137,7 +137,7 @@ let main argv =
     |> Svg.ofGroup
     |> Svg.withStyle namedStyle
     |> Svg.withSize {Height = boardLength; Width = boardLength}
-    |> Svg.withViewbox {Minimums = Point.ofInts (0, 0); Size = Area.full}
+    |> Svg.withViewbox Point.origin Area.full
     |> Svg.toHtml "SVG Life Example"
     |> saveToFile fileName
 
