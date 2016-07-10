@@ -24,4 +24,4 @@ module Area =
         [Attribute.createXML "height" <| Length.toString area.Height; Attribute.createXML "width" <| Length.toString area.Width]
 
     let toString area =
-        Length.toString area.Height + "," + Length.toString area.Width
+        Length.toString area.Width + "," + Length.toString area.Height
