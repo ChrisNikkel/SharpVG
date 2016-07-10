@@ -55,7 +55,7 @@ module Style =
         ] |> List.choose id
 
     let toAttributes style =
-        mapToString Attribute.createCSS style |> Set.ofList
+        mapToString Attribute.createCSS style
 
     let toString style =
         let stylePartToString name value =

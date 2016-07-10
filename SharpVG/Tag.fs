@@ -3,7 +3,7 @@ namespace SharpVG
 type Tag =
     {
         Name: string;
-        Attributes: Set<Attribute>;
+        Attributes: List<Attribute>;
         Body: string option;
     }
 
@@ -11,10 +11,10 @@ type Tag =
 module Tag =
 
     let create name =
-        { Name = name; Attributes = Set.empty; Body = None }
+        { Name = name; Attributes = List.empty; Body = None }
 
     let withAttribute attribute tag =
-        { tag with Attributes = set [attribute] }
+        { tag with Attributes = List.singleton attribute }
 
     let withAttributes attributes tag =
         { tag with Attributes = attributes }
@@ -22,13 +22,13 @@ module Tag =
     let withBody body tag =
         { tag with Body = Some(body) }
 
-    let addAttribute attribute tag =
-        tag 
-        |> withAttributes (Set.add attribute tag.Attributes)
-
     let addAttributes attributes tag =
         tag
-        |> withAttributes (attributes + tag.Attributes)
+        |> withAttributes (tag.Attributes @ attributes)
+
+    let addAttribute attribute tag =
+        tag 
+        |> addAttributes (List.singleton attribute)
 
     let addBody body tag =
         tag
@@ -39,10 +39,10 @@ module Tag =
         )
 
     let toString tag =
-        let attributesToString attributes = (attributes |> Set.map Attribute.toString |> Set.toSeq |> String.concat " ")
-        match tag with
-        | { Name = n; Attributes = a; Body = Some(b) } when a <> Set.empty -> "<" + n + " " + (attributesToString a) + ">" + b + "</" + n + ">"
-        | { Name = n; Attributes = a; Body = Some(b) } when a = Set.empty -> "<" + n + ">" + b + "</" + n + ">"
-        | { Name = n; Attributes = a; Body = None } when a <> Set.empty  -> "<" + n + " " + (attributesToString a) + "/>"
-        | { Name = n; Attributes = a; Body = None } when a = Set.empty  -> "<" + n + "/>"
+        let attributesToString attributes = (attributes |> List.map Attribute.toString |> String.concat " ")
+        match (List.isEmpty tag.Attributes), tag with
+        | false, { Name = n; Attributes = a; Body = Some(b) } -> "<" + n + " " + (attributesToString a) + ">" + b + "</" + n + ">"
+        | false, { Name = n; Attributes = a; Body = None } -> "<" + n + " " + (attributesToString a) + "/>"
+        | true, { Name = n; Attributes = a; Body = Some(b) } -> "<" + n + ">" + b + "</" + n + ">"
+        | true, { Name = n; Attributes = a; Body = None } -> "<" + n + "/>"
         | _ -> failwith "Unmatched tag"

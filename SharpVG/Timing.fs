@@ -103,9 +103,9 @@ module Timing =
                     )
 
             match repetition with
-                | None -> set []
-                | Some {RepeatCount = c; RepeatDuration = None} -> set [repetitionCountToAttribute c]
-                | Some {RepeatCount = c; RepeatDuration = Some(d)} -> set [repetitionCountToAttribute c; repetitionDurationToAttribute d]
+                | None -> []
+                | Some {RepeatCount = c; RepeatDuration = None} -> [repetitionCountToAttribute c]
+                | Some {RepeatCount = c; RepeatDuration = Some(d)} -> [repetitionCountToAttribute c; repetitionDurationToAttribute d]
 
         let finalStateToString finalState =
             match finalState with
@@ -114,7 +114,7 @@ module Timing =
 
         let restartToString r = (Enum.GetName(typeof<Restart>, r).ToLower())
 
-        ([
+        [
             Some (Attribute.createXML "begin" (timing.Begin |> timeSpanToString))
             timing.Duration |> Option.map (durationToString >> Attribute.createXML "dur")
             timing.End |> Option.map (timeSpanToString >> Attribute.createXML "end")
@@ -122,4 +122,6 @@ module Timing =
             timing.Maximum |> Option.map (timeSpanToString >> Attribute.createXML "max")
             timing.Restart |> Option.map (restartToString >> Attribute.createXML "restart")
             timing.FinalState |> Option.map (finalStateToString >> Attribute.createXML "fill")
-        ] |> List.choose id |> Set.ofList) + (repetitionToAttributes timing.Repetition)
+        ]
+        |> List.choose id
+        |> List.append (repetitionToAttributes timing.Repetition)

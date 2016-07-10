@@ -78,13 +78,13 @@ module Element =
         |> Tag.addAttributes
             (
                 [
-                    element.Id |> Option.map (Attribute.createCSS "id" >> Set.singleton)
-                    element.Class |> Option.map (Attribute.createCSS "class" >> Set.singleton)
+                    element.Id |> Option.map (Attribute.createCSS "id" >> List.singleton)
+                    element.Class |> Option.map (Attribute.createCSS "class" >> List.singleton)
                     element.Style  |> Option.map Style.toAttributes
-                    element.Transform |> Option.map (Transform.toAttribute >> Set.singleton)
-                    Some Set.empty // To prevent an empty list for the reduce
+                    element.Transform |> Option.map (Transform.toAttribute >> List.singleton)
                 ]
-                |> List.choose id |> List.reduce (+)
+                |> List.choose id
+                |> List.concat
             )
         |> match element.Animations with
             | Some(a) -> Tag.addBody (a |> Seq.map Animation.toString |> String.concat "")
@@ -93,7 +93,7 @@ module Element =
     let toString element = element |> toTag |> Tag.toString
 
     let setTo timing newElement element =
-        let attributesDiff = (newElement |> toTag).Attributes - (element |> toTag).Attributes
-        element |> withAnimations (attributesDiff |> Set.toSeq |> Seq.map (fun {Name = n; Value = v; Type = t} -> Animation.createSet timing t n v))
+        let attributesDiff = ((newElement |> toTag).Attributes |> Set.ofList) - ((element |> toTag).Attributes |> Set.ofList) |> Set.toList
+        element |> withAnimations (attributesDiff |> List.map (fun {Name = n; Value = v; Type = t} -> Animation.createSet timing t n v))
 
     // TODO: Add more animations such as transform, path, animate, etc.

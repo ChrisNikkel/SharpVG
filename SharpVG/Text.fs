@@ -28,14 +28,14 @@ module Text =
         |> Tag.addAttributes
             (
                     match text.FontFamily with
-                        | Some(family) -> set [Attribute.createXML "font-family" family]
-                        | None -> set []
+                        | Some(family) -> [Attribute.createXML "font-family" family]
+                        | None -> []
             )
         |> Tag.addAttributes
             (
                     match text.FontSize with
-                        | Some(size) -> set [Attribute.createXML "font-size" (string size)]
-                        | None -> set []
+                        | Some(size) -> [Attribute.createXML "font-size" (string size)]
+                        | None -> []
             )
 
     let toString text = text |> toTag |> Tag.toString

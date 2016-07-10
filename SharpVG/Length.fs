@@ -12,6 +12,9 @@ module Length =
     let empty =
         Pixel 0.0
 
+    let full =
+        Percent 100.0
+
     let ofPixels =
         Pixel
 

@@ -71,14 +71,14 @@ module Animation =
     let toTag animation =
         let calculationModeToAttribute c =
             match c with
-                | Some(c) -> set [Attribute.createXML "calculationMode" (Enum.GetName(typeof<CalculationMode>, c).ToLower())]
-                | None -> set []
+                | Some(c) -> List.singleton (Attribute.createXML "calculationMode" (Enum.GetName(typeof<CalculationMode>, c).ToLower()))
+                | None -> []
         let name, attributes =
             match animation.AnimationType with 
-                | Set c -> "set", set [Attribute.createXML "attributeName" c.AttributeName; Attribute.createXML "attributeType" (Enum.GetName(typeof<AttributeType>, c.AttributeType)); Attribute.createXML "to" c.AttributeValue]
-                | Animate c -> "animate", set [Attribute.createXML "attributeName" c.AttributeName; Attribute.createXML "attributeType" (Enum.GetName(typeof<AttributeType>, c.AttributeType)); Attribute.createXML "from" c.AttributeFromValue; Attribute.createXML "to" c.AttributeToValue]
-                | Transform (f, t) -> "animateTransform", set [Attribute.createXML "type" (Transform.getTypeName f); Attribute.createXML "from" (f |> Transform.toString); Attribute.createXML "to" (t |> Transform.toString)]
-                | Motion m -> "animateMotion", set [m.Path |> Path.toAttribute] + (calculationModeToAttribute m.CalculationMode)
+                | Set c -> "set", [Attribute.createXML "attributeName" c.AttributeName; Attribute.createXML "attributeType" (Enum.GetName(typeof<AttributeType>, c.AttributeType)); Attribute.createXML "to" c.AttributeValue]
+                | Animate c -> "animate", [Attribute.createXML "attributeName" c.AttributeName; Attribute.createXML "attributeType" (Enum.GetName(typeof<AttributeType>, c.AttributeType)); Attribute.createXML "from" c.AttributeFromValue; Attribute.createXML "to" c.AttributeToValue]
+                | Transform (f, t) -> "animateTransform", [Attribute.createXML "type" (Transform.getTypeName f); Attribute.createXML "from" (f |> Transform.toString); Attribute.createXML "to" (t |> Transform.toString)]
+                | Motion m -> "animateMotion", [m.Path |> Path.toAttribute] @ (calculationModeToAttribute m.CalculationMode)
         Tag.create name
         |> Tag.addAttributes attributes
         |> Tag.addAttributes (animation.Timing |> Timing.toAttributes)

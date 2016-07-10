@@ -47,15 +47,14 @@ let rec iterateAliveGeneration previousData newData cellIndex =
             if survives (List.length aliveNeighbors)
             then aliveCell :: newData |> removeDups
             else newData
-        iterateDeadGeneration previousData deadNeighbors 
-            |> List.append (iterateAliveGeneration previousData (newAliveData) (cellIndex + 1)) |> removeDups
+        (iterateAliveGeneration previousData newAliveData (cellIndex + 1)) @ (iterateDeadGeneration previousData deadNeighbors) |> removeDups
     else
         newData 
 
 let doIteration initialData = (iterateAliveGeneration initialData [] 0)
 
 let setItemPosition x y item = item |> List.map (fun (ix, iy) -> (ix + x, iy + y))
-let addItem item x y map = map |> List.append (item |> setItemPosition x y)
+let addItem item x y map = (item |> setItemPosition x y) @ map
 
 let crossItem = [(1, 1); (1, 2); (1, 3)]
 let gliderItem = [(1, 1); (2, 1); (3, 1); (3, 2); (2, 3)]

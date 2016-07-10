@@ -18,10 +18,10 @@ module Area =
         ofFloats (float x, float y)
 
     let full =
-        create (Percent 100.0) (Percent 100.0)
+        create Length.full Length.full
 
     let toAttributes area =
-        set[Attribute.createXML "height" <| Length.toString area.Height; Attribute.createXML "width" <| Length.toString area.Width]
+        [Attribute.createXML "height" <| Length.toString area.Height; Attribute.createXML "width" <| Length.toString area.Width]
 
     let toString area =
         Length.toString area.Height + "," + Length.toString area.Width

@@ -16,7 +16,7 @@ module Circle =
 
     let toTag circle =
         Tag.create "circle"
-        |> Tag.withAttributes ((Point.toAttributesWithModifier circle.Center "c" "") |> Set.add (Attribute.createXML "r" (Length.toString circle.Radius)))
+        |> Tag.withAttributes ((Attribute.createXML "r" (Length.toString circle.Radius)) :: (Point.toAttributesWithModifier circle.Center "c" ""))
 
     let toString =
         toTag >> Tag.toString

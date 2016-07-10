@@ -27,7 +27,7 @@ module Point =
         (Length.toDouble point.X, Length.toDouble point.Y)
 
     let toAttributesWithModifier point pre post =
-        set [Attribute.createXML (pre + "x" + post) (Length.toString point.X); Attribute.createXML (pre + "y" + post) (Length.toString point.Y)]
+        [Attribute.createXML (pre + "x" + post) (Length.toString point.X); Attribute.createXML (pre + "y" + post) (Length.toString point.Y)]
 
     let toAttributes point =
         toAttributesWithModifier point "" ""
