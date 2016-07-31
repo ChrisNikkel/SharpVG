@@ -14,6 +14,7 @@ module Plot =
     let create minimum maximum elements =
         {Elements = elements; Minimum = minimum; Maximum = maximum; Title = None}
 
+    // TODO: Make this support either a list of tuples or a list of just x values
     let line values =
         let (minimum, maximum) =
             let (xValues, yValues) = values |> List.unzip

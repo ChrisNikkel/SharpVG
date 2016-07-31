@@ -137,9 +137,10 @@ let main argv =
     |> Svg.ofGroup
     |> Svg.withStyle namedStyle
     |> Svg.withSize {Height = boardLength; Width = boardLength}
-    |> Svg.withViewbox Point.origin Area.full
     |> Svg.toHtml "SVG Life Example"
     |> saveToFile fileName
 
     openFile fileName
     0 // return an integer exit code
+
+    // TODO: Combine with FunScript to make a realtime version: https://github.com/ZachBray/FunScript/blob/master/examples/EasyGettingStarted/Mazing.fs
