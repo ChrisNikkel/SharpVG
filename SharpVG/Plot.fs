@@ -6,13 +6,15 @@ type Plot =
         Minimum: Point
         Maximum: Point
         Title: string option
+        Style: NamedStyle
     }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Plot =
+    let defaultStyle = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None } |> NamedStyle.ofStyle "DefaultPlotStyle"
 
     let create minimum maximum elements =
-        {Elements = elements; Minimum = minimum; Maximum = maximum; Title = None}
+        {Elements = elements; Minimum = minimum; Maximum = maximum; Title = None; Style = defaultStyle}
 
     // TODO: Make this support either a list of tuples or a list of just x values
     let line values =
@@ -30,13 +32,11 @@ module Plot =
         create (Point.ofFloats minimum) (Point.ofFloats maximum) (Seq.singleton elements)
 
     let toGroup plot =
-        let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None }
-        let namedStyle = style |> NamedStyle.ofStyle "std"
         let yOffset =  Length.ofFloat (((Length.toFloat plot.Maximum.Y) - (Length.toFloat plot.Minimum.Y)))
-        let xAxis = Line.create (Point.create plot.Minimum.X Length.empty) (Point.create plot.Maximum.X Length.empty) |> Element.ofLine |> Element.withNamedStyle namedStyle
-        let yAxis = Line.create (Point.create Length.empty plot.Minimum.Y) (Point.create Length.empty plot.Maximum.Y) |> Element.ofLine |> Element.withNamedStyle namedStyle
+        let xAxis = Line.create (Point.create plot.Minimum.X Length.empty) (Point.create plot.Maximum.X Length.empty) |> Element.ofLine |> Element.withNamedStyle plot.Style
+        let yAxis = Line.create (Point.create Length.empty plot.Minimum.Y) (Point.create Length.empty plot.Maximum.Y) |> Element.ofLine |> Element.withNamedStyle plot.Style
         plot.Elements
-        |> Seq.map (Element.withNamedStyle namedStyle)
+        |> Seq.map (Element.withNamedStyle plot.Style)
         |> Group.ofSeq
         |> Group.addElement xAxis
         |> Group.addElement yAxis

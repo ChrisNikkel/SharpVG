@@ -61,6 +61,7 @@ module Svg =
         |> Plot.toGroup
         |> ofGroup
         |> withViewbox Point.origin (Area.create xSize ySize)
+        |> withStyle plot.Style
 
     let toString svg =
         let attributes =
