@@ -12,7 +12,7 @@ module Point =
         { X = x; Y = y }
 
     let ofFloats (x, y) =
-        create (Pixel x) (Pixel y)
+        create (UserSpace x) (UserSpace y)
 
     let ofInts (x, y) =
         ofFloats (float x, float y)
@@ -22,9 +22,6 @@ module Point =
 
     let toFloats point =
         (Length.toFloat point.X, Length.toFloat point.Y)
-
-    let toDoubles point =
-        (Length.toDouble point.X, Length.toDouble point.Y)
 
     let toAttributesWithModifier point pre post =
         [Attribute.createXML (pre + "x" + post) (Length.toString point.X); Attribute.createXML (pre + "y" + post) (Length.toString point.Y)]

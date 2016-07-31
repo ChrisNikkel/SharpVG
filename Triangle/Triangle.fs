@@ -61,7 +61,7 @@ let main argv =
     |> Group.asCartesian (Length.ofFloat margin) (Length.ofFloat triangleLength)
     |> Svg.ofGroup
     |> Svg.withStyle namedStyle
-    |> Svg.withSize (Area.ofFloats (triangleLength, triangleLength + margin))
+    |> Svg.withSize (Area.ofFloats (triangleLength + margin, triangleLength + margin))
     |> Svg.withViewbox Point.origin Area.full
     |> Svg.toHtml "SVG Triangle Example"
     |> saveToFile fileName

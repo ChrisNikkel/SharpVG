@@ -3,7 +3,8 @@ open System
 
 // TODO: Would it better to do something different here so that pixels could more magically be transformed to ems or percent.  Maybe even without ems if that is hard.
 type Length =
-    | Pixel of float
+    | UserSpace of float
+    | Pixel of int
     | Em of float
     | Percent of float
 
@@ -11,19 +12,22 @@ type Length =
 module Length =
 
     let empty =
-        Pixel 0.0
+        UserSpace 0.0
 
     let full =
         Percent 100.0
+
+    let ofUserSpace =
+        UserSpace
 
     let ofPixels =
         Pixel
 
     let ofFloat =
-        ofPixels
+        ofUserSpace
 
     let ofInt =
-        float >> ofPixels
+        float >> ofUserSpace
 
     let ofEm =
         Em
@@ -35,20 +39,16 @@ module Length =
         // TODO: Not sure how smart it is to always round things, but this prevents extra un-needed data.
         let round (n:float) = Math.Round(n, 4)
         match length with
-            | Pixel p -> sprintf "%g" (round p)
+            | UserSpace u -> sprintf "%g" (round u)
+            | Pixel p -> sprintf "%d" p + "px"
             | Em e -> sprintf "%g" (round e) + "em"
             | Percent p -> sprintf "%g" (round p) + "%"
 
     let toFloat length =
         match length with
+            | UserSpace u -> u
             | Pixel p -> float p
             | Em e -> e
             | Percent p -> p
-
-    let toDouble length =
-        match length with
-            | Pixel p -> p
-            | Em e -> float e
-            | Percent p -> float p
 
     // TODO: Make Lengths subtractable

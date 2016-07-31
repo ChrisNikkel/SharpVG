@@ -47,7 +47,7 @@ module Group =
 
     let asCartesian x y group =
         group
-        |> withTransform (Transform.createScale (Pixel 1.0) |> Transform.withY (Pixel -1.0))
+        |> withTransform (Transform.createScale (UserSpace 1.0) |> Transform.withY (UserSpace -1.0))
         |> addTransform (Transform.createTranslate x |> Transform.withY y)
 
     // TODO: Add Group.toTag

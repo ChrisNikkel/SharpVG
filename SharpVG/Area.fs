@@ -12,7 +12,7 @@ module Area =
         { Width = width; Height = height }
 
     let ofFloats (x, y) =
-        create (Pixel x) (Pixel y)
+        create (UserSpace x) (UserSpace y)
 
     let ofInts (x, y) =
         ofFloats (float x, float y)
