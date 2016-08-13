@@ -17,6 +17,12 @@ module Area =
     let ofInts (x, y) =
         ofFloats (float x, float y)
 
+    let fromPoints p1 p2 =
+        create
+            (Length.ofFloat (abs ((Length.toFloat p1.X) - (Length.toFloat p2.X))))
+            (Length.ofFloat (abs ((Length.toFloat p1.Y) - (Length.toFloat p2.Y))))
+
+
     let full =
         create Length.full Length.full
 

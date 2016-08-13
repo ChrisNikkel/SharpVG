@@ -45,13 +45,10 @@ module Svg =
         }
 
     let ofPlot plot =
-        // TODO: Make general purpose function to translate points to area
-        let ySize = Length.ofFloat (((Length.toFloat plot.Maximum.Y) - (Length.toFloat plot.Minimum.Y)))
-        let xSize = Length.ofFloat (((Length.toFloat plot.Maximum.X) - (Length.toFloat plot.Minimum.X)))
         plot
         |> Plot.toGroup
         |> ofGroup
-        |> withViewbox Point.origin (Area.create xSize ySize)
+        |> withViewbox Point.origin (Area.fromPoints plot.Minimum plot.Maximum)
 
     let toString svg =
         let attributes =

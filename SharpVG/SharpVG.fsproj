@@ -47,9 +47,9 @@
     <Compile Include="Attribute.fs" />
     <Compile Include="Tag.fs" />
     <Compile Include="Length.fs" />
+    <Compile Include="Point.fs" />
     <Compile Include="Area.fs" />
     <Compile Include="Color.fs" />
-    <Compile Include="Point.fs" />
     <Compile Include="Path.fs" />
     <Compile Include="Polygon.fs" />
     <Compile Include="Polyline.fs" />

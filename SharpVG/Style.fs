@@ -73,7 +73,7 @@ module Style =
         Attribute.createCSS "style" (toString style)
 
     let toCssString style =
-        match style.Name with | Some name  -> "." + name + " " | None -> "" + "{" + (style |> toString) + "}"
+        (match style.Name with | Some name  -> "." + name + " " | None -> "") + "{" + (style |> toString) + "}"
 
     let toTag style =
         Tag.create "style"

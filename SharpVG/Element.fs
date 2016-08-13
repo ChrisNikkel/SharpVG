@@ -23,7 +23,6 @@ type Element = {
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Element =
 
-    // TODO: Make create element follow same rules as other creates
     let create element =
         {
             Id = None
