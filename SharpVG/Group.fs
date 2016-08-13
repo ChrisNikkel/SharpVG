@@ -55,8 +55,12 @@ module Group =
             |> Seq.map (function | Element(e) -> e.Style |> Option.toList |> Set.ofList | Group(g) -> g |> toStyleSet)
             |> Seq.reduce (+)
 
-    // TODO: Add Group.toTag
     let rec toString group =
+        group
+        |> toTag
+        |> Tag.toString
+
+    and toTag group =
         let body =
             group.Body
             |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> toString)
@@ -64,15 +68,6 @@ module Group =
 
         (match group.Transforms with | Some(t) -> Tag.create "g" |> (Tag.withAttribute (t |> Transforms.toAttribute)) | None -> Tag.create "g")
         |> Tag.withBody body
-        |> Tag.toString
-
-    // TODO: Integrate tag into recursive function for Group.toString
-    // let toTag group =
-    //    {
-    //        Name = "g";
-    //        Attribute = ??;
-    //        Body = body
-    //    }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Body =
