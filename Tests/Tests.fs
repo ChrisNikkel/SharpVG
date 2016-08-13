@@ -119,7 +119,7 @@ let ``do lots and don't fail`` () =
     let point = Point.ofInts (24, 15)
     let style1 = Style.create (Name Colors.Red) (Hex 0xff0000) (Length.ofFloat 3.0) 1.0
     let style2 = Style.create (Name Colors.Blue) (SmallHex 0xf00s) (Length.ofFloat 6.0) 1.0
-    let length = Length.ofPixels 1.0
+    let length = Length.ofPixels 1
     let area = Area.create length length
 
     let graphics = seq {

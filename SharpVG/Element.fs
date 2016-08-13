@@ -12,25 +12,26 @@ type BaseElement =
     | Path of Path
 
 type Element = {
-        Id: string option;
-        Class: string option;  // TODO: Auto fill this for named styles
-        Element: BaseElement;
-        Style: Style option;
-        Transform: Transform option;
-        Animations: seq<Animation> option
+        Id: string option
+        Classes: seq<string>
+        Element: BaseElement
+        Style: Style option
+        Transform: Transform option
+        Animations: seq<Animation>
     }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Element =
 
+    // TODO: Make create element follow same rules as other creates
     let create element =
         {
-            Id = None;
-            Class = None;
-            Element = element;
-            Style = None;
-            Transform = None;
-            Animations = None
+            Id = None
+            Classes = Seq.empty
+            Element = element
+            Style = None
+            Transform = None
+            Animations = Seq.empty
         }
 
     let withStyle style (element:Element) =
@@ -40,19 +41,25 @@ module Element =
         { element with Transform = Some transform }
 
     let withAnimation animation element =
-        { element with Animations = Some (Seq.singleton animation) }
+        { element with Animations = Seq.singleton animation }
 
     let withAnimations animations element =
-        { element with Animations = Some animations }
+        { element with Animations = animations }
+
+    let addAnimation animation element =
+        element.Animations |> Seq.append (Seq.singleton animation)
 
     let withId id element =
         { element with Id = Some id }
 
     let withClass className element =
-        { element with Class = Some className }
+        { element with Classes = Seq.singleton className }
 
-    let withNamedStyle namedStyle =
-        withClass namedStyle.Name
+    let withClasses classes element =
+        { element with Classes = classes }
+
+    let addClass className element =
+        element.Classes |> Seq.append (Seq.singleton className)
 
     let ofLine line = create (Line line)
     let ofText text = create (Text text)
@@ -65,6 +72,16 @@ module Element =
     let ofPath path = create (Path path)
 
     let toTag element =
+        let styleClass =
+            match element.Style with
+                | Some s -> s.Name
+                | None -> None
+
+        let classes =
+            match styleClass with
+                | Some n -> element.Classes |> Seq.append (Seq.singleton n)
+                | None -> element.Classes
+
         match element.Element with
             | Line line -> line |> Line.toTag
             | Text text -> text |> Text.toTag
@@ -79,16 +96,14 @@ module Element =
             (
                 [
                     element.Id |> Option.map (Attribute.createCSS "id" >> List.singleton)
-                    element.Class |> Option.map (Attribute.createCSS "class" >> List.singleton)
-                    element.Style  |> Option.map Style.toAttributes
+                    classes |> Seq.map (Attribute.createCSS "class") |> Seq.toList |> Option.Some
+                    element.Style |> Option.filter (not << Style.isNamed) |> Option.map Style.toAttributes
                     element.Transform |> Option.map (Transform.toAttribute >> List.singleton)
                 ]
                 |> List.choose id
                 |> List.concat
             )
-        |> match element.Animations with
-            | Some(a) -> Tag.addBody (a |> Seq.map Animation.toString |> String.concat "")
-            | None -> id
+        |> if element.Animations |> Seq.isEmpty then id else Tag.addBody (element.Animations |> Seq.map Animation.toString |> String.concat "")
 
     let toString element = element |> toTag |> Tag.toString
 

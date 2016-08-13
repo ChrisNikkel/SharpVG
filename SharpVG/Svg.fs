@@ -7,7 +7,6 @@ type Viewbox = {
 
 type Svg = {
     Body: Body
-    Styles: seq<NamedStyle> option
     Size: Area option
     Viewbox: Viewbox option
 }
@@ -20,12 +19,6 @@ module Svg =
     let withViewbox minimum size (svg:Svg) =
         { svg with Viewbox = Some({ Minimum = minimum; Size = size }) }
 
-    let withStyles styles (svg:Svg) =
-        { svg with Styles = Some(styles) }
-
-    let withStyle namedStyle (svg:Svg) =
-        { svg with Styles = Some(Seq.singleton namedStyle) }
-
     /// <summary>
     /// This function takes seqence of elements and creates a simple svg object.
     /// </summary>
@@ -33,9 +26,8 @@ module Svg =
     /// <returns>The svg object containing the elements.</returns>
     let ofSeq seq =
         {
-            Body = seq |> Seq.map (fun e -> Element(e));
-            Styles = None;
-            Size = None;
+            Body = seq |> Seq.map (fun e -> Element(e))
+            Size = None
             Viewbox = None
         }
 
@@ -48,7 +40,6 @@ module Svg =
     let ofGroup group =
         {
             Body = seq { yield Group(group) }
-            Styles = None;
             Size = Some(Area.full);
             Viewbox = None
         }
@@ -61,17 +52,13 @@ module Svg =
         |> Plot.toGroup
         |> ofGroup
         |> withViewbox Point.origin (Area.create xSize ySize)
-        |> withStyle plot.Style
 
     let toString svg =
         let attributes =
             match svg.Size with | Some size -> Area.toAttributes size | None -> []
             @ match svg.Viewbox with | Some viewbox -> [Attribute.createXML "viewBox" ((Point.toString viewbox.Minimum) + " " + (Area.toString viewbox.Size))] | None -> []
 
-        let styles =
-            match svg.Styles with
-                | Some(styles) -> styles |> Styles.toString 
-                | None -> ""
+        let styles = svg.Body |> Body.toStyles |> Styles.named |> Styles.toString
 
         let body =
             svg.Body

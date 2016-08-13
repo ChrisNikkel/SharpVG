@@ -6,12 +6,12 @@ type Plot =
         Minimum: Point
         Maximum: Point
         Title: string option
-        Style: NamedStyle
+        Style: Style
     }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Plot =
-    let defaultStyle = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None } |> NamedStyle.ofStyle "DefaultPlotStyle"
+    let defaultStyle = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None; Name = Some("DefaultPlotStyle") }
 
     let create minimum maximum elements =
         {Elements = elements; Minimum = minimum; Maximum = maximum; Title = None; Style = defaultStyle}
@@ -33,10 +33,10 @@ module Plot =
 
     let toGroup plot =
         let yOffset =  Length.ofFloat (((Length.toFloat plot.Maximum.Y) - (Length.toFloat plot.Minimum.Y)))
-        let xAxis = Line.create (Point.create plot.Minimum.X Length.empty) (Point.create plot.Maximum.X Length.empty) |> Element.ofLine |> Element.withNamedStyle plot.Style
-        let yAxis = Line.create (Point.create Length.empty plot.Minimum.Y) (Point.create Length.empty plot.Maximum.Y) |> Element.ofLine |> Element.withNamedStyle plot.Style
+        let xAxis = Line.create (Point.create plot.Minimum.X Length.empty) (Point.create plot.Maximum.X Length.empty) |> Element.ofLine |> Element.withStyle plot.Style
+        let yAxis = Line.create (Point.create Length.empty plot.Minimum.Y) (Point.create Length.empty plot.Maximum.Y) |> Element.ofLine |> Element.withStyle plot.Style
         plot.Elements
-        |> Seq.map (Element.withNamedStyle plot.Style)
+        |> Seq.map (Element.withStyle plot.Style)
         |> Group.ofSeq
         |> Group.addElement xAxis
         |> Group.addElement yAxis

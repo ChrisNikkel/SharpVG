@@ -105,9 +105,7 @@ let main argv =
         |> List.concat
         |> removeDups
 
-    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None }
-
-    let namedStyle = style |> NamedStyle.ofStyle "std"
+    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None; Name = Some("std") }
 
     // Execute
 
@@ -131,11 +129,10 @@ let main argv =
     |> Seq.scan (fun (d, t) _ -> (doIteration d, t + delay)) (initialData, 0.0)
     |> Seq.collect (fun (p, t) -> p |> List.map (fun (x, y) -> ((x, y), t)))
     |> Seq.groupBy (fun ((x, y), t) -> (x, y))
-    |> Seq.map (fun ((x, y), times) -> addAnimation (makeElement x y) (times |> Seq.map snd) |> Element.withNamedStyle namedStyle)
+    |> Seq.map (fun ((x, y), times) -> addAnimation (makeElement x y) (times |> Seq.map snd) |> Element.withStyle style)
     |> Group.ofSeq
     |> Group.asCartesian Length.empty (Length.ofFloat boardSize)
     |> Svg.ofGroup
-    |> Svg.withStyle namedStyle
     |> Svg.withSize {Height = boardLength; Width = boardLength}
     |> Svg.toHtml "SVG Life Example"
     |> saveToFile fileName
