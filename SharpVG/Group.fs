@@ -51,12 +51,8 @@ module Group =
         |> addTransform (Transform.createTranslate x |> Transform.withY y)
 
     let rec toStyleSet group =
-        let styleToSet style =
-            match style with
-                | Some(s) -> Set.singleton s
-                | None -> Set.empty
         group.Body
-            |> Seq.map (function | Element(e) -> e.Style |> styleToSet | Group(g) -> g |> toStyleSet)
+            |> Seq.map (function | Element(e) -> e.Style |> Option.toList |> Set.ofList | Group(g) -> g |> toStyleSet)
             |> Seq.reduce (+)
 
     // TODO: Add Group.toTag
@@ -81,16 +77,11 @@ module Group =
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Body =
     let toStyles body =
-        // TODO: Remove duplication from within Group.toStyleSet
-        let styleToSet style =
-            match style with
-                | Some(s) -> Set.singleton s
-                | None -> Set.empty
         body
         |> Seq.map (
             fun b -> match b with
             | Group(g) -> g |> Group.toStyleSet
-            | Element(e) -> e.Style |> styleToSet
+            | Element(e) -> e.Style |> Option.toList |> Set.ofList
             )
         |> Seq.reduce (+)
         |> Set.toSeq
