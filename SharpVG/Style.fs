@@ -73,9 +73,7 @@ module Style =
         Attribute.createCSS "style" (toString style)
 
     let toCssString style =
-        match style.Name with
-            | Some name  -> "." + name + "{" + (style |> toString) + "}"
-            | None -> failwith "Unnamed styles cannot be converted to css"  // TODO: Handle unnamed style to css conversion without an exception.  Maybe allow it if a class name is passed in. (ie. rect)
+        match style.Name with | Some name  -> "." + name + " " | None -> "" + "{" + (style |> toString) + "}"
 
     let toTag style =
         Tag.create "style"
