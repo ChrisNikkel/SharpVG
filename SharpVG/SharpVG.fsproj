@@ -68,7 +68,6 @@
     <Compile Include="Group.fs" />
     <Compile Include="Plot.fs" />
     <Compile Include="Svg.fs" />
-    <Compile Include="SharpVG.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

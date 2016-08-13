@@ -1,3 +1,5 @@
+// TODO: Add anchor, decorator, spacing, and writing mode to text
+// TODO: Add def and use to make reusable elements
 namespace SharpVG
 
 type Style =
