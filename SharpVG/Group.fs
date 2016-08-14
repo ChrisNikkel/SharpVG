@@ -1,8 +1,9 @@
 ﻿namespace SharpVG
 
 type Group = {
+    Id: string option
     Body: Body
-    Transforms: seq<Transform> option
+    Transforms: seq<Transform>
 }
 and GroupElement =
     | Group of Group
@@ -14,8 +15,9 @@ and Body =
 module Group =
     let ofSeq seq =
         {
+            Id = None
             Body = seq |> Seq.map (fun e -> Element(e))
-            Transforms = None
+            Transforms = Seq.empty
         }
 
     let ofList list =
@@ -28,16 +30,16 @@ module Group =
         { group with Body = body }
 
     let withTransforms transforms group =
-        { group with Transforms = Some transforms }
+        { group with Transforms = transforms }
 
     let withTransform transform group =
-        { group with Transforms = Some (Seq.singleton transform) }
+        { group with Transforms = Seq.singleton transform }
+
+    let withId idName (group:Group) =
+        { group with Id = Some idName }
 
     let addTransform transform group =
-        group
-        |> match group.Transforms with
-            | Some (t) -> withTransforms (Seq.append (Seq.singleton transform) t)
-            | None -> withTransform transform
+        group |> withTransforms (Seq.append (Seq.singleton transform) group.Transforms)
 
     let addElements elements group =
         group |> withBody (Seq.append group.Body (elements |> Seq.map Element))
@@ -66,8 +68,14 @@ module Group =
             |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> toString)
             |> String.concat ""
 
-        (match group.Transforms with | Some(t) -> Tag.create "g" |> (Tag.withAttribute (t |> Transforms.toAttribute)) | None -> Tag.create "g")
-        |> Tag.withBody body
+        let attributes =
+            [
+                group.Id |> Option.map (Attribute.createXML "Id")
+                (if group.Transforms |> Seq.isEmpty then None else Some (group.Transforms |> Transforms.toAttribute))
+            ]
+            |> List.choose id
+
+        (if attributes |> List.isEmpty then Tag.create "g" else Tag.create "g" |> (Tag.withAttributes attributes)) |> Tag.withBody body
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Body =

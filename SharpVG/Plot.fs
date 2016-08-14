@@ -11,6 +11,7 @@ type Plot =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Plot =
+    let defaultScale = 1000.0
     let defaultStyle = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None; Name = Some("DefaultPlotStyle") }
 
     let create minimum maximum elements =
@@ -38,6 +39,7 @@ module Plot =
         plot.Elements
         |> Seq.map (Element.withStyle plot.Style)
         |> Group.ofSeq
+        |> Group.withId "MyPlot"
         |> Group.addElement xAxis
         |> Group.addElement yAxis
         |> Group.asCartesian yOffset plot.Maximum.Y

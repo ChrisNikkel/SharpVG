@@ -3,6 +3,7 @@ module TriangleExample
 open SharpVG
 open System.Diagnostics
 open System.IO
+open System
 
 type Triangle =
     {
