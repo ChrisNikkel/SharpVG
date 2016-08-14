@@ -53,4 +53,3 @@ module Tag =
         | false, { Name = n; Attributes = a; Body = None } -> "<" + n + " " + (attributesToString a) + "/>"
         | true, { Name = n; Attributes = a; Body = Some(b) } -> "<" + n + ">" + b + "</" + n + ">"
         | true, { Name = n; Attributes = a; Body = None } -> "<" + n + "/>"
-        | _ -> failwith "Unmatched tag"

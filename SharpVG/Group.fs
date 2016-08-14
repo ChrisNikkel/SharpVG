@@ -81,10 +81,9 @@ module Group =
 module Body =
     let toStyles body =
         body
-        |> Seq.map (
-            fun b -> match b with
-            | Group(g) -> g |> Group.toStyleSet
-            | Element(e) -> e.Style |> Option.toList |> Set.ofList
-            )
+        |> Seq.map (fun b ->
+            match b with
+                | Group(g) -> g |> Group.toStyleSet
+                | Element(e) -> e.Style |> Option.toList |> Set.ofList)
         |> Seq.reduce (+)
         |> Set.toSeq
