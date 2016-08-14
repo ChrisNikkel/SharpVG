@@ -91,7 +91,7 @@ module Element =
             | Polygon polygon -> polygon |> Polygon.toTag
             | Polyline polyline -> polyline |> Polyline.toTag
             | Path path -> path |> Path.toTag
-        |> Tag.addAttributes
+        |> Tag.insertAttributes
             (
                 [
                     element.Id |> Option.map (Attribute.createCSS "id" >> List.singleton)

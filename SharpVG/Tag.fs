@@ -27,8 +27,16 @@ module Tag =
         |> withAttributes (tag.Attributes @ attributes)
 
     let addAttribute attribute tag =
-        tag 
+        tag
         |> addAttributes (List.singleton attribute)
+
+    let insertAttributes attributes tag =
+        tag
+        |> withAttributes (attributes @ tag.Attributes)
+
+    let insertAttribute attribute tag =
+        tag 
+        |> insertAttributes (List.singleton attribute)
 
     let addBody body tag =
         tag
