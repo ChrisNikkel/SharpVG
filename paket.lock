@@ -1,5 +1,6 @@
 NUGET
   remote: http://api.nuget.org/v3/index.json
+    FAKE (4.37.2)
     FsCheck (2.5) - framework: >= net452
       FSharp.Core (>= 3.1.2.5)
     FsCheck.Xunit (2.5) - framework: >= net452
