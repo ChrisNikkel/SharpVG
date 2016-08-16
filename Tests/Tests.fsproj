@@ -64,6 +64,7 @@
     <Compile Include="LogHelpers.fs" />
     <Compile Include="BasicChecks.fs" />
     <Compile Include="TestAttribute.fs" />
+    <Compile Include="TestTag.fs" />
     <Compile Include="Tests.fs" />
     <Content Include="paket.references" />
     <Content Include="log4net.config">
