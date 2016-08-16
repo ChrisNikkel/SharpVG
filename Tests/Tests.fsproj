@@ -84,7 +84,12 @@
     <Compile Include="TestTag.fs" />
     <Compile Include="Tests.fs" />
     <Content Include="paket.references" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="log4net.config">
+      <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

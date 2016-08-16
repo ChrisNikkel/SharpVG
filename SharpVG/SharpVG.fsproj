@@ -68,6 +68,10 @@
     <Compile Include="Group.fs" />
     <Compile Include="Plot.fs" />
     <Compile Include="Svg.fs" />
+    <Content Include="app.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
