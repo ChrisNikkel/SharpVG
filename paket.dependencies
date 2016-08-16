@@ -1,5 +1,7 @@
 source https://api.nuget.org/v3/index.json
 
+redirects:on
+
 nuget NuGet.CommandLine
 nuget FsCheck
 nuget FsCheck.Xunit
