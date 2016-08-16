@@ -63,6 +63,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="LogHelpers.fs" />
     <Compile Include="BasicChecks.fs" />
+    <Compile Include="TestAttribute.fs" />
     <Compile Include="Tests.fs" />
     <Content Include="paket.references" />
     <Content Include="log4net.config">
@@ -81,7 +82,7 @@
     </ProjectReference>
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
