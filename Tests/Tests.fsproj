@@ -82,6 +82,7 @@
     <Compile Include="BasicChecks.fs" />
     <Compile Include="TestAttribute.fs" />
     <Compile Include="TestTag.fs" />
+    <Compile Include="TestLength.fs" />
     <Compile Include="Tests.fs" />
     <Content Include="paket.references" />
     <None Include="app.config">

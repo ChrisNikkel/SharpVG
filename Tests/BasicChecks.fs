@@ -1,7 +1,24 @@
 module BasicChecks
 
 open LogHelpers
+open Xunit
+open FsCheck
+open FsCheck.Xunit
 open Swensen.Unquote
+
+type Positive =
+    static member Int() =
+        Arb.Default.Int32()
+        |> Arb.mapFilter abs (fun t -> t > 0)
+
+type PositiveFloat =
+    static member Float() =
+        Arb.Default.Float()
+        |> Arb.mapFilter abs (fun t -> t > 0.0)
+
+type SvgProperty() =
+    inherit PropertyAttribute(Arbitrary = [| typeof<PositiveFloat> |])
+
 
 let isTagEnclosed (tag:string) =
     let trimmedTag = tag.Trim()
@@ -36,16 +53,16 @@ let isMatched left right (str:string) =
         ) 0 = 0
 
 let checkBodylessTag name tag =
-    <@ (isMatched '<' '>' tag)
-    && (isDepthNoMoreThanOne '<' '>' tag)
-    && (happensEvenly '"' tag)
-    && (happensEvenly ''' tag)
-    && (tag.Contains name)
-    && (isTagEnclosed tag) @>
+    test <| <@ isMatched '<' '>' tag @>
+    test <| <@ isDepthNoMoreThanOne '<' '>' tag @>
+    test <| <@ happensEvenly '"' tag @>
+    test <| <@ happensEvenly ''' tag @>
+    test <| <@ tag.Contains name @>
+    test <| <@ isTagEnclosed tag @>
 
 let checkTag name tag =
-    <@ (isMatched '<' '>' tag)
-    && (isDepthNoMoreThanOne '<' '>' tag)
-    && (happensEvenly '"' tag)
-    && (happensEvenly ''' tag)
-    && (tag.Contains name) @>
+    test <| <@ isMatched '<' '>' tag @>
+    test <| <@ isDepthNoMoreThanOne '<' '>' tag @>
+    test <| <@ happensEvenly '"' tag @>
+    test <| <@ happensEvenly ''' tag @>
+    test <| <@ tag.Contains name @>

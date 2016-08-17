@@ -48,23 +48,3 @@ module Length =
             | Pixels p -> float p
             | Em e -> e
             | Percent p -> p
-
-    let apply operation left right =
-        match left, right with
-            | UserSpace l, UserSpace r -> operation l r |> ofUserSpace
-            | Pixels l, Pixels r -> operation (float l) (float r) |> int |> ofPixels  // TODO: Don't cast ints to floats to do operations on lengths
-            | Em l, Em r -> operation l r |> ofEm
-            | Percent l, Percent r -> operation l r |> ofPercent
-            | _ -> failwith "Incompatible length types"
-
-    let (-) left right =
-        apply (-) left right
-
-    let (+) left right =
-        apply (+) left right
-
-    let (*) left right =
-        apply (*) left right
-
-    let (/) left right =
-        apply (/) left right

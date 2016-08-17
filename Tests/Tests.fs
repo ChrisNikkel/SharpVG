@@ -7,19 +7,6 @@ open BasicChecks
 open Swensen.Unquote
 open System
 
-type Positive =
-    static member Int() =
-        Arb.Default.Int32()
-        |> Arb.mapFilter abs (fun t -> t > 0)
-
-type PositiveFloat =
-    static member Float() =
-        Arb.Default.Float()
-        |> Arb.mapFilter abs (fun t -> t > 0.0)
-
-type SvgProperty() =
-    inherit PropertyAttribute(Arbitrary = [| typeof<PositiveFloat> |])
-
 module Tests =
 
     [<SvgProperty>]
@@ -30,7 +17,7 @@ module Tests =
         let line = Line.create point1 point2
         let tag = line |> Element.ofLine |> Element.withStyle style |> Element.toString
 
-        test <| checkBodylessTag "line" tag
+        checkBodylessTag "line" tag
 
     [<SvgProperty>]
     let ``draw rectangles`` (x, y, h, w, c, r, g, b, p, o) =
@@ -41,7 +28,7 @@ module Tests =
         let rect = Rect.create point area
         let tag = rect |> Element.ofRect |> Element.withStyle style |> Element.toString
 
-        test <| checkBodylessTag "rect" tag
+        checkBodylessTag "rect" tag
 
     [<SvgProperty>]
     let ``draw circles`` (x, y, radius, c, r, g, b, p, o) =
@@ -51,7 +38,7 @@ module Tests =
         let circle = Circle.create point (Length.ofFloat radius)
         let tag = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
 
-        test <| checkBodylessTag "circle" tag
+        checkBodylessTag "circle" tag
 
 
     [<SvgProperty>]
@@ -62,7 +49,7 @@ module Tests =
         let ellipse = Ellipse.create point1 point2
         let tag = ellipse |> Element.ofEllipse |> Element.withStyle style |> Element.toString
 
-        test <| checkBodylessTag "ellipse" tag
+        checkBodylessTag "ellipse" tag
 
     [<Property>]
     let ``draw images`` (x, y, h, w, i) =
@@ -71,7 +58,7 @@ module Tests =
         let image = Image.create point area i
         let tag = image |> Element.ofImage |> Element.toString
 
-        test <| checkBodylessTag "image" tag
+        checkBodylessTag "image" tag
 
     [<SvgProperty>]
     let ``draw texts`` (x, y, c, r, g, b, p, o) =
@@ -81,7 +68,7 @@ module Tests =
         let text = Text.create point "test"
         let tag = text |> Element.ofText |> Element.withStyle style |> Element.toString
 
-        test <| checkTag "text" tag
+        checkTag "text" tag
 
     [<SvgProperty>]
     let ``animate circles`` (x, y, radius, c, r, g, b, p, o) =
@@ -97,7 +84,7 @@ module Tests =
         let animation = Animation.createMotion timing path None
         let tag = circle |> Element.ofCircle |> Element.withStyle style |> Element.withAnimation animation |> Element.toString
 
-        test <| checkTag "circle" tag
+        checkTag "circle" tag
 
     [<Fact>]
     let ``do lots and don't fail`` () =
@@ -124,4 +111,4 @@ module Tests =
         }
 
         let html = graphics|> Svg.ofSeq |> Svg.toHtml "SVG Demo"
-        test <| checkTag "SVG Demo" html
+        checkTag "SVG Demo" html
