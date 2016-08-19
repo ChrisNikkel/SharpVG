@@ -16,7 +16,7 @@ module Ellipse =
 
     let toTag circle =
         Tag.create "ellipse"
-        |> Tag.withAttributes ((Point.toAttributesWithModifier circle.Center "c" "") @ (Point.toAttributesWithModifier circle.Radius "r" ""))
+        |> Tag.withAttributes ((Point.toAttributesWithModifier "c" "" circle.Center) @ (Point.toAttributesWithModifier "r" "" circle.Radius))
 
     let toString =
         toTag >> Tag.toString

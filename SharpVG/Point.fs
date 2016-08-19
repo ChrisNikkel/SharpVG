@@ -23,11 +23,11 @@ module Point =
     let toFloats point =
         (Length.toFloat point.X, Length.toFloat point.Y)
 
-    let toAttributesWithModifier point pre post =
+    let toAttributesWithModifier pre post point =
         [Attribute.createXML (pre + "x" + post) (Length.toString point.X); Attribute.createXML (pre + "y" + post) (Length.toString point.Y)]
 
     let toAttributes point =
-        toAttributesWithModifier point "" ""
+        toAttributesWithModifier "" "" point
 
     let toStringWithSeparator separator point =
         Length.toString point.X + separator + Length.toString point.Y

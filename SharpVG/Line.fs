@@ -13,7 +13,7 @@ module Line =
 
     let toTag line =
         Tag.create "line"
-        |> Tag.withAttributes (Point.toAttributesWithModifier line.Point1 "" "1")
-        |> Tag.addAttributes (Point.toAttributesWithModifier line.Point2 "" "2")
+        |> Tag.withAttributes (Point.toAttributesWithModifier "" "1" line.Point1)
+        |> Tag.addAttributes (Point.toAttributesWithModifier "" "2" line.Point2)
 
     let toString = toTag >> Tag.toString
