@@ -1,6 +1,5 @@
 ﻿namespace SharpVG.Tests
 
-namespace SharpVG.Tests
 open SharpVG
 open Xunit
 open FsCheck
@@ -8,7 +7,7 @@ open FsCheck.Xunit
 open BasicChecks
 open Swensen.Unquote
 
-module TestArea =
+module TestColor =
 
     [<Fact>]
     let ``create area`` () =
