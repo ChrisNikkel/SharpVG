@@ -3,7 +3,6 @@ open SharpVG
 open Xunit
 open FsCheck
 open FsCheck.Xunit
-open BasicChecks
 open Swensen.Unquote
 
 module TestPoint =
