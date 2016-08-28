@@ -7,7 +7,7 @@ open FsCheck.Xunit
 open BasicChecks
 open Swensen.Unquote
 
-module TestColor =
+module TestArea =
 
     [<Fact>]
     let ``create area`` () =
@@ -16,3 +16,4 @@ module TestColor =
     [<Fact>]
     let ``transform point to attribute`` () =
         test <| <@ (Area.create Length.empty Length.empty |> Area.toAttributes |> List.map Attribute.toString |> String.concat " ") = "height=\"0\" width=\"0\"" @>
+
