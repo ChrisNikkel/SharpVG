@@ -96,6 +96,7 @@
     <Compile Include="TestPoint.fs" />
     <Compile Include="TestArea.fs" />
     <Compile Include="TestColor.fs" />
+    <Compile Include="TestPath..fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
