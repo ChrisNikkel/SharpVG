@@ -56,5 +56,6 @@ module Text =
                         | Some(Inherit) -> [Attribute.createXML "text-anchor" "inherit"]
                         | None -> []
             )
+        |> Tag.addBody text.Body
 
     let toString text = text |> toTag |> Tag.toString
