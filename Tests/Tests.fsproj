@@ -104,6 +104,7 @@
     <Compile Include="TestLength.fs" />
     <Compile Include="TestPoint.fs" />
     <Compile Include="TestArea.fs" />
+    <Compile Include="TestStyle.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
