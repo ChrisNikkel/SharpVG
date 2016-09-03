@@ -82,6 +82,12 @@
     <Compile Include="BasicChecks.fs" />
     <Compile Include="TestAttribute.fs" />
     <Compile Include="TestTag.fs" />
+    <Compile Include="TestColor.fs" />
+    <Compile Include="TestPath..fs" />
+    <Compile Include="TestPolygon.fs" />
+    <Compile Include="TestImage.fs" />
+    <Compile Include="TestCircle.fs" />
+    <Compile Include="TestEllipse.fs" />
     <Compile Include="Tests.fs" />
     <Content Include="paket.references" />
     <None Include="app.config">
@@ -95,8 +101,6 @@
     <Compile Include="TestLength.fs" />
     <Compile Include="TestPoint.fs" />
     <Compile Include="TestArea.fs" />
-    <Compile Include="TestColor.fs" />
-    <Compile Include="TestPath..fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
