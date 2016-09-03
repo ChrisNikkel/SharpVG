@@ -88,6 +88,9 @@
     <Compile Include="TestImage.fs" />
     <Compile Include="TestCircle.fs" />
     <Compile Include="TestEllipse.fs" />
+    <Compile Include="TestLine.fs" />
+    <Compile Include="TestRect.fs" />
+    <Compile Include="TestText.fs" />
     <Compile Include="Tests.fs" />
     <Content Include="paket.references" />
     <None Include="app.config">
