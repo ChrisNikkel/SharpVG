@@ -114,7 +114,7 @@ let main argv =
         Circle.create point <| Length.ofFloat (cellSize / 2.0) |> Element.ofCircle
 
     let addAnimation element times =
-        let duration = Duration (TimeSpan.FromSeconds(delay))
+        let duration = TimeSpan.FromSeconds(delay)
         let createAnimation t =
             let start = TimeSpan.FromSeconds(t)        
             let timing = Timing.create start |> (Timing.withDuration duration)

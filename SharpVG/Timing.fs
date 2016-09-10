@@ -56,7 +56,10 @@ module Timing =
         }
 
     let withDuration duration timing =
-        { timing with Duration = Some(duration) }
+        { timing with Duration = Some(Duration(duration)) }
+
+    let withMediaDuration timing =
+        { timing with Duration = Some(DurationValue.Media) }
 
     let withEnd e timing =
         { timing with End = Some(e) }
@@ -112,7 +115,11 @@ module Timing =
                 | Freeze -> "freeze"
                 | Remove -> "remove"
 
-        let restartToString r = (Enum.GetName(typeof<Restart>, r).ToLower())
+        let restartToString restart =
+            match restart with
+                | Always -> "always"
+                | WhenNotActive -> "whennotactive"
+                | Never -> "never"
 
         [
             Some (Attribute.createXML "begin" (timing.Begin |> timeSpanToString))
