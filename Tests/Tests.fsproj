@@ -80,17 +80,22 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="LogHelpers.fs" />
     <Compile Include="BasicChecks.fs" />
+    <Compile Include="TestArea.fs" />
     <Compile Include="TestAttribute.fs" />
-    <Compile Include="TestTag.fs" />
-    <Compile Include="TestColor.fs" />
-    <Compile Include="TestPath..fs" />
-    <Compile Include="TestPolygon.fs" />
-    <Compile Include="TestImage.fs" />
     <Compile Include="TestCircle.fs" />
+    <Compile Include="TestColor.fs" />
     <Compile Include="TestEllipse.fs" />
+    <Compile Include="TestImage.fs" />
+    <Compile Include="TestLength.fs" />
     <Compile Include="TestLine.fs" />
+    <Compile Include="TestPath..fs" />
+    <Compile Include="TestPoint.fs" />
+    <Compile Include="TestPolygon.fs" />
     <Compile Include="TestRect.fs" />
+    <Compile Include="TestStyle.fs" />
+    <Compile Include="TestTag.fs" />
     <Compile Include="TestText.fs" />
+    <Compile Include="TestTiming.fs" />
     <Compile Include="Tests.fs" />
     <Content Include="paket.references" />
     <None Include="app.config">
@@ -101,10 +106,6 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Compile Include="TestLength.fs" />
-    <Compile Include="TestPoint.fs" />
-    <Compile Include="TestArea.fs" />
-    <Compile Include="TestStyle.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
