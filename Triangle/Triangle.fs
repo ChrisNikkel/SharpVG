@@ -46,21 +46,37 @@ let main argv =
     // Initialization
     let fileName = ".\\triangle.html"
     let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None; Name = Some("std") }
-    let iterations, triangleLength, margin = 7, 1000.0, 100.0
+    let iterations, triangleLength = 8, 1000.0
+    let offsetY = triangleLength - Math.Sqrt 3.0 * triangleLength / 2.0
     let startingTriangle =
             [{
-                A = Point.origin
-                B = Point.ofFloats (triangleLength / 2.0, sqrt (0.75 * triangleLength * triangleLength))
-                C = Point.ofFloats (triangleLength, 0.0)
+                A = Point.ofFloats (0.0, offsetY)
+                B = Point.ofFloats (triangleLength / 2.0, sqrt (0.75 * triangleLength * triangleLength) + offsetY)
+                C = Point.ofFloats (triangleLength, offsetY)
             }]
+
+    let center = triangleLength / 2.0 |> Length.ofFloat
+    let centerCircle = Circle.create (Point.create center center) (Length.ofFloat 5.0) |> Element.ofCircle |> Element.withStyle style
+    let frame = Rect.create Point.origin (Area.ofFloats (triangleLength, triangleLength)) |> Element.ofRect |> Element.withStyle style
+    let rotationStart = Transform.createRotate 0.0 center center
+    let rotationEnd = Transform.createRotate 360.0 center center
+    let sizeStart = Transform.createScale (Length.ofInt 1)
+    let sizeEnd = Transform.createScale (Length.ofInt 2)
+    let offsetStart = Transform.createTranslate (Length.ofFloat 0.0) |> Transform.withY (Length.ofFloat 0.0)
+    let offsetEnd = Transform.createTranslate (Length.ofFloat (triangleLength/(0.0-4.0))) |> (Transform.withY (Length.ofFloat (triangleLength/(0.0-4.0))))
+    let timing = Timing.create (TimeSpan.FromSeconds(0.0)) |> Timing.withDuration (TimeSpan.FromSeconds(5.0)) |> Timing.withRepetition { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = None }
+    let rotationAnimation = Animation.createTransform timing rotationStart rotationEnd |> Animation.withAdditive Additive.Sum |> Element.ofAnimation
+    let resizeAnimation = Animation.createTransform timing sizeStart sizeEnd |> Animation.withAdditive Additive.Sum |> Element.ofAnimation
+    let offsetAnimation = Animation.createTransform timing offsetStart offsetEnd |> Animation.withAdditive Additive.Sum |> Element.ofAnimation
 
     // Execute
     recursiveTriangles startingTriangle iterations
     |> List.map (triangleToPolygon >> (Element.withStyle style))
+    |> List.append [resizeAnimation; rotationAnimation; offsetAnimation]
+    |> List.append [frame; centerCircle]
     |> Group.ofList
-    |> Group.asCartesian (Length.ofFloat margin) (Length.ofFloat triangleLength)
     |> Svg.ofGroup
-    |> Svg.withSize (Area.ofFloats (triangleLength + margin, triangleLength + margin))
+    |> Svg.withSize (Area.ofFloats (triangleLength, triangleLength))
     |> Svg.withViewbox Point.origin Area.full
     |> Svg.toHtml "SVG Triangle Example"
     |> saveToFile fileName

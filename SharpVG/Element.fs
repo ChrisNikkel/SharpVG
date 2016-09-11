@@ -10,6 +10,7 @@ type BaseElement =
     | Polygon of seq<Point>
     | Polyline of seq<Point>
     | Path of Path
+    | Animation of Animation
 
 type Element = {
         Id: string option
@@ -69,6 +70,7 @@ module Element =
     let ofPolygon polygon = create (Polygon polygon)
     let ofPolyline polyline = create (Polyline polyline)
     let ofPath path = create (Path path)
+    let ofAnimation animation = create (Animation animation)
 
     let toTag element =
         let styleClass =
@@ -91,6 +93,7 @@ module Element =
             | Polygon polygon -> polygon |> Polygon.toTag
             | Polyline polyline -> polyline |> Polyline.toTag
             | Path path -> path |> Path.toTag
+            | Animation animation -> animation |> Animation.toTag
         |> Tag.insertAttributes
             (
                 [

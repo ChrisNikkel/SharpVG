@@ -5,7 +5,7 @@ type Transform =
     | Matrix of A: Length * B: Length * C: Length * D: Length * E: Length * F: Length
     | Translate of X: Length * Y: Length option
     | Scale of X: Length * Y: Length option
-    | Rotate of Angle: float * Point: ((Length * Length) option)
+    | Rotate of Angle: float * Point: ((Length * Length) option) // TODO: Use point instead of Length*Length
     | SkewX of Angle: float
     | SkewY of Angle: float
 
@@ -20,9 +20,9 @@ module Transform =
 
     let createScale x =
         Scale (x, None)
-    
-    let createRotate angle =
-        Rotate (angle, None)
+
+    let createRotate angle xLength yLength =
+        Rotate (angle, Some (xLength, yLength))
 
     let createSkewX angle =
         SkewX angle
@@ -60,7 +60,7 @@ module Transform =
             | Translate (x, None) | Scale (x, None) -> Length.toString x
             | Translate (x, Some y) | Scale (x, Some y) -> Length.toString x + s + Length.toString y
             | Rotate (a, None) | SkewX a | SkewY a -> string a
-            | Rotate (a, Some (x, y)) -> string a + "," + Length.toString x + s + Length.toString y
+            | Rotate (a, Some (x, y)) -> string a + s + Length.toString x + s + Length.toString y
 
     let toString =
         toStringWithSeparator " "

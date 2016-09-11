@@ -81,7 +81,7 @@ module Timing =
 
     let toAttributes timing =
         let timeSpanToString (timeSpan:TimeSpan) =
-            string timeSpan.TotalSeconds
+            string timeSpan.TotalSeconds + "s"
 
         let durationToString duration =
             match duration with
