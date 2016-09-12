@@ -56,14 +56,12 @@ let main argv =
             }]
 
     let center = triangleLength / 2.0 |> Length.ofFloat
-    let centerCircle = Circle.create (Point.create center center) (Length.ofFloat 5.0) |> Element.ofCircle |> Element.withStyle style
-    let frame = Rect.create Point.origin (Area.ofFloats (triangleLength, triangleLength)) |> Element.ofRect |> Element.withStyle style
     let rotationStart = Transform.createRotate 0.0 center center
     let rotationEnd = Transform.createRotate 360.0 center center
     let sizeStart = Transform.createScale (Length.ofInt 1)
     let sizeEnd = Transform.createScale (Length.ofInt 2)
     let offsetStart = Transform.createTranslate (Length.ofFloat 0.0) |> Transform.withY (Length.ofFloat 0.0)
-    let offsetEnd = Transform.createTranslate (Length.ofFloat (triangleLength/(0.0-4.0))) |> (Transform.withY (Length.ofFloat (triangleLength/(0.0-4.0))))
+    let offsetEnd = Transform.createTranslate (Length.ofFloat (triangleLength/(-4.0))) |> (Transform.withY (Length.ofFloat (triangleLength/(-2.0))))
     let timing = Timing.create (TimeSpan.FromSeconds(0.0)) |> Timing.withDuration (TimeSpan.FromSeconds(5.0)) |> Timing.withRepetition { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = None }
     let rotationAnimation = Animation.createTransform timing rotationStart rotationEnd |> Animation.withAdditive Additive.Sum |> Element.ofAnimation
     let resizeAnimation = Animation.createTransform timing sizeStart sizeEnd |> Animation.withAdditive Additive.Sum |> Element.ofAnimation
@@ -73,10 +71,9 @@ let main argv =
     recursiveTriangles startingTriangle iterations
     |> List.map (triangleToPolygon >> (Element.withStyle style))
     |> List.append [resizeAnimation; rotationAnimation; offsetAnimation]
-    |> List.append [frame; centerCircle]
     |> Group.ofList
     |> Svg.ofGroup
-    |> Svg.withSize (Area.ofFloats (triangleLength, triangleLength))
+    |> Svg.withSize (Area.ofFloats (triangleLength*5.0, triangleLength*3.0))
     |> Svg.withViewbox Point.origin Area.full
     |> Svg.toHtml "SVG Triangle Example"
     |> saveToFile fileName
