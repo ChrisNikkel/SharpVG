@@ -27,7 +27,7 @@ let triangleToPolygon t =
     [t.A; t.B; t.C] |> Element.ofPolygon
 
 let rec recursiveTriangles t iteration =
-    let it = t |> List.map insideTriangles |> List.concat;
+    let it = t |> List.collect insideTriangles;
     if iteration > 1 then
         recursiveTriangles it (iteration - 1)
     else
@@ -56,23 +56,29 @@ let main argv =
             }]
 
     let center = triangleLength / 2.0 |> Length.ofFloat
-    let rotationStart = Transform.createRotate 0.0 center center
-    let rotationEnd = Transform.createRotate 360.0 center center
-    let sizeStart = Transform.createScale (Length.ofInt 1)
-    let sizeEnd = Transform.createScale (Length.ofInt 2)
-    let offsetStart = Transform.createTranslate (Length.ofFloat 0.0) |> Transform.withY (Length.ofFloat 0.0)
-    let offsetEnd = Transform.createTranslate (Length.ofFloat (triangleLength/(-4.0))) |> (Transform.withY (Length.ofFloat (triangleLength/(-2.0))))
+
+    let rotate degrees = Transform.createRotate degrees center center 
+    let rotationStart, rotationEnd = rotate 0.0, rotate 360.0
+
+    let scale = Length.ofFloat >> Transform.createScale
+    let sizeStart, sizeEnd = scale 1.0, scale 2.0
+
+    let offset x y =  Transform.createTranslate (Length.ofFloat x) |> Transform.withY (Length.ofFloat y)
+    let offsetStart = offset 0.0 0.0
+    let offsetEnd = offset (triangleLength/(-4.0)) (triangleLength/(2.0))
+
     let timing = Timing.create (TimeSpan.FromSeconds(0.0)) |> Timing.withDuration (TimeSpan.FromSeconds(5.0)) |> Timing.withRepetition { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = None }
-    let rotationAnimation = Animation.createTransform timing rotationStart rotationEnd |> Animation.withAdditive Additive.Sum |> Element.ofAnimation
-    let resizeAnimation = Animation.createTransform timing sizeStart sizeEnd |> Animation.withAdditive Additive.Sum |> Element.ofAnimation
-    let offsetAnimation = Animation.createTransform timing offsetStart offsetEnd |> Animation.withAdditive Additive.Sum |> Element.ofAnimation
+    let addAnimation = Animation.withAdditive Additive.Sum >> Element.ofAnimation
+    let transform = Animation.createTransform timing
+    let rotationAnimation = transform rotationStart rotationEnd
+    let resizeAnimation = transform sizeStart sizeEnd
+    let offsetAnimation = transform offsetStart offsetEnd
 
     // Execute
     recursiveTriangles startingTriangle iterations
     |> List.map (triangleToPolygon >> (Element.withStyle style))
-    |> List.append [resizeAnimation; rotationAnimation; offsetAnimation]
-    |> Group.ofList
-    |> Svg.ofGroup
+    |> List.append (List.map addAnimation [resizeAnimation; rotationAnimation; offsetAnimation])
+    |> Group.ofList |> Svg.ofGroup
     |> Svg.withSize (Area.ofFloats (triangleLength*5.0, triangleLength*3.0))
     |> Svg.withViewbox Point.origin Area.full
     |> Svg.toHtml "SVG Triangle Example"
