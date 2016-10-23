@@ -68,16 +68,16 @@ let main argv =
     let offsetEnd = offset (triangleLength/(-4.0)) (triangleLength/(2.0))
 
     let timing = Timing.create (TimeSpan.FromSeconds(0.0)) |> Timing.withDuration (TimeSpan.FromSeconds(5.0)) |> Timing.withRepetition { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = None }
-    let addAnimation = Animation.withAdditive Additive.Sum >> Element.ofAnimation
-    let transform = Animation.createTransform timing
-    let rotationAnimation = transform rotationStart rotationEnd
-    let resizeAnimation = transform sizeStart sizeEnd
-    let offsetAnimation = transform offsetStart offsetEnd
+    let animations =
+        List.map2 (Animation.createTransform timing)
+            [sizeStart; rotationStart; offsetStart]
+            [sizeEnd; rotationEnd; offsetEnd]
+        |> List.map (Animation.withAdditive Additive.Sum >> Element.ofAnimation)
 
     // Execute
     recursiveTriangles startingTriangle iterations
     |> List.map (triangleToPolygon >> (Element.withStyle style))
-    |> List.append (List.map addAnimation [resizeAnimation; rotationAnimation; offsetAnimation])
+    |> List.append animations
     |> Group.ofList |> Svg.ofGroup
     |> Svg.withSize (Area.ofFloats (triangleLength*5.0, triangleLength*3.0))
     |> Svg.withViewbox Point.origin Area.full
