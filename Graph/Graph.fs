@@ -1,18 +1,11 @@
 ﻿module GraphExample
 
 open SharpVG
+open Helpers.File
 open System
-open System.Diagnostics
-open System.IO
 
 [<EntryPoint>]
 let main argv = 
-    // Helper Functions
-    let saveToFile name lines =
-        File.WriteAllLines(name, [lines]);
-
-    let openFile (name:string) =
-        Process.Start(name) |> ignore
 
     // Initalize
     let fileName = ".\\Graph.html"

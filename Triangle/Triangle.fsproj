@@ -56,6 +56,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Helpers\Helpers.fsproj">
+      <Name>Helpers</Name>
+      <Project>{4930af77-5ae4-4692-ba6c-6d8952d87edf}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\SharpVG\SharpVG.fsproj">
       <Name>SharpVG</Name>
       <Project>{b5154113-511a-4461-a276-6c7572a63050}</Project>

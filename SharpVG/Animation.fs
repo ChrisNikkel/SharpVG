@@ -90,17 +90,19 @@ module Animation =
 
     let toTag animation =
         let calculationModeToAttribute c =
+            let createCalculationMode mode = List.singleton (Attribute.createXML "calculationMode" mode)
             match c with
-                | Some CalculationMode.Discrete -> List.singleton (Attribute.createXML "calculationMode" "discrete")
-                | Some CalculationMode.Linear -> List.singleton (Attribute.createXML "calculationMode" "linear")
-                | Some CalculationMode.Paced -> List.singleton (Attribute.createXML "calculationMode" "paced")
-                | Some CalculationMode.Spline -> List.singleton (Attribute.createXML "calculationMode" "spline")
+                | Some CalculationMode.Discrete -> createCalculationMode "discrete"
+                | Some CalculationMode.Linear -> createCalculationMode "linear"
+                | Some CalculationMode.Paced -> createCalculationMode "paced"
+                | Some CalculationMode.Spline -> createCalculationMode "spline"
                 | None -> []
 
         let additiveToAttribute a =
+            let createAdditive mode = List.singleton (Attribute.createXML "additive" mode)
             match a with
-                | Some Additive.Replace -> List.singleton (Attribute.createXML "additive" "replace")
-                | Some Additive.Sum -> List.singleton (Attribute.createXML "additive" "sum")
+                | Some Additive.Replace -> createAdditive "replace"
+                | Some Additive.Sum -> createAdditive "sum"
                 | None -> []
 
         let targetToAttribute t =

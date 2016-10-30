@@ -2,8 +2,8 @@
 
 open SharpVG
 open System
-open System.Diagnostics
-open System.IO
+open Helpers.File
+open Helpers.Random
 
 let combine (a, b) = (fst a + fst b, snd a + snd b) 
 
@@ -62,9 +62,6 @@ let toadItem = [(1, 1); (2, 1); (3, 1); (2, 2); (3, 2); (4, 2)]
 let blockItem = [(1, 1); (1, 2); (2, 1); (2, 2)]
 let beaconItem = [(4, 1); (4, 2); (3, 1); (1, 3); (1, 4); (2, 4)]
 
-let randomGenerator = Random()
-let randomsBetween min max = Seq.initInfinite (fun _ -> randomGenerator.Next(min,  max+1))
-
 let itemByNumber number =
     match number with
         | 1 -> gliderItem
@@ -76,13 +73,6 @@ let itemByNumber number =
 [<EntryPoint>]
 let main argv = 
 
-    // Helper Functions
-    let saveToFile name lines =
-        File.WriteAllLines(name, [lines]);
-
-    let openFile (name:string) =
-        Process.Start(name) |> ignore
-
     // Initalize
     let fileName = ".\\life.html"
     
@@ -92,11 +82,10 @@ let main argv =
     let boardLength = Length.ofFloat boardSize
 
     let randomItems =
-        let quantity = randomsBetween 20 40 |> Seq.take 1 |> Seq.head
-        let randomPositions = randomsBetween 0 (size - 5)
-        let randomXs = randomPositions |> Seq.take quantity
-        let randomYs = randomPositions |> Seq.skip quantity |> Seq.take quantity
-        let randomItemTypes = randomsBetween 1 5 |> Seq.take quantity
+        let quantity = randomsBetween "quantity" 20 40 |> Seq.take 1 |> Seq.head
+        let randomXs = randomsBetween "x" 0 (size - 5) |> Seq.take quantity
+        let randomYs = randomsBetween "y" 0 (size - 5) |> Seq.take quantity
+        let randomItemTypes = randomsBetween "type" 1 5 |> Seq.take quantity
         Seq.zip3 randomItemTypes randomXs randomYs |> List.ofSeq
 
     let initialData =
