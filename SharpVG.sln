@@ -20,6 +20,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Life", "Life\Life.fsproj", 
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Graph", "Graph\Graph.fsproj", "{66E7BA33-1073-4083-8D49-51BCE31B367C}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Animate", "Animate\Animate.fsproj", "{1232F73E-C035-442E-850D-F7E14CAF4ED6}"
+EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Helpers", "Helpers\Helpers.fsproj", "{4930AF77-5AE4-4692-BA6C-6D8952D87EDF}"
 EndProject
 Global
