@@ -23,32 +23,32 @@ A .NET Core library for F# to generate vector graphics in SVG format.
 ## Building SharpVG
 
 Clone the repository:
-```
-  $ git clone https://github.com/ChrisNikkel/SharpVG.git
+```bash
+  git clone https://github.com/ChrisNikkel/SharpVG.git
   $ cd SharpVG
 ```
 
 Restore the dependancies:
-```
-  $ dotnet restore
+```bash
+  dotnet restore
 ```
 
 Start the build:
-```
-  $ dotnet build
+```bash
+  dotnet build
 ```
 
 Run the tests:
-```
-  $ dotnet test Tests
+```bash
+  dotnet test Tests
 ```
 
 Run the examples:
-```
-  $ dotnet run Examples\Triangle\Triangle.fsproj
-  $ dotnet run Examples\Life\Life.fsproj
-  $ dotnet run Examples\Graph\Graph.fsproj
-  $ dotnet run Examples\Animate\Animate.fsproj
+```bash
+  dotnet run -p Examples\Triangle\Triangle.fsproj
+  dotnet run -p Examples\Life\Life.fsproj
+  dotnet run -p Examples\Graph\Graph.fsproj
+  dotnet run -p Examples\Animate\Animate.fsproj
 ```
 
 ## Support
