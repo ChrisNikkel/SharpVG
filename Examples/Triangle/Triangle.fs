@@ -1,9 +1,8 @@
 module TriangleExample
 
 open SharpVG
-open System.Diagnostics
-open System.IO
 open System
+open Helpers.File
 
 type Triangle =
     {
@@ -36,15 +35,7 @@ let rec recursiveTriangles t iteration =
 [<EntryPoint>]
 let main argv =
 
-    // Helper Functions
-    let saveToFile name lines =
-        File.WriteAllLines(name, [lines]);
-
-    let openFile (name:string) =
-        Process.Start(name) |> ignore
-
-    // Initialization
-    let fileName = ".\\triangle.html"
+    let fileName = "Triangle.html"
     let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None; Name = Some("std") }
     let iterations, triangleLength = 8, 1000.0
     let offsetY = triangleLength - Math.Sqrt 3.0 * triangleLength / 2.0
@@ -74,7 +65,6 @@ let main argv =
             [sizeEnd; rotationEnd; offsetEnd]
         |> List.map (Animation.withAdditive Additive.Sum >> Element.ofAnimation)
 
-    // Execute
     recursiveTriangles startingTriangle iterations
     |> List.map (triangleToPolygon >> (Element.withStyle style))
     |> List.append animations

@@ -5,24 +5,24 @@ open System
 open Helpers.File
 open Helpers.Random
 
-let combine (a, b) = (fst a + fst b, snd a + snd b) 
+let combine (a, b) = (fst a + fst b, snd a + snd b)
 
-let surrounding = 
-    [for i in -1..1 -> [for j in -1..1 -> (i, j)]] 
+let surrounding =
+    [for i in -1..1 -> [for j in -1..1 -> (i, j)]]
     |> List.concat
 
-let findSurrounding d = 
-    surrounding 
-    |> List.map(fun cell -> combine(d, cell)) 
+let findSurrounding d =
+    surrounding
+    |> List.map(fun cell -> combine(d, cell))
     |> List.filter(fun x -> x<>d)
 
-let categorizeNeighbors d centerCell = 
-    List.partition (fun cell -> (List.exists (fun c -> c = cell) d)) (findSurrounding centerCell)   
-   
+let categorizeNeighbors d centerCell =
+    List.partition (fun cell -> (List.exists (fun c -> c = cell) d)) (findSurrounding centerCell)
+
 let countNeighbors d centerCell =
     List.length (fst (categorizeNeighbors d centerCell))
-    
-   
+
+
 // Any live cell with fewer than two live neighbours dies, as if caused by under-population.
 // Any live cell with two or three live neighbours lives on to the next generation.
 // Any live cell with more than three live neighbours dies, as if by overcrowding.
@@ -41,15 +41,15 @@ let removeDups data = data |> Set.ofList |> Set.toList
 
 let rec iterateAliveGeneration previousData newData cellIndex =
     if cellIndex < List.length previousData then
-        let aliveCell = previousData.[cellIndex] 
+        let aliveCell = previousData.[cellIndex]
         let (aliveNeighbors, deadNeighbors) = categorizeNeighbors previousData aliveCell
-        let newAliveData = 
+        let newAliveData =
             if survives (List.length aliveNeighbors)
             then aliveCell :: newData |> removeDups
             else newData
         (iterateAliveGeneration previousData newAliveData (cellIndex + 1)) @ (iterateDeadGeneration previousData deadNeighbors) |> removeDups
     else
-        newData 
+        newData
 
 let doIteration initialData = (iterateAliveGeneration initialData [] 0)
 
@@ -71,11 +71,10 @@ let itemByNumber number =
         | _ -> blockItem
 
 [<EntryPoint>]
-let main argv = 
+let main argv =
 
-    // Initalize
-    let fileName = ".\\life.html"
-    
+    let fileName = "Life.html"
+
     let iterations, delay, cellSize = 100, 0.25, 15.0
     let size = 70
     let boardSize = cellSize * float size
@@ -105,7 +104,7 @@ let main argv =
     let addAnimation element times =
         let duration = TimeSpan.FromSeconds(delay)
         let createAnimation t =
-            let start = TimeSpan.FromSeconds(t)        
+            let start = TimeSpan.FromSeconds(t)
             let timing = Timing.create start |> (Timing.withDuration duration)
             Animation.createSet timing AttributeType.CSS "display" "inline"
         let animations =

@@ -4,10 +4,6 @@ open SharpVG
 open Helpers.File
 open Helpers.Random
 
-//open System.Diagnostics
-//open System.IO
-//open System
-
 [<EntryPoint>]
 let main argv =
 
@@ -22,9 +18,7 @@ let main argv =
                     | 3 -> Rect.create Point.origin (Area.ofFloats (10.0, 10.0)) |> Element.ofRect
                     | _ -> failwith "inconceivable"
             )
-
-    // Initialization
-    let fileName = ".\\animate.html"
+    let fileName = "Animate.html"
     let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None; Name = Some("std") }
     (*
     let rotate degrees = Transform.createRotate degrees center center
