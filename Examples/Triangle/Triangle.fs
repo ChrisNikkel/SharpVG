@@ -57,7 +57,7 @@ let main argv =
 
     let center = triangleLength / 2.0 |> Length.ofFloat
 
-    let rotate degrees = Transform.createRotate degrees center center 
+    let rotate degrees = Transform.createRotate degrees center center
     let rotationStart, rotationEnd = rotate 0.0, rotate 360.0
 
     let scale = Length.ofFloat >> Transform.createScale

@@ -4,7 +4,6 @@ open Xunit
 open FsCheck
 open FsCheck.Xunit
 open BasicChecks
-open Swensen.Unquote
 open System
 
 module Tests =

@@ -1,21 +1,18 @@
 namespace SharpVG.Tests
 open SharpVG
 open Xunit
-open FsCheck
-open FsCheck.Xunit
 open BasicChecks
-open Swensen.Unquote
 
 module TestTag =
 
     let testTag (name:string) (tag:string) =
-        test <| <@ tag.Contains name @>
-        test <| <@ isMatched '<' '>' tag @>
-        test <| <@ isDepthNoMoreThanOne '<' '>' tag @>
-        test <| <@ happensEvenly '"' tag @>
-        test <| <@ tag.Contains "/" @>
-        test <| <@ tag.Contains "<" @>
-        test <| <@ tag.Contains ">" @>
+        Assert.True(tag.Contains name)
+        Assert.True(isMatched '<' '>' tag)
+        Assert.True(isDepthNoMoreThanOne '<' '>' tag)
+        Assert.True(happensEvenly '"' tag)
+        Assert.True(tag.Contains "/")
+        Assert.True(tag.Contains "<")
+        Assert.True(tag.Contains ">")
 
     [<Fact>]
     let ``create tag`` ()=

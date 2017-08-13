@@ -1,10 +1,8 @@
 module BasicChecks
 
-open LogHelpers
 open Xunit
 open FsCheck
 open FsCheck.Xunit
-open Swensen.Unquote
 
 type Positive =
     static member Int() =
@@ -53,16 +51,16 @@ let isMatched left right (str:string) =
         ) 0 = 0
 
 let checkBodylessTag name tag =
-    test <| <@ isMatched '<' '>' tag @>
-    test <| <@ isDepthNoMoreThanOne '<' '>' tag @>
-    test <| <@ happensEvenly '"' tag @>
-    test <| <@ happensEvenly ''' tag @>
-    test <| <@ tag.Contains name @>
-    test <| <@ isTagEnclosed tag @>
+    Assert.True(isMatched '<' '>' tag)
+    Assert.True(isDepthNoMoreThanOne '<' '>' tag)
+    Assert.True(happensEvenly '"' tag)
+    Assert.True(happensEvenly ''' tag)
+    Assert.True(tag.Contains name)
+    Assert.True(isTagEnclosed tag)
 
 let checkTag name tag =
-    test <| <@ isMatched '<' '>' tag @>
-    test <| <@ isDepthNoMoreThanOne '<' '>' tag @>
-    test <| <@ happensEvenly '"' tag @>
-    test <| <@ happensEvenly ''' tag @>
-    test <| <@ tag.Contains name @>
+    Assert.True(isMatched '<' '>' tag)
+    Assert.True(isDepthNoMoreThanOne '<' '>' tag)
+    Assert.True(happensEvenly '"' tag)
+    Assert.True(happensEvenly ''' tag)
+    Assert.True(tag.Contains name)

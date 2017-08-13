@@ -20,13 +20,14 @@ let main argv =
                     | 1 -> Circle.create Point.origin (Length.ofFloat 10.0) |> Element.ofCircle
                     | 2 -> Ellipse.create Point.origin Point.origin |> Element.ofEllipse
                     | 3 -> Rect.create Point.origin (Area.ofFloats (10.0, 10.0)) |> Element.ofRect
+                    | _ -> failwith "inconceivable"
             )
 
     // Initialization
     let fileName = ".\\animate.html"
     let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None; Name = Some("std") }
     (*
-    let rotate degrees = Transform.createRotate degrees center center 
+    let rotate degrees = Transform.createRotate degrees center center
     let rotationStart, rotationEnd = rotate 0.0, rotate 360.0
 
     let scale = Length.ofFloat >> Transform.createScale
