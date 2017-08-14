@@ -14,11 +14,23 @@ A .NET Core library for F# to generate vector graphics in SVG format.
  - Limited support for cartesian plotting
  - Reusable styles
 
-## Example
+## Examples
 
 ```F#
 Circle.create Point.origin (Length.ofInt 10)
   |> Circle.toString
+  |> printf "%A"
+```
+
+```html
+<circle r="10" cx="0" cy="0"/>
+```
+
+```F#
+Circle.create Point.origin (Length.ofInt 10)
+  |> Element.ofCircle
+  |> Svg.ofElement
+  |> Svg.toHtml "Example";;
   |> printf "%A"
 ```
 
@@ -52,13 +64,14 @@ dotnet run -p Examples\Graph\Graph.fsproj
 dotnet run -p Examples\Animate\Animate.fsproj
 ```
 
-Explore interactive:
+Explore interactively:
 ```bash
 fsharpi -r:SharpVG/bin/Debug/netcoreapp2.0/SharpVG.dll
 ```
 ```F#
 open SharpVG;;
 Circle.create Point.origin (Length.ofInt 10) |> Circle.toString |> printf "%A";;
+Circle.create Point.origin (Length.ofInt 10) |> Element.ofCircle |> Svg.ofElement |> Svg.toHtml "Example";;
 #quit;;
 ```
 
