@@ -35,7 +35,14 @@ Circle.create Point.origin (Length.ofInt 10)
 ```
 
 ```html
-<circle r="10" cx="0" cy="0"/>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Example</title>
+</head>
+<body>
+<svg><style type="text/css"><![CDATA[]]></style><circle r="10" cx="0" cy="0"/></svg></body>
+</html>
 ```
 
 ## Building SharpVG
