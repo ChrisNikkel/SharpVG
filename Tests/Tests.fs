@@ -109,5 +109,5 @@ module Tests =
             yield Ellipse.create point point |> Element.ofEllipse |> Element.withStyle style1
         }
 
-        let html = graphics|> Svg.ofSeq |> Svg.toHtml "SVG Demo"
+        let html = graphics |> Svg.ofSeq |> Svg.toHtml "SVG Demo"
         checkTag "SVG Demo" html

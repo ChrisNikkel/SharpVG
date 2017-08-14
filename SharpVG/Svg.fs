@@ -34,6 +34,9 @@ module Svg =
     let ofList list =
         list |> Seq.ofList |> ofSeq
 
+    let ofElement element =
+        element |> Seq.singleton |> ofSeq
+
     let ofArray array =
         array |> Seq.ofArray |> ofSeq
 

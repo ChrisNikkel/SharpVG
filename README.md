@@ -21,6 +21,7 @@ Circle.create Point.origin (Length.ofInt 10)
   |> Circle.toString
   |> printf "%A"
 ```
+
 ```html
 <circle r="10" cx="0" cy="0"/>
 ```
