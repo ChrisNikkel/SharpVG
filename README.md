@@ -43,7 +43,8 @@ Circle.create Point.origin (Length.ofInt 10)
 <title>Example</title>
 </head>
 <body>
-<svg><style type="text/css"><![CDATA[]]></style><circle r="10" cx="0" cy="0"/></svg></body>
+<svg><circle r="10" cx="0" cy="0"/></svg>
+</body>
 </html>
 ```
 

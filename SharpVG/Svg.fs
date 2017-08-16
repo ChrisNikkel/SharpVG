@@ -58,7 +58,12 @@ module Svg =
             match svg.Size with | Some size -> Area.toAttributes size | None -> []
             @ match svg.Viewbox with | Some viewbox -> [Attribute.createXML "viewBox" ((Point.toString viewbox.Minimum) + " " + (Area.toString viewbox.Size))] | None -> []
 
-        let styles = svg.Body |> Body.toStyles |> Styles.named |> Styles.toString
+        let styles =
+          let namedStyles = svg.Body |> Body.toStyles |> Styles.named
+          if Seq.isEmpty namedStyles then
+            ""
+          else
+            Styles.toString namedStyles
 
         let body =
             svg.Body
@@ -71,4 +76,4 @@ module Svg =
         |> Tag.toString
 
     let toHtml title svg =
-        "<!DOCTYPE html>\n<html>\n<head>\n<title>" + title + "</title>\n</head>\n<body>\n" + (toString svg) + "</body>\n</html>\n"
+        "<!DOCTYPE html>\n<html>\n<head>\n<title>" + title + "</title>\n</head>\n<body>\n" + (toString svg) + "\n</body>\n</html>\n"
