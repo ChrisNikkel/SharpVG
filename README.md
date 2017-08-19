@@ -95,10 +95,13 @@ Circle.create Point.origin (Length.ofInt 10) |> Circle.toString |> printf "%A";;
 Circle.create Point.origin (Length.ofInt 10) |> Element.ofCircle |> Svg.ofElement |> Svg.toHtml "Example";;
 #quit;;
 ```
+## Documentation
+
+Read the documentation [here](https://github.com/ChrisNikkel/SharpVG/wiki)
 
 ## Support
 
- - Please submit bugs and feature requests [here](https://github.com/ChrisNikkel/SharpVG/issues)
+Please submit bugs and feature requests [here](https://github.com/ChrisNikkel/SharpVG/issues)
 
 ## Library License
 
