@@ -1,4 +1,4 @@
-﻿module TriangleExample
+﻿module AnimateExample
 
 open SharpVG
 open Helpers.File
