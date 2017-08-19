@@ -31,7 +31,7 @@ Rect.create upperLeft area
 ```
 
 ```html
-<circle r="10" cx="0" cy="0"/>
+<rect stroke="blue" stroke-width="3" fill="cyan" opacity="1" x="10" y="10" height="50" width="50"/>
 ```
 
 ```F#
@@ -54,7 +54,7 @@ Circle.create center radius
 <title>Example</title>
 </head>
 <body>
-<svg><circle r="10" cx="0" cy="0"/></svg>
+<svg><circle stroke="indigo" stroke-width="3" fill="violet" opacity="1" r="50" cx="60" cy="60"/></svg>
 </body>
 </html>
 ```
