@@ -97,7 +97,7 @@ Circle.create Point.origin (Length.ofInt 10) |> Element.ofCircle |> Svg.ofElemen
 ```
 ## Documentation
 
-Read the documentation [here](https://github.com/ChrisNikkel/SharpVG/wiki)
+Read the documentation [here](docs/Contents)
 
 ## Support
 
