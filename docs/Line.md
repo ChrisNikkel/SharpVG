@@ -1,6 +1,6 @@
 # Creating a line
 
-```F#
+```fsharp
 let start = Point.ofInts (5, 0)
 let finish =  Point.ofInts (60, 9)
 
