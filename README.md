@@ -19,8 +19,14 @@ A .NET Core library for F# to generate vector graphics in SVG format.
 ## Examples
 
 ```F#
-Circle.create Point.origin (Length.ofInt 10)
-  |> Circle.toString
+let upperLeft = Point.ofInts (10, 10)
+let area = Area.ofInts (50, 50)
+let style = Style.create (Name Colors.Cyan) (Name Colors.Blue) (Length.ofInt 3) 1.0
+
+Rect.create upperLeft area
+  |> Element.ofRect
+  |> Element.withStyle style
+  |> Element.toString
   |> printf "%A"
 ```
 
@@ -29,10 +35,15 @@ Circle.create Point.origin (Length.ofInt 10)
 ```
 
 ```F#
-Circle.create Point.origin (Length.ofInt 10)
+let center = Point.ofInts (60, 60)
+let radius = Length.ofInt 50
+let style = Style.create (Name Colors.Violet) (Name Colors.Indigo) (Length.ofInt 3) 1.0
+
+Circle.create center radius
   |> Element.ofCircle
+  |> Element.withStyle style
   |> Svg.ofElement
-  |> Svg.toHtml "Example";;
+  |> Svg.toHtml "Example"
   |> printf "%A"
 ```
 
