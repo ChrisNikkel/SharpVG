@@ -16,6 +16,9 @@ module Length =
     let full =
         Percent 100.0
 
+    let one =
+        UserSpace 1.0
+
     let ofUserSpace =
         UserSpace
 
