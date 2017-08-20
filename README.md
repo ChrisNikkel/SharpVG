@@ -97,7 +97,7 @@ Circle.create Point.origin (Length.ofInt 10) |> Element.ofCircle |> Svg.ofElemen
 ```
 ## Documentation
 
-Read the documentation [here](https://chrisnikkel.github.io/SharpVG/docs/Contents)
+Read the documentation [here](https://github.com/ChrisNikkel/SharpVG/wiki)
 
 ## Support
 
@@ -109,4 +109,4 @@ The library is available under the MIT license. For more information see the [Li
 
 ## Maintainer(s)
 
-- [@ChrisNikkel](https://github.com/ChrisNikkel)
+- [@ChrisNikkel](https://githu://github.com/ChrisNikkel/SharpVG/wikib.com/ChrisNikkel)
