@@ -22,6 +22,8 @@ module Area =
             (Length.ofFloat (abs ((Length.toFloat p1.X) - (Length.toFloat p2.X))))
             (Length.ofFloat (abs ((Length.toFloat p1.Y) - (Length.toFloat p2.Y))))
 
+    let toFloats area =
+        (Length.toFloat area.Width, Length.toFloat area.Height)
 
     let full =
         create Length.full Length.full
