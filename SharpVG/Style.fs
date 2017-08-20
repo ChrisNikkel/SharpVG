@@ -50,6 +50,9 @@ module Style =
     let createWithOpacity opacity =
         empty |> withOpacity opacity
 
+    let createWithName name =
+        empty |> withName name
+
     let isNamed style =
         style.Name.IsSome
 
