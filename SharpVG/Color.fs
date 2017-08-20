@@ -161,19 +161,19 @@ type Color =
 module Color =
     open System
 
-    let createWithName =
+    let ofName =
         Name
 
-    let createWithSmallHex =
+    let ofSmallHex =
         SmallHex
 
-    let createWithHex =
+    let ofHex =
         Hex
 
-    let createWithValues =
+    let ofValues =
         Values
 
-    let createWithPercents =
+    let ofPercents =
         Percents
 
     let toString color =
