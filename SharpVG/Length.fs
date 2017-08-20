@@ -33,7 +33,7 @@ module Length =
 
     let ofEm =
         Em
-    
+
     let ofPercent =
         Percent
 
