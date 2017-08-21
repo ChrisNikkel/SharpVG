@@ -8,15 +8,15 @@ SharpVG is pre-release and is changing rapidly.  We welcome pull requests while 
 
 ## Why SharpVG?
 
- - Allows you to emit SVG using simple F# commands so that you can create graphics and animations that are easy to distribute
- - Ability to render dynamically using [Fable](http://fable.io) to create interactive web pages
- - All basic SVG elements are supported: line, circle, ellipse, rect, text, polygon, polyline, path, image, and groups
- - No understanding of SVG is required and its as easy as using seq, list, or array
- - No external dependencies other than SharpVG are required
- - .NET Core cross platform support on Windows, Linux, and OSX
- - Limited support for SVG animations
- - Limited support for cartesian plotting
- - Reusable styles
+  - Allows you to emit SVG using simple F# commands so that you can create graphics and animations that are easy to distribute
+  - Ability to render dynamically using [Fable](http://fable.io) to create interactive web pages
+  - All basic SVG elements are supported: line, circle, ellipse, rect, text, polygon, polyline, path, image, and groups
+  - No understanding of SVG is required and its as easy as using seq, list, or array
+  - No external dependencies other than SharpVG are required
+  - .NET Core cross platform support on Windows, Linux, and OSX
+  - Limited support for SVG animations
+  - Limited support for cartesian plotting
+  - Reusable styles
 
 ## Examples
 
@@ -46,7 +46,7 @@ Circle.create center radius
   |> Element.withStyle style
   |> Svg.ofElement
   |> Svg.toHtml "Example"
-  |> printf "%A"
+  |> printf "%s"
 ```
 
 ```html
@@ -111,4 +111,4 @@ The library is available under the MIT license. For more information see the [Li
 
 ## Maintainer(s)
 
-- [@ChrisNikkel](https://githu://github.com/ChrisNikkel/SharpVG/wikib.com/ChrisNikkel)
+  - [@ChrisNikkel](https://githu://github.com/ChrisNikkel/SharpVG/wikib.com/ChrisNikkel)
