@@ -107,7 +107,7 @@ Please submit bugs and feature requests [here](https://github.com/ChrisNikkel/Sh
 
 ## Library License
 
-The library is available under the MIT license. For more information see the [License file](https://github.com/ChrisNikkel/SharpVG/blob/master/LICENSE.md).
+The library is available under the MIT license. For more information see the [license file](https://github.com/ChrisNikkel/SharpVG/blob/master/LICENSE.md).
 
 ## Maintainer(s)
 
