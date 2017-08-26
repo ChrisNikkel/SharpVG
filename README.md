@@ -4,7 +4,7 @@
 
 A .NET Core library for F# to generate vector graphics in SVG format.
 
-_SharpVG is pre-release and is changing rapidly.  [Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions](https://github.com/ChrisNikkel/SharpVG/issues) are greatly appreciated._
+_SharpVG is pre-release and the API is still changing.  [Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions](https://github.com/ChrisNikkel/SharpVG/issues) are greatly appreciated._
 
 ## Why SharpVG?
 
