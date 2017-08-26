@@ -7,49 +7,49 @@ module TestPath =
 
     [<Fact>]
     let ``create empty`` () =
-        Assert.Equal(Path.empty |> Path.toString, "<path d=\"\"/>")
+        Assert.Equal("<path d=\"\"/>", Path.empty |> Path.toString)
 
     [<Fact>]
     let ``create move to`` () =
-        Assert.Equal(Path.empty |> Path.addAbsolute PathType.MoveTo Point.origin |> Path.toString, "<path d=\"M0 0\"/>")
+        Assert.Equal("<path d=\"M0 0\"/>", Path.empty |> Path.addAbsolute PathType.MoveTo Point.origin |> Path.toString)
 
     [<Fact>]
     let ``create relative move to`` () =
-        Assert.Equal(Path.empty |> Path.addRelative PathType.MoveTo Point.origin |> Path.toString, "<path d=\"m0 0\"/>")
+        Assert.Equal("<path d=\"m0 0\"/>", Path.empty |> Path.addRelative PathType.MoveTo Point.origin |> Path.toString)
 
     [<Fact>]
     let ``create line to`` () =
-        Assert.Equal(Path.empty |> Path.addAbsolute PathType.LineTo Point.origin |> Path.toString, "<path d=\"L0 0\"/>")
+        Assert.Equal("<path d=\"L0 0\"/>", Path.empty |> Path.addAbsolute PathType.LineTo Point.origin |> Path.toString)
 
     [<Fact>]
     let ``create line to with close`` () =
-        Assert.Equal(Path.empty |> Path.addAbsolute PathType.LineTo Point.origin |> Path.addClosePath |> Path.toString, "<path d=\"L0 0 Z\"/>")
+        Assert.Equal("<path d=\"L0 0 Z\"/>", Path.empty |> Path.addAbsolute PathType.LineTo Point.origin |> Path.addClosePath |> Path.toString)
 
     [<Fact>]
     let ``create horizontal line to`` () =
-        Assert.Equal(Path.empty |> Path.addAbsolute PathType.HorizontalLineTo Point.origin |> Path.toString, "<path d=\"H0 0\"/>")
+        Assert.Equal("<path d=\"H0 0\"/>", Path.empty |> Path.addAbsolute PathType.HorizontalLineTo Point.origin |> Path.toString)
 
     [<Fact>]
     let ``create vertical line to`` () =
-        Assert.Equal(Path.empty |> Path.addAbsolute PathType.VerticalLineTo Point.origin |> Path.toString, "<path d=\"V0 0\"/>")
+        Assert.Equal("<path d=\"V0 0\"/>", Path.empty |> Path.addAbsolute PathType.VerticalLineTo Point.origin |> Path.toString)
 
     [<Fact>]
     let ``create curve to`` () =
-        Assert.Equal(Path.empty |> Path.addAbsolute PathType.CurveTo Point.origin |> Path.toString, "<path d=\"C0 0\"/>")
+        Assert.Equal("<path d=\"C0 0\"/>", Path.empty |> Path.addAbsolute PathType.CurveTo Point.origin |> Path.toString)
 
     [<Fact>]
     let ``create smooth curve to`` () =
-        Assert.Equal(Path.empty |> Path.addAbsolute PathType.SmoothCurveTo Point.origin |> Path.toString, "<path d=\"S0 0\"/>")
+        Assert.Equal("<path d=\"S0 0\"/>", Path.empty |> Path.addAbsolute PathType.SmoothCurveTo Point.origin |> Path.toString)
 
     [<Fact>]
     let ``create quadratic bezier curve to`` () =
-        Assert.Equal(Path.empty |> Path.addAbsolute PathType.QuadraticBezierCurveTo Point.origin |> Path.toString,"<path d=\"Q0 0\"/>")
+        Assert.Equal("<path d=\"Q0 0\"/>", Path.empty |> Path.addAbsolute PathType.QuadraticBezierCurveTo Point.origin |> Path.toString)
 
     [<Fact>]
     let ``create smooth quadratic bezier curve to`` () =
-        Assert.Equal(Path.empty |> Path.addAbsolute PathType.SmoothQuadraticBezierCurveTo Point.origin |> Path.toString, "<path d=\"T0 0\"/>")
+        Assert.Equal("<path d=\"T0 0\"/>", Path.empty |> Path.addAbsolute PathType.SmoothQuadraticBezierCurveTo Point.origin |> Path.toString)
 
     [<Fact>]
     let ``create ellipticalArc`` () =
-        Assert.Equal(Path.empty |> Path.addAbsolute PathType.EllipticalArc Point.origin |> Path.toString, "<path d=\"A0 0\"/>")
+        Assert.Equal("<path d=\"A0 0\"/>", Path.empty |> Path.addAbsolute PathType.EllipticalArc Point.origin |> Path.toString)
 

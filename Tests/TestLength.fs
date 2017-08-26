@@ -9,34 +9,34 @@ module TestLength =
 
     [<Fact>]
     let ``create empty user space`` () =
-        Assert.Equal(Length.empty |> Length.toString, "0")
+        Assert.Equal("0", Length.empty |> Length.toString)
 
     [<Fact>]
     let ``create full percent`` () =
-        Assert.Equal(Length.full |> Length.toString, "100%")
+        Assert.Equal("100%", Length.full |> Length.toString)
 
     [<Fact>]
     let ``create user space`` () =
-        Assert.Equal(2.0 |> Length.ofUserSpace |> Length.toString, "2")
-        Assert.Equal(2.1 |> Length.ofUserSpace |> Length.toString, "2.1")
+        Assert.Equal("2", 2.0 |> Length.ofUserSpace |> Length.toString)
+        Assert.Equal("2.1", 2.1 |> Length.ofUserSpace |> Length.toString)
 
     [<Fact>]
     let ``create pixels`` () =
-        Assert.Equal(2 |> Length.ofPixels |> Length.toString, "2px")
+        Assert.Equal("2px", 2 |> Length.ofPixels |> Length.toString)
 
     [<Fact>]
     let ``create em`` () =
-        Assert.Equal(2.0 |> Length.ofEm |> Length.toString, "2em")
-        Assert.Equal(2.1 |> Length.ofEm |> Length.toString, "2.1em")
+        Assert.Equal("2em", 2.0 |> Length.ofEm |> Length.toString)
+        Assert.Equal("2.1em", 2.1 |> Length.ofEm |> Length.toString)
 
     [<Fact>]
     let ``create percent`` () =
-        Assert.Equal(2.0 |> Length.ofPercent |> Length.toString, "2%")
-        Assert.Equal(2.1 |> Length.ofPercent |> Length.toString, "2.1%")
+        Assert.Equal("2%", 2.0 |> Length.ofPercent |> Length.toString)
+        Assert.Equal("2.1%", 2.1 |> Length.ofPercent |> Length.toString)
 
     [<SvgProperty>]
     let ``what goes in must come out`` (x) =
-        Assert.Equal(x |> Length.ofUserSpace |> Length.toFloat, x)
-        Assert.Equal(x |> Length.ofEm |> Length.toFloat, x)
-        Assert.Equal(x |> Length.ofPercent |> Length.toFloat, x)
-        Assert.Equal(x |> int |> Length.ofPixels |> Length.toFloat |> int, int x)
+        Assert.Equal(x, x |> Length.ofUserSpace |> Length.toFloat)
+        Assert.Equal(x, x |> Length.ofEm |> Length.toFloat)
+        Assert.Equal(x, x |> Length.ofPercent |> Length.toFloat)
+        Assert.Equal(int x, x |> int |> Length.ofPixels |> Length.toFloat |> int)

@@ -6,24 +6,24 @@ module TestPoint =
 
     [<Fact>]
     let ``create point`` () =
-        Assert.Equal((Point.create Length.empty Length.empty |> Point.toString), "0,0")
+        Assert.Equal("0,0", (Point.create Length.empty Length.empty |> Point.toString))
 
     [<Fact>]
     let ``create origin`` () =
-        Assert.Equal((Point.origin |> Point.toString), "0,0")
+        Assert.Equal("0,0", (Point.origin |> Point.toString))
 
     [<Fact>]
     let ``transform point to attribute`` () =
-        Assert.Equal((Point.origin |> Point.toAttributes |> List.map Attribute.toString |> String.concat " "), "x=\"0\" y=\"0\"")
+        Assert.Equal("x=\"0\" y=\"0\"", (Point.origin |> Point.toAttributes |> List.map Attribute.toString |> String.concat " "))
 
     [<Fact>]
     let ``transform point to attribute with modifier`` () =
-        Assert.Equal((Point.origin |> Point.toAttributesWithModifier "a" "b" |> List.map Attribute.toString |> String.concat " "), "axb=\"0\" ayb=\"0\"")
+        Assert.Equal("axb=\"0\" ayb=\"0\"", (Point.origin |> Point.toAttributesWithModifier "a" "b" |> List.map Attribute.toString |> String.concat " "))
 
     [<Fact>]
     let ``transform point to attribute with separator`` () =
-        Assert.Equal((Point.origin |> Point.toStringWithSeparator " "), "0 0")
+        Assert.Equal("0 0", (Point.origin |> Point.toStringWithSeparator " "))
 
     [<Fact>]
     let ``points to string`` () =
-        Assert.Equal((seq { yield Point.origin; yield Point.origin } |> Points.toString), "0,0 0,0")
+        Assert.Equal("0,0 0,0", (seq { yield Point.origin; yield Point.origin } |> Points.toString))

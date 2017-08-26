@@ -9,20 +9,20 @@ module TestColor =
 
     [<Fact>]
     let ``create with name`` () =
-        Assert.Equal(Color.ofName Colors.Snow |> Color.toString, "snow")
+        Assert.Equal("snow", Color.ofName Colors.Snow |> Color.toString)
 
     [<Fact>]
     let ``create with small hex`` () =
-        Assert.Equal(Color.ofSmallHex 0x123s |> Color.toString, "0x123")
+        Assert.Equal("0x123", Color.ofSmallHex 0x123s |> Color.toString)
 
     [<Fact>]
     let ``create with hex`` () =
-        Assert.Equal(Color.ofHex 0x112233 |> Color.toString, "0x112233")
+        Assert.Equal("0x112233", Color.ofHex 0x112233 |> Color.toString)
 
     [<Fact>]
     let ``create with percents`` () =
-        Assert.Equal(Color.ofPercents (10.0, 10.0, 10.0) |> Color.toString, "(10%,10%,10%)")
+        Assert.Equal("(10%,10%,10%)", Color.ofPercents (10.0, 10.0, 10.0) |> Color.toString)
 
     [<Property>]
     let ``create with values`` (r, g, b) =
-        Assert.Equal(Color.ofValues (r, g, b) |> Color.toString, sprintf "(%d,%d,%d)" r g b)
+        Assert.Equal(sprintf "(%d,%d,%d)" r g b, Color.ofValues (r, g, b) |> Color.toString)
