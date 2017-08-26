@@ -51,10 +51,10 @@ module Tests =
         checkBodylessTag "ellipse" tag
 
     [<Property>]
-    let ``draw images`` (x, y, h, w, i) =
+    let ``draw images`` (x, y, h, w) =
         let point = Point.ofFloats (x, y)
         let area = Area.ofFloats (h, w)
-        let image = Image.create point area i
+        let image = Image.create point area "test.jpg"
         let tag = image |> Element.ofImage |> Element.toString
 
         checkBodylessTag "image" tag
