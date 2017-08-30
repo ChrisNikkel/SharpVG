@@ -26,7 +26,7 @@ module Group =
     let ofArray array =
         array |> Seq.ofArray |> ofSeq
 
-    let withBody body (group:Group) =
+    let private withBody body (group:Group) =
         { group with Body = body }
 
     let withTransforms transforms group =
