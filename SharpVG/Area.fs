@@ -28,6 +28,9 @@ module Area =
     let full =
         create Length.full Length.full
 
+    let half =
+        create Length.half Length.half
+
     let toAttributes area =
         [Attribute.createXML "height" <| Length.toString area.Height; Attribute.createXML "width" <| Length.toString area.Width]
 
