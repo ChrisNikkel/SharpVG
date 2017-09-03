@@ -17,6 +17,12 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tests", "Tests\Tests.fsproj
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Triangle", "Examples\Triangle\Triangle.fsproj", "{F6C5BF43-8728-4ECF-9AB0-0FB2EA8F672E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{14030B52-964A-4830-9A92-7586532EEC55}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bounce", "Bounce", "{9BE12FC0-BC24-47DB-B1BA-82B1C9549346}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Bounce", "Examples\Bounce\src\Bounce.fsproj", "{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -114,5 +120,21 @@ Global
 		{F6C5BF43-8728-4ECF-9AB0-0FB2EA8F672E}.Release|x64.Build.0 = Release|x64
 		{F6C5BF43-8728-4ECF-9AB0-0FB2EA8F672E}.Release|x86.ActiveCfg = Release|x86
 		{F6C5BF43-8728-4ECF-9AB0-0FB2EA8F672E}.Release|x86.Build.0 = Release|x86
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}.Debug|x64.ActiveCfg = Debug|x64
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}.Debug|x64.Build.0 = Debug|x64
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}.Debug|x86.ActiveCfg = Debug|x86
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}.Debug|x86.Build.0 = Debug|x86
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}.Release|x64.ActiveCfg = Release|x64
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}.Release|x64.Build.0 = Release|x64
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}.Release|x86.ActiveCfg = Release|x86
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9BE12FC0-BC24-47DB-B1BA-82B1C9549346} = {14030B52-964A-4830-9A92-7586532EEC55}
+		{BECFC0BB-DADF-4645-9BB5-2702F63C37C0} = {9BE12FC0-BC24-47DB-B1BA-82B1C9549346}
 	EndGlobalSection
 EndGlobal
