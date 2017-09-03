@@ -87,7 +87,7 @@ dotnet run -p Examples\Graph\Graph.fsproj
 dotnet run -p Examples\Animate\Animate.fsproj
 ```
 
-Run the Fable example ([prerequisites](http://fable.io/pages/prerequisites.html)):
+Run the [Fable](http://fable.io) example ([prerequisites](http://fable.io/pages/prerequisites.html)):
 ```bash
 cd Examples\Bounce\src
 dotnet restore
