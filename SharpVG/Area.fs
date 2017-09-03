@@ -32,7 +32,7 @@ module Area =
         create Length.half Length.half
 
     let toAttributes area =
-        [Attribute.createXML "height" <| Length.toString area.Height; Attribute.createXML "width" <| Length.toString area.Width]
+        [Attribute.createXML "width" <| Length.toString area.Width; Attribute.createXML "height" <| Length.toString area.Height]
 
     let toString area =
         Length.toString area.Width + "," + Length.toString area.Height

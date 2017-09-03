@@ -23,7 +23,7 @@ module TestArea =
 
     [<Fact>]
     let ``transform point to attribute`` () =
-        Assert.Equal( "height=\"0\" width=\"0\"", Area.create Length.empty Length.empty |> Area.toAttributes |> List.map Attribute.toString |> String.concat " ")
+        Assert.Equal( "width=\"0\" height=\"0\"", Area.create Length.empty Length.empty |> Area.toAttributes |> List.map Attribute.toString |> String.concat " ")
 
     [<Fact>]
     let ``create full area`` () =

@@ -181,5 +181,5 @@ module Color =
             | Name n -> Enum.GetName(typeof<Colors>, n).ToLower()
             | SmallHex sh -> String.Format("0x{0:x}", sh)
             | Hex h -> String.Format("0x{0:x}", h)
-            | Values (r, g, b) -> "(" + string r + "," + string g + "," + string b + ")"
-            | Percents (r, g, b) -> "(" + string r + "%," + string g + "%," + string b + "%)"
+            | Values (r, g, b) -> "rgb(" + string r + "," + string g + "," + string b + ")"
+            | Percents (r, g, b) -> "rgb(" + string r + "%," + string g + "%," + string b + "%)"
