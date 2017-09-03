@@ -21,8 +21,8 @@ module TestColor =
 
     [<Fact>]
     let ``create with percents`` () =
-        Assert.Equal("(10%,10%,10%)", Color.ofPercents (10.0, 10.0, 10.0) |> Color.toString)
+        Assert.Equal("rgb(10%,10%,10%)", Color.ofPercents (10.0, 10.0, 10.0) |> Color.toString)
 
     [<Property>]
     let ``create with values`` (r, g, b) =
-        Assert.Equal(sprintf "(%d,%d,%d)" r g b, Color.ofValues (r, g, b) |> Color.toString)
+        Assert.Equal(sprintf "rgb(%d,%d,%d)" r g b, Color.ofValues (r, g, b) |> Color.toString)
