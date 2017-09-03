@@ -89,9 +89,7 @@ dotnet run -p Examples\Animate\Animate.fsproj
 
 Run the Fable example ([prerequisites](http://fable.io/pages/prerequisites.html)):
 ```bash
-cd Examples\Bounce
-yarn install
-cd src
+cd Examples\Bounce\src
 dotnet restore
 dotnet fable yarn-run start
 ```
