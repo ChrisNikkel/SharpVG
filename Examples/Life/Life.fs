@@ -127,5 +127,4 @@ let main argv =
 
     openFile fileName
     0 // return an integer exit code
-
-    // TODO: Combine with FunScript to make a realtime version: https://github.com/ZachBray/FunScript/blob/master/examples/EasyGettingStarted/Mazing.fs
+    

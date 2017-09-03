@@ -111,6 +111,3 @@ module Tests =
 
         let html = graphics |> Svg.ofSeq |> Svg.toHtml "SVG Demo"
         checkTag "SVG Demo" html
-
-    [<EntryPoint>]
-    let main argv = 0
