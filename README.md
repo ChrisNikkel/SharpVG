@@ -87,6 +87,15 @@ dotnet run -p Examples\Graph\Graph.fsproj
 dotnet run -p Examples\Animate\Animate.fsproj
 ```
 
+Run the Fable example ([prerequisites](http://fable.io/pages/prerequisites.html)):
+```bash
+cd Examples\Bounce
+yarn install
+cd src
+dotnet restore
+dotnet fable yarn-run start
+```
+
 Explore interactively:
 ```bash
 fsharpi -r:SharpVG/bin/Debug/netcoreapp2.0/SharpVG.dll
