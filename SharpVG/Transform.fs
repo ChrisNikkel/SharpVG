@@ -1,11 +1,10 @@
 namespace SharpVG
 
-// TODO: Allow multi transforms for static transformations using a seq/list
 type Transform =
     | Matrix of A: Length * B: Length * C: Length * D: Length * E: Length * F: Length
     | Translate of X: Length * Y: Length option
     | Scale of X: Length * Y: Length option
-    | Rotate of Angle: float * Point: ((Length * Length) option) // TODO: Use point instead of Length*Length
+    | Rotate of Angle: float * Point: ((Length * Length) option)
     | SkewX of Angle: float
     | SkewY of Angle: float
 
@@ -26,7 +25,7 @@ module Transform =
 
     let createSkewX angle =
         SkewX angle
-    
+
     let createSkewY angle =
         SkewY angle
 
@@ -56,7 +55,7 @@ module Transform =
     let toStringWithSeparator separator transform =
         let s = separator
         match transform with
-            | Matrix (a, b, c, d, e, f) ->  Length.toString a + s + Length.toString b + s + Length.toString c + s + Length.toString d + s + Length.toString e + s + Length.toString f 
+            | Matrix (a, b, c, d, e, f) ->  Length.toString a + s + Length.toString b + s + Length.toString c + s + Length.toString d + s + Length.toString e + s + Length.toString f
             | Translate (x, None) | Scale (x, None) -> Length.toString x
             | Translate (x, Some y) | Scale (x, Some y) -> Length.toString x + s + Length.toString y
             | Rotate (a, None) | SkewX a | SkewY a -> string a

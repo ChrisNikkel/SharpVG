@@ -113,4 +113,3 @@ module Element =
         let attributesDiff = ((newElement |> toTag).Attributes |> Set.ofList) - ((element |> toTag).Attributes |> Set.ofList) |> Set.toList
         element |> withAnimations (attributesDiff |> List.map (fun {Name = n; Value = v; Type = t} -> Animation.createSet timing t n v))
 
-    // TODO: Add more animations such as transform, path, animate, etc.

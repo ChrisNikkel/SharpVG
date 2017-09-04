@@ -1,5 +1,3 @@
-// TODO: Add decorator, spacing, and writing mode to text
-// TODO: Add def and use to make reusable elements
 namespace SharpVG
 
 type Style =
@@ -31,7 +29,6 @@ module Style =
     let withOpacity opacity style =
         { style with Opacity = Some(opacity) }
 
-    // TODO: Style.create isn't consistant with the other creates which only take required values as parameters
     let create fill stroke strokeWidth opacity =
         { Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity); Name = None }
 

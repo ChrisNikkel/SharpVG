@@ -17,13 +17,12 @@ module Plot =
     let create minimum maximum elements =
         {Elements = elements; Minimum = minimum; Maximum = maximum; Title = None; Style = defaultStyle}
 
-    // TODO: Make this support either a list of tuples or a list of just x values
     let line values =
         let (minimum, maximum) =
             let (xValues, yValues) = values |> List.unzip
             ((xValues |> List.min, yValues |> List.min), (xValues |> List.max, yValues |> List.max))
 
-        let elements = 
+        let elements =
             let path = Path.empty |> Path.addAbsolute PathType.MoveTo (Point.ofFloats values.Head)
             values
             |> List.scan (fun acc p -> acc |> (Path.addAbsolute PathType.LineTo (Point.ofFloats p))) path
