@@ -25,9 +25,9 @@ module Plot =
         let elements =
             let path = Path.empty |> Path.addAbsolute PathType.MoveTo (Point.ofFloats values.Head)
             values
-            |> List.scan (fun acc p -> acc |> (Path.addAbsolute PathType.LineTo (Point.ofFloats p))) path
-            |> List.last
-            |> Element.ofPath
+                |> List.scan (fun acc p -> acc |> (Path.addAbsolute PathType.LineTo (Point.ofFloats p))) path
+                |> List.last
+                |> Element.ofPath
 
         create (Point.ofFloats minimum) (Point.ofFloats maximum) (Seq.singleton elements)
 
@@ -35,11 +35,12 @@ module Plot =
         let yOffset =  Length.ofFloat (((Length.toFloat plot.Maximum.Y) - (Length.toFloat plot.Minimum.Y)))
         let xAxis = Line.create (Point.create plot.Minimum.X Length.empty) (Point.create plot.Maximum.X Length.empty) |> Element.ofLine |> Element.withStyle plot.Style
         let yAxis = Line.create (Point.create Length.empty plot.Minimum.Y) (Point.create Length.empty plot.Maximum.Y) |> Element.ofLine |> Element.withStyle plot.Style
+
         plot.Elements
-        |> Seq.map (Element.withStyle plot.Style)
-        |> Group.ofSeq
-        |> Group.withId "MyPlot"
-        |> Group.addElement xAxis
-        |> Group.addElement yAxis
-        |> Group.asCartesian yOffset plot.Maximum.Y
+            |> Seq.map (Element.withStyle plot.Style)
+            |> Group.ofSeq
+            |> Group.withId "MyPlot"
+            |> Group.addElement xAxis
+            |> Group.addElement yAxis
+            |> Group.asCartesian yOffset plot.Maximum.Y
 
