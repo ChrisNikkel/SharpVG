@@ -25,3 +25,9 @@ module Attribute =
 
     let toString attribute =
         attribute.Name + "=" + "\"" + attribute.Value + "\""
+
+module AttributeType =
+    let toString = function
+        | AttributeType.CSS -> "CSS"
+        | AttributeType.XML -> "XML"
+        | _ -> failwith "Unknown AttributeType"
