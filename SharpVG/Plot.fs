@@ -31,6 +31,12 @@ module Plot =
 
         create (Point.ofFloats minimum) (Point.ofFloats maximum) (Seq.singleton elements)
 
+    let lineXY = line
+
+    let lineX values =
+        let naturalNumbers = [1.0 .. (List.length values |> float)]
+        line (List.zip naturalNumbers values)
+
     let toGroup plot =
         let yOffset =  Length.ofFloat (((Length.toFloat plot.Maximum.Y) - (Length.toFloat plot.Minimum.Y)))
         let xAxis = Line.create (Point.create plot.Minimum.X Length.empty) (Point.create plot.Maximum.X Length.empty) |> Element.ofLine |> Element.withStyle plot.Style
