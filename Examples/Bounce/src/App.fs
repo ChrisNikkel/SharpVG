@@ -26,39 +26,39 @@ let createRect p c o =
     Element.ofRect rect |> Element.withStyle style
 
 let render position =
-  let pos1, pos2 = position
-  let rect1 = createRect pos1 red opaque
-  let rect2 = createRect pos2 blue translucent
-  [rect1; rect2]
-    |> Group.ofList
-    |> Svg.ofGroup
-    |> Svg.withSize fieldArea
-    |> Svg.toString
+    let pos1, pos2 = position
+    let rect1 = createRect pos1 red opaque
+    let rect2 = createRect pos2 blue translucent
+    [rect1; rect2]
+        |> Group.ofList
+        |> Svg.ofGroup
+        |> Svg.withSize fieldArea
+        |> Svg.toString
 
 let getElement(name) = Browser.document.getElementById name
 
 let getDirection position (dx, dy) =
-  match position with
-    | (x, y) when (x <= 0 || x >= outerBounds) && (y <= 0 || y >= outerBounds) -> (-1 * dx, -1 * dy)
-    | (x, _) when (x <= 0 || x >= outerBounds) -> (-1 * dx, dy)
-    | (_, y) when (y <= 0 || y >= outerBounds) -> (dx, -1 * dy)
-    | (_, _) -> (dx, dy)
+    match position with
+        | (x, y) when (x <= 0 || x >= outerBounds) && (y <= 0 || y >= outerBounds) -> (-1 * dx, -1 * dy)
+        | (x, _) when (x <= 0 || x >= outerBounds) -> (-1 * dx, dy)
+        | (_, y) when (y <= 0 || y >= outerBounds) -> (dx, -1 * dy)
+        | (_, _) -> (dx, dy)
 
 
 let add (x1, y1) (x2, y2) =
-  (x1 + x2, y1 + y2)
+    (x1 + x2, y1 + y2)
 
 let move (position, direction) =
-  let point1, point2 = position
-  let direction1, direction2 = direction
-  let (newDirection1, newDirection2) = (getDirection point1 direction1, getDirection point2 direction2)
+    let point1, point2 = position
+    let direction1, direction2 = direction
+    let (newDirection1, newDirection2) = (getDirection point1 direction1, getDirection point2 direction2)
 
-  ((add point1 newDirection1, add point2 newDirection2), (newDirection1, newDirection2))
+    ((add point1 newDirection1, add point2 newDirection2), (newDirection1, newDirection2))
 
 let rec update position direction () =
-  let (newPosition, newDirection) = move(position, direction)
-  getElement("content").innerHTML <- render newPosition
-  window.setTimeout(update newPosition newDirection, 1000. / 60.) |> ignore
+    let (newPosition, newDirection) = move(position, direction)
+    getElement("content").innerHTML <- render newPosition
+    window.setTimeout(update newPosition newDirection, 1000. / 60.) |> ignore
 
 let init() =
     let position = ((10, 10), (30, 30))
