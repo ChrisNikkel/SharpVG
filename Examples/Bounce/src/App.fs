@@ -58,7 +58,7 @@ let move (position, direction) =
 let rec update position direction () =
     let (newPosition, newDirection) = move(position, direction)
     getElement("content").innerHTML <- render newPosition
-    window.setTimeout(update newPosition newDirection, 1000. / 60.) |> ignore
+    window.setTimeout(update newPosition newDirection, 1000 / 60) |> ignore
 
 let init() =
     let position = ((10, 10), (30, 30))
