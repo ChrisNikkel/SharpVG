@@ -2,11 +2,14 @@
 
 open System.Diagnostics
 open System.IO
-open System
 
 module File =
+    let getTemporaryFileName =
+        Path.GetTempFileName()
+
     let saveToFile name lines =
-        File.WriteAllLines(name, [lines]);
+        File.WriteAllLines(name, [lines])
 
     let openFile (name:string) =
-        Process.Start(name) |> ignore
+        let info = new ProcessStartInfo("open", name)
+        Process.Start(info) |> ignore
