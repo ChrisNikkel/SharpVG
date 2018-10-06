@@ -6,13 +6,14 @@ type Style =
         Stroke : Color option;
         StrokeWidth : Length option;
         Opacity: float option;
+        FillOpacity: float option;
         Name: string option;
     }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Style =
     let empty =
-        { Fill = None; Stroke = None; StrokeWidth = None; Opacity = None; Name = None; }
+        { Fill = None; Stroke = None; StrokeWidth = None; Opacity = None; FillOpacity = None; Name = None; }
 
     let withName name (style : Style) =
         { style with Name = Some(name) }
@@ -29,11 +30,14 @@ module Style =
     let withOpacity opacity style =
         { style with Opacity = Some(opacity) }
 
-    let create fill stroke strokeWidth opacity =
-        { Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity); Name = None }
+    let withFillOpacity opacity style =
+        { style with FillOpacity = Some(opacity) }
 
-    let createNamed fill stroke strokeWidth opacity name =
-        { Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity); Name = Some(name) }
+    let create fill stroke strokeWidth opacity fillOpacity =
+        { Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity); FillOpacity = Some(fillOpacity); Name = None }
+
+    let createNamed fill stroke strokeWidth opacity fillOpacity name =
+        { Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity); FillOpacity = Some(fillOpacity); Name = Some(name) }
 
     let createWithFill fill =
         empty |> withFill fill
@@ -58,7 +62,8 @@ module Style =
             style.Stroke |> Option.map (Color.toString >> (f "stroke"));
             style.StrokeWidth |> Option.map (Length.toString >> (f "stroke-width"));
             style.Fill |> Option.map (Color.toString >> (f "fill"));
-            style.Opacity |> Option.map (string >> (f "opacity"))
+            style.Opacity |> Option.map (string >> (f "opacity"));
+            style.FillOpacity |> Option.map (string >> (f "fill-opacity"))
         ] |> List.choose id
 
     let toAttributes style =

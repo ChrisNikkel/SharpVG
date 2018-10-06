@@ -28,6 +28,7 @@
     <Compile Include="Animation.fs" />
     <Compile Include="Element.fs" />
     <Compile Include="Group.fs" />
+    <Compile Include="Axis.fs" />
     <Compile Include="Plot.fs" />
     <Compile Include="Svg.fs" />
   </ItemGroup>

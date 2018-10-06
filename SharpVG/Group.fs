@@ -13,6 +13,9 @@ and Body =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Group =
+    let empty =
+        { Id = None; Body = Seq.empty<GroupElement>; Transforms = Seq.empty }
+
     let ofSeq seq =
         {
             Id = None
