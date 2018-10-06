@@ -27,27 +27,43 @@ module Plot =
     let withAxis axis plot =
         {plot with Axis = Some(axis)}
 
-    let line values =
+    let discoverSize values =
         let (minimum, maximum) =
             let (xValues, yValues) = values |> List.unzip
             ((xValues |> List.min, yValues |> List.min), (xValues |> List.max, yValues |> List.max))
 
-        let elements =
-            let path = Path.empty |> Path.addAbsolute PathType.MoveTo (Point.ofFloats values.Head)
-            values
-                |> List.scan (fun acc p -> acc |> (Path.addAbsolute PathType.LineTo (Point.ofFloats p))) path
-                |> List.last
-                |> Element.ofPath
-        let minimum = Point.ofFloats minimum
-        let maximum = Point.ofFloats maximum
-        create minimum maximum (Seq.singleton elements) |> withAxis (Axis.create minimum maximum)
+        (Point.ofFloats minimum, Point.ofFloats maximum)
+
+    let plot values =
+        let min, max = discoverSize values
+
+        values
+            |> List.map (fun p -> Circle.create (Point.ofFloats p) (Length.ofInt 1) |> Element.ofCircle)
+            |> create min max
+            |> withAxis (Axis.create min max)
+
+    let plotXY = plot
+
+    let plotX values =
+        let naturalNumbers = [1.0 .. (List.length values |> float)]
+        plot (List.zip naturalNumbers values)
+
+    let line values =
+        let min, max = discoverSize values
+        let path = Path.empty |> Path.addAbsolute PathType.MoveTo (Point.ofFloats (List.head values))
+        values
+            |> List.scan (fun acc p -> acc |> Path.addAbsolute PathType.LineTo (Point.ofFloats p)) path
+            |> List.last
+            |> Element.ofPath
+            |> Seq.singleton
+            |> create min max
+            |> withAxis (Axis.create min max)
 
     let lineXY = line
 
     let lineX values =
         let naturalNumbers = [1.0 .. (List.length values |> float)]
         line (List.zip naturalNumbers values)
-
 
     let toGroup plot =
         let yOffset =  Length.ofFloat (((Length.toFloat plot.Maximum.Y) - (Length.toFloat plot.Minimum.Y)))
