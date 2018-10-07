@@ -19,10 +19,16 @@ type Plot =
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Plot =
     let defaultScale = 1000.0
+
     let defaultStyle = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = None; Opacity = None; FillOpacity = Some(0.0); Name = Some("DefaultPlotStyle") }
 
+    let defaultColors =
+        let colors = [ Colors.Blue; Colors.Red; Colors.Green; Colors.Orange; Colors.Purple; Colors.Yellow ]
+        let rec loop n = seq { yield n; yield! loop ((n + 1) % colors.Length)}
+        loop 0 |> Seq.map (fun c -> colors.[c])
+
     let create minimum maximum elements =
-        {PlotElement = {Elements = elements; Style = defaultStyle};  Minimum = minimum; Maximum = maximum; Title = None; Axis = None}
+        {PlotElement = {Elements = elements; Style = {defaultStyle with Stroke = Some(Name (Seq.head defaultColors))}};  Minimum = minimum; Maximum = maximum; Title = None; Axis = None}
 
     let withAxis axis plot =
         {plot with Axis = Some(axis)}
