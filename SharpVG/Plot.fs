@@ -8,37 +8,43 @@ type PlotElement =
 
 type Plot =
     {
-        Minimum: Point
-        Maximum: Point
+        Minimum: float * float
+        Maximum: float * float
         Title: string option
         Axis: Axis option
 
-        PlotElement: PlotElement
+        PlotElements: seq<PlotElement>
     }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Plot =
     let defaultScale = 1000.0
 
-    let defaultStyle = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = None; Opacity = None; FillOpacity = Some(0.0); Name = Some("DefaultPlotStyle") }
+    let defaultStyle = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = None; Opacity = None; FillOpacity = Some(0.0); Name = None }
 
-    let defaultColors =
-        let colors = [ Colors.Blue; Colors.Red; Colors.Green; Colors.Orange; Colors.Purple; Colors.Yellow ]
-        let rec loop n = seq { yield n; yield! loop ((n + 1) % colors.Length)}
-        loop 0 |> Seq.map (fun c -> colors.[c])
+    let defaultColors = [ Colors.Blue; Colors.Red; Colors.Green; Colors.Orange; Colors.Purple; Colors.Yellow ]
 
-    let create minimum maximum elements =
-        {PlotElement = {Elements = elements; Style = {defaultStyle with Stroke = Some(Name (Seq.head defaultColors))}};  Minimum = minimum; Maximum = maximum; Title = None; Axis = None}
+    let getDefaultColor i = defaultColors.[i % List.length defaultColors]
+
+    let getDefaultStyle i = { defaultStyle with Stroke = Some(Name (getDefaultColor i)); Name = Some ("DefaultPlotStyle" + string i)}
+
+    let discoverSize values =
+        let (xValues, yValues) = values |> List.unzip
+        ((xValues |> List.min, yValues |> List.min), (xValues |> List.max, yValues |> List.max))
+
+    let create minimum maximum elements=
+        {PlotElements = Seq.singleton {Elements = elements; Style = getDefaultStyle 0};  Minimum = minimum; Maximum = maximum; Title = None; Axis = None}
+
+    let addPlotElement element plot =
+        {plot with PlotElements = Seq.append plot.PlotElements (Seq.singleton {Elements = element; Style = getDefaultStyle (Seq.length plot.PlotElements)})}
+
+    let addPlot newPlot plot =
+        let (min, max) = discoverSize [newPlot.Minimum; newPlot.Maximum; plot.Minimum; plot.Maximum]
+        let newPlotElements = newPlot.PlotElements |> Seq.mapi (fun i pe -> {pe with Style = getDefaultStyle (i + Seq.length plot.PlotElements)})
+        {plot with PlotElements = Seq.append newPlotElements plot.PlotElements; Minimum = min; Maximum = max }
 
     let withAxis axis plot =
         {plot with Axis = Some(axis)}
-
-    let discoverSize values =
-        let (minimum, maximum) =
-            let (xValues, yValues) = values |> List.unzip
-            ((xValues |> List.min, yValues |> List.min), (xValues |> List.max, yValues |> List.max))
-
-        (Point.ofFloats minimum, Point.ofFloats maximum)
 
     let plot values =
         let min, max = discoverSize values
@@ -72,12 +78,12 @@ module Plot =
         line (List.zip naturalNumbers values)
 
     let toGroup plot =
-        let yOffset =  Length.ofFloat (((Length.toFloat plot.Maximum.Y) - (Length.toFloat plot.Minimum.Y)))
+        let yOffset =  Length.ofFloat ((snd plot.Maximum) - (snd plot.Minimum))
 
         plot.Axis
             |> Option.fold (fun _ a -> Axis.toElements a) Seq.empty<Element>
             |> Group.ofSeq
-            |> Group.addElements (plot.PlotElement.Elements |> Seq.map (Element.withStyle plot.PlotElement.Style))
+            |> Group.addElements (plot.PlotElements |> Seq.collect (fun pe -> pe.Elements |> Seq.map (Element.withStyle pe.Style)))
             |> Group.withId "MyPlot"
-            |> Group.asCartesian yOffset plot.Maximum.Y
+            |> Group.asCartesian yOffset (Length.ofFloat (snd plot.Maximum))
 

@@ -5,8 +5,8 @@ type Axis =
         Visible: bool * bool
         Labels: bool * bool
         Style: Style
-        Minimum: Point
-        Maximum: Point
+        Minimum: float * float
+        Maximum: float * float
     }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
@@ -23,8 +23,8 @@ module Axis =
         }
 
     let toElements axis =
-        let xAxis = Line.create (Point.create Length.empty axis.Minimum.Y) (Point.create Length.empty axis.Maximum.Y) |> Element.ofLine |> Element.withStyle axis.Style
-        let yAxis = Line.create (Point.create axis.Minimum.X Length.empty) (Point.create axis.Maximum.X Length.empty) |> Element.ofLine |> Element.withStyle axis.Style
+        let yAxis = Line.create (Point.create Length.empty (Length.ofFloat (snd axis.Minimum))) (Point.create Length.empty (Length.ofFloat (snd axis.Maximum))) |> Element.ofLine |> Element.withStyle axis.Style
+        let xAxis = Line.create (Point.create (Length.ofFloat (fst axis.Minimum)) Length.empty) (Point.create (Length.ofFloat (fst axis.Maximum)) Length.empty) |> Element.ofLine |> Element.withStyle axis.Style
 
         match axis.Visible with
             | true, true -> seq [xAxis; yAxis]

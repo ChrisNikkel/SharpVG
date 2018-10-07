@@ -51,7 +51,7 @@ module Svg =
         plot
         |> Plot.toGroup
         |> ofGroup
-        |> withViewbox Point.origin (Area.fromPoints plot.Minimum plot.Maximum)
+        |> withViewbox Point.origin (Area.fromPoints (Point.ofFloats plot.Minimum) (Point.ofFloats plot.Maximum))
 
     let toString svg =
         let attributes =
