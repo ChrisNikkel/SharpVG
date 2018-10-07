@@ -93,7 +93,7 @@ let main argv =
         |> List.concat
         |> removeDups
 
-    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None; Name = Some("std") }
+    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None; Name = Some("std"); FillOpacity = None }
 
     // Execute
 
@@ -127,4 +127,3 @@ let main argv =
 
     openFile fileName
     0 // return an integer exit code
-    

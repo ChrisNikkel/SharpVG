@@ -46,6 +46,7 @@ let main argv =
       StrokeWidth = Some(Length.ofInt 1);
       Fill = Some(Name Colors.LightGray);
       Opacity = None;
+      FillOpacity = None;
       Name = Some("std")
     }
 
