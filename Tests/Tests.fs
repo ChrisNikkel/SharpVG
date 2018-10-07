@@ -21,31 +21,31 @@ module Tests =
       Assert.Equal(result, element);
 
     [<SvgProperty>]
-    let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p, o) =
+    let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p, o, fo) =
         let point1, point2 = Point.ofFloats (x1, y1), Point.ofFloats (x2, y2)
-        let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Length.ofFloat p, o
-        let style = Style.create fill stroke strokeWidth opacity
+        let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat p, o, fo
+        let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let line = Line.create point1 point2
         let tag = line |> Element.ofLine |> Element.withStyle style |> Element.toString
 
         checkBodylessTag "line" tag
 
     [<SvgProperty>]
-    let ``draw rectangles`` (x, y, h, w, c, r, g, b, p, o) =
+    let ``draw rectangles`` (x, y, h, w, c, r, g, b, p, o, fo) =
         let point = Point.ofFloats (x, y)
         let area = Area.ofFloats (h, w)
-        let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Length.ofFloat p, o
-        let style = Style.create fill stroke strokeWidth opacity
+        let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat p, o, fo
+        let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let rect = Rect.create point area
         let tag = rect |> Element.ofRect |> Element.withStyle style |> Element.toString
 
         checkBodylessTag "rect" tag
 
     [<SvgProperty>]
-    let ``draw circles`` (x, y, radius, c, r, g, b, p, o) =
+    let ``draw circles`` (x, y, radius, c, r, g, b, p, o, fo) =
         let point = Point.ofFloats (x, y)
-        let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Length.ofFloat p, o
-        let style = Style.create fill stroke strokeWidth opacity
+        let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat p, o, fo
+        let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let circle = Circle.create point (Length.ofFloat radius)
         let tag = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
 
@@ -53,10 +53,10 @@ module Tests =
 
 
     [<SvgProperty>]
-    let ``draw ellipses`` (x1, y1, x2, y2, c, r, g, b, p, o) =
+    let ``draw ellipses`` (x1, y1, x2, y2, c, r, g, b, p, o, fo) =
         let point1, point2 = Point.ofFloats (x1, y1), Point.ofFloats (x2, y2)
-        let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Length.ofFloat p, o
-        let style = Style.create fill stroke strokeWidth opacity
+        let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat p, o, fo
+        let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let ellipse = Ellipse.create point1 point2
         let tag = ellipse |> Element.ofEllipse |> Element.withStyle style |> Element.toString
 
@@ -72,25 +72,25 @@ module Tests =
         checkBodylessTag "image" tag
 
     [<SvgProperty>]
-    let ``draw texts`` (x, y, c, r, g, b, p, o) =
+    let ``draw texts`` (x, y, c, r, g, b, p, o, fo) =
         let point = Point.ofFloats (x, y)
-        let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Length.ofFloat p, o
-        let style = Style.create fill stroke strokeWidth opacity
+        let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat p, o, fo
+        let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let text = Text.create point "test"
         let tag = text |> Element.ofText |> Element.withStyle style |> Element.toString
 
         checkTag "text" tag
 
     [<SvgProperty>]
-    let ``animate circles`` (x, y, radius, c, r, g, b, p, o) =
+    let ``animate circles`` (x, y, radius, c, r, g, b, p, o, fo) =
         let p1 = Point.ofInts (100, 100)
         let p2 = Point.ofInts (500, 500)
         let p3 = Point.ofInts (200, 200)
         let point = Point.ofFloats (x, y)
         let path = Path.empty |> (Path.addAbsolute CurveTo p1) |> (Path.addAbsolute LineTo p2) |> (Path.addAbsolute CurveTo p3)
         let timing = Timing.create <| TimeSpan.FromSeconds(0.0)
-        let fill, stroke, strokeWidth, opacity = Hex c, Values(r, g, b), Length.ofFloat p, o
-        let style = Style.create fill stroke strokeWidth opacity
+        let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat p, o, fo
+        let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let circle = Circle.create point (Length.ofFloat radius)
         let animation = Animation.createMotion timing path None
         let tag = circle |> Element.ofCircle |> Element.withStyle style |> Element.withAnimation animation |> Element.toString
@@ -106,8 +106,8 @@ module Tests =
         }
 
         let point = Point.ofInts (24, 15)
-        let style1 = Style.create (Name Colors.Red) (Hex 0xff0000) (Length.ofFloat 3.0) 1.0
-        let style2 = Style.create (Name Colors.Blue) (SmallHex 0xf00s) (Length.ofFloat 6.0) 1.0
+        let style1 = Style.create (Name Colors.Red) (Hex 0xff0000) (Length.ofFloat 3.0) 1.0 1.0
+        let style2 = Style.create (Name Colors.Blue) (SmallHex 0xf00s) (Length.ofFloat 6.0) 1.0 1.0
         let length = Length.ofPixels 1
         let area = Area.create length length
 
