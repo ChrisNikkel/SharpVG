@@ -23,7 +23,11 @@ module Axis =
         }
 
     let toElements axis =
-        seq [
-            Line.create (Point.create Length.empty axis.Minimum.Y) (Point.create Length.empty axis.Maximum.Y) |> Element.ofLine |> Element.withStyle axis.Style;
-            Line.create (Point.create axis.Minimum.X Length.empty) (Point.create axis.Maximum.X Length.empty) |> Element.ofLine |> Element.withStyle axis.Style
-        ]
+        let xAxis = Line.create (Point.create Length.empty axis.Minimum.Y) (Point.create Length.empty axis.Maximum.Y) |> Element.ofLine |> Element.withStyle axis.Style
+        let yAxis = Line.create (Point.create axis.Minimum.X Length.empty) (Point.create axis.Maximum.X Length.empty) |> Element.ofLine |> Element.withStyle axis.Style
+
+        match axis.Visible with
+            | true, true -> seq [xAxis; yAxis]
+            | false, true -> seq [yAxis]
+            | true, false -> seq [xAxis]
+            | _ -> Seq.empty<Element>
