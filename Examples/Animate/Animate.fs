@@ -19,7 +19,7 @@ let main argv =
                     | _ -> failwith "inconceivable"
             )
     let fileName = "Animate.html"
-    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None; Name = Some("std") }
+    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None; FillOpacity = None; Name = Some("std") }
     (*
     let rotate degrees = Transform.createRotate degrees center center
     let rotationStart, rotationEnd = rotate 0.0, rotate 360.0
