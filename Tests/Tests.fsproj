@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +25,7 @@
     <Compile Include="TestText.fs" />
     <Compile Include="TestTiming.fs" />
     <Compile Include="Tests.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,11 +33,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="FsCheck" Version="2.9.0" />
-    <PackageReference Include="FsCheck.Xunit" Version="2.9.0" />
-    <PackageReference Include="Xunit" Version="2.2.0" />
-    <PackageReference Include="Xunit.Runner.VisualStudio" Version="2.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="FsCheck" Version="2.13.0" />
+    <PackageReference Include="FsCheck.Xunit" Version="2.13.0" />
+    <PackageReference Include="Xunit" Version="2.4.1" />
+    <PackageReference Include="Xunit.Runner.VisualStudio" Version="2.4.1" />
   </ItemGroup>
 
 </Project>
