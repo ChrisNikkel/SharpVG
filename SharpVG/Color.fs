@@ -156,7 +156,6 @@ type Color =
     | Values of byte * byte * byte // 0 - 255
     | Percents of float * float * float // 0.0% - 100.0%
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Colors =
     let toString = function
         | AliceBlue -> "AliceBlue"

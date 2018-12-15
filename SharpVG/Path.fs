@@ -21,7 +21,6 @@ type PathPart =
 
 type Path = seq<PathPart>
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Path =
 
     let empty = Seq.empty
@@ -34,7 +33,7 @@ module Path =
 
     let addAbsolute pathType point path =
         add Absolute pathType point path
-    
+
     let addClosePath path =
         Seq.append path (Seq.singleton ClosePath)
 

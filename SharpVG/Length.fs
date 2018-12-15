@@ -7,7 +7,6 @@ type Length =
     | Em of float
     | Percent of float
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Length =
 
     let empty =

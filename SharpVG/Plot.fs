@@ -16,7 +16,6 @@ type Plot =
         PlotElements: seq<PlotElement>
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Plot =
     let defaultScale = 1000.0
 

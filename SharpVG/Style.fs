@@ -10,7 +10,6 @@ type Style =
         Name: string option;
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Style =
     let empty =
         { Fill = None; Stroke = None; StrokeWidth = None; Opacity = None; FillOpacity = None; Name = None; }

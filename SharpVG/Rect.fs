@@ -6,7 +6,6 @@ type Rect =
         Size: Area
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Rect =
     let create upperLeft size =
         { UpperLeft = upperLeft; Size = size }

@@ -7,7 +7,6 @@ type Image =
         Source: string
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Image =
 
     let create upperLeft size source =

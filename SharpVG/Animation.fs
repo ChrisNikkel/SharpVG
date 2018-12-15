@@ -47,7 +47,6 @@ type Animation =
         Additive: Additive option
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Animation =
 
     let createTransform timing fromTransform toTransform =

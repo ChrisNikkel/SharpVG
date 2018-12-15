@@ -15,7 +15,6 @@ type Text =
         Anchor: TextAnchor option
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Text =
     let create upperLeft body =
         { UpperLeft = upperLeft; Body = body; FontFamily = None; FontSize = None; Anchor = None }

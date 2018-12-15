@@ -11,7 +11,6 @@ type Attribute =
         Type: AttributeType
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Attribute =
 
     let create t name value =

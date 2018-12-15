@@ -11,7 +11,6 @@ type Svg = {
     Viewbox: Viewbox option
 }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Svg =
     let withSize size (svg:Svg) =
         { svg with Size = Some(size) }

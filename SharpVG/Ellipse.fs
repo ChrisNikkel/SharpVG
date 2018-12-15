@@ -6,7 +6,6 @@ type Ellipse =
         Radius: Point
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Ellipse =
     let create center radius =
         {

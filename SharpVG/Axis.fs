@@ -9,7 +9,6 @@ type Axis =
         Maximum: float * float
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Axis =
     let defaultStyle = { Stroke = Some(Name Colors.DarkGrey); StrokeWidth = Some(Length.ofInt 1); Fill = None; Opacity = None; FillOpacity = None; Name = Some("DefaultAxisStyle") }
 

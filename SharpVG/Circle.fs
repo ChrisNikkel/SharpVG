@@ -6,7 +6,6 @@ type Circle =
         Radius: Length
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Circle =
     let create center radius =
         {

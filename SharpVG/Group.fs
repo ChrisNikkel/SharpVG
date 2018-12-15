@@ -11,7 +11,6 @@ and GroupElement =
 and Body =
     seq<GroupElement>
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Group =
     let empty =
         { Id = None; Body = Seq.empty<GroupElement>; Transforms = Seq.empty }
@@ -80,7 +79,6 @@ module Group =
 
         (if attributes |> List.isEmpty then Tag.create "g" else Tag.create "g" |> (Tag.withAttributes attributes)) |> Tag.withBody body
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Body =
     let toStyles body =
         body

@@ -7,7 +7,6 @@ type Tag =
         Body: string option;
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Tag =
 
     let create name =

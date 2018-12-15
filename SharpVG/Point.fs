@@ -6,7 +6,6 @@ type Point =
         Y : Length;
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Point =
     let create x y =
         { X = x; Y = y }

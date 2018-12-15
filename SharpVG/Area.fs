@@ -6,7 +6,6 @@ type Area =
         Height : Length;
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Area =
     let create width height =
         { Width = width; Height = height }

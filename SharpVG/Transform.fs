@@ -8,7 +8,6 @@ type Transform =
     | SkewX of Angle: float
     | SkewY of Angle: float
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Transform =
 
     let createMatrix matrix =

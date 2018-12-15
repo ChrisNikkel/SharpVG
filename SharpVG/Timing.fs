@@ -41,7 +41,6 @@ type Timing =
         FinalState: FinalState option
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Timing =
     let create b =
         {

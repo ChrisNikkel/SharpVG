@@ -21,7 +21,6 @@ type Element = {
         Animations: seq<Animation>
     }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Element =
 
     let create element =
