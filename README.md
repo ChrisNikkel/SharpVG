@@ -26,7 +26,7 @@ let area = Area.ofInts (50, 50)
 let style = Style.create (Name Colors.Cyan) (Name Colors.Blue) (Length.ofInt 3) 1.0
 
 Rect.create upperLeft area
-  |> Element.ofRect
+  |> Element.create
   |> Element.withStyle style
   |> Element.toString
   |> printf "%A"
@@ -42,7 +42,7 @@ let radius = Length.ofInt 50
 let style = Style.create (Name Colors.Violet) (Name Colors.Indigo) (Length.ofInt 3) 1.0
 
 Circle.create center radius
-  |> Element.ofCircle
+  |> Element.create
   |> Element.withStyle style
   |> Svg.ofElement
   |> Svg.toHtml "Example"
@@ -100,8 +100,8 @@ fsharpi -r:SharpVG/bin/Debug/netcoreapp2.0/SharpVG.dll
 ```
 ```F#
 open SharpVG;;
-Circle.create Point.origin (Length.ofInt 10) |> Circle.toString |> printf "%A";;
-Circle.create Point.origin (Length.ofInt 10) |> Element.ofCircle |> Svg.ofElement |> Svg.toHtml "Example";;
+Circle.create Point.origin (Length.ofInt 10) |> printf "%A";;
+Circle.create Point.origin (Length.ofInt 10) |> Element.create |> Svg.ofElement |> Svg.toHtml "Example";;
 #quit;;
 ```
 ## Documentation
