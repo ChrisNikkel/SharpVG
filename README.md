@@ -28,7 +28,7 @@ let style = Style.create (Name Colors.Cyan) (Name Colors.Blue) (Length.ofInt 3) 
 Rect.create upperLeft area
   |> Element.createWithStyle style
   |> Element.toString
-  |> printf "%A"
+  |> printf "%O"
 ```
 
 ```html
@@ -98,7 +98,7 @@ fsharpi -r:SharpVG/bin/Debug/netcoreapp2.0/SharpVG.dll
 ```
 ```F#
 open SharpVG;;
-Circle.create Point.origin (Length.ofInt 10) |> printf "%A";;
+Circle.create Point.origin (Length.ofInt 10) |> printf "%O";;
 Circle.create Point.origin (Length.ofInt 10) |> Element.create |> Svg.ofElement |> Svg.toHtml "Example";;
 #quit;;
 ```
