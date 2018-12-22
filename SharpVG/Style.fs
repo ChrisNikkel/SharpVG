@@ -86,6 +86,9 @@ module Style =
     let createWithOpacity opacity =
         empty |> withOpacity opacity
 
+    let createWithFillOpacity opacity =
+        empty |> withFillOpacity opacity
+
     let createWithName name =
         empty |> withName name
 
