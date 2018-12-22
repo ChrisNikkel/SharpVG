@@ -8,6 +8,34 @@ type Element = {
         Transform: Transform option
         Animations: seq<Animation>
     }
+with
+    static member ToTag element =
+        let styleClass =
+            match element.Style with
+                | Some s -> s.Name
+                | None -> None
+
+        let classes =
+            match styleClass with
+                | Some n -> element.Classes |> Seq.append (Seq.singleton n)
+                | None -> element.Classes
+
+        element.BaseTag
+        |> Tag.insertAttributes
+            (
+                [
+                    element.Id |> Option.map (Attribute.createCSS "id" >> List.singleton)
+                    classes |> Seq.map (Attribute.createCSS "class") |> Seq.toList |> Option.Some
+                    element.Style |> Option.filter (not << Style.isNamed) |> Option.map Style.toAttributes
+                    element.Transform |> Option.map (Transform.toAttribute >> List.singleton)
+                ]
+                |> List.choose id
+                |> List.concat
+            )
+        |> if element.Animations |> Seq.isEmpty then id else Tag.addBody (element.Animations |> Seq.map Animation.toString |> String.concat "")
+
+    override this.ToString() =
+        this |> Element.ToTag |> Tag.toString
 
 module Element =
 
@@ -48,32 +76,11 @@ module Element =
     let addClass className element =
         element.Classes |> Seq.append (Seq.singleton className)
 
-    let toTag element =
-        let styleClass =
-            match element.Style with
-                | Some s -> s.Name
-                | None -> None
+    let toTag =
+        Element.ToTag
 
-        let classes =
-            match styleClass with
-                | Some n -> element.Classes |> Seq.append (Seq.singleton n)
-                | None -> element.Classes
-
-        element.BaseTag
-        |> Tag.insertAttributes
-            (
-                [
-                    element.Id |> Option.map (Attribute.createCSS "id" >> List.singleton)
-                    classes |> Seq.map (Attribute.createCSS "class") |> Seq.toList |> Option.Some
-                    element.Style |> Option.filter (not << Style.isNamed) |> Option.map Style.toAttributes
-                    element.Transform |> Option.map (Transform.toAttribute >> List.singleton)
-                ]
-                |> List.choose id
-                |> List.concat
-            )
-        |> if element.Animations |> Seq.isEmpty then id else Tag.addBody (element.Animations |> Seq.map Animation.toString |> String.concat "")
-
-    let toString element = element |> toTag |> Tag.toString
+    let toString (element : Element) =
+        element.ToString()
 
     let setTo timing newElement element =
         let attributesDiff = ((newElement |> toTag).Attributes |> Set.ofList) - ((element |> toTag).Attributes |> Set.ofList) |> Set.toList

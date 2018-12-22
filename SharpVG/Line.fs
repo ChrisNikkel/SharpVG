@@ -11,6 +11,9 @@ with
             |> Tag.withAttributes (Point.toAttributesWithModifier "" "1" line.Point1)
             |> Tag.addAttributes (Point.toAttributesWithModifier "" "2" line.Point2)
 
+    override this.ToString() =
+        Line.ToTag this |> Tag.toString
+
 module Line =
     let create point1 point2 =
         { Point1 = point1; Point2 = point2 }
@@ -18,4 +21,5 @@ module Line =
     let toTag line =
         Line.ToTag line
 
-    let toString = toTag >> Tag.toString
+    let toString (line : Line) =
+        line.ToString()

@@ -5,6 +5,9 @@ type Area =
         Width : Length;
         Height : Length;
     }
+with
+    override this.ToString() =
+        Length.toString this.Width + "," + Length.toString this.Height
 
 module Area =
     let create width height =
@@ -33,5 +36,5 @@ module Area =
     let toAttributes area =
         [Attribute.createXML "width" <| Length.toString area.Width; Attribute.createXML "height" <| Length.toString area.Height]
 
-    let toString area =
-        Length.toString area.Width + "," + Length.toString area.Height
+    let toString (area : Area) =
+        area.ToString()

@@ -51,6 +51,9 @@ with
         Tag.create "path"
             |> Tag.withAttribute (Attribute.createXML "d" (path |> Path.ToDataString))
 
+    override this.ToString() =
+        this |> Path.ToTag |> Tag.toString
+
 module Path =
 
     let empty = { PathParts = Seq.empty }
@@ -84,5 +87,5 @@ module Path =
     let toTag =
         Path.ToTag
 
-    let toString path =
-        path |> toTag |> Tag.toString
+    let toString (path : Path) =
+        path.ToString()

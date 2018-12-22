@@ -33,6 +33,9 @@ with
         |> Tag.withAttribute (Attribute.createCSS "type" "text/css")
         |> Tag.withBody ("<![CDATA[" + (Style.ToCssString style) + "]]>")
 
+    override this.ToString() =
+        this |> Style.ToString
+
 type Styles =
     {
         Styles: seq<Style>

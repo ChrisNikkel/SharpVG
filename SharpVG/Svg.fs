@@ -10,6 +10,28 @@ type Svg = {
     Size: Area option
     Viewbox: Viewbox option
 }
+with
+    override this.ToString() =
+        let attributes =
+            match this.Size with | Some size -> Area.toAttributes size | None -> []
+            @ match this.Viewbox with | Some viewbox -> [Attribute.createXML "viewBox" ((Point.toString viewbox.Minimum) + " " + (Area.toString viewbox.Size))] | None -> []
+
+        let styles =
+          let namedStyles = this.Body |> Body.toStyles |> Styles.named
+          if Seq.isEmpty namedStyles then
+            ""
+          else
+            Styles.toString namedStyles
+
+        let body =
+            this.Body
+            |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> Group.toString)
+            |> String.concat ""
+
+        Tag.create "svg"
+        |> Tag.withAttributes attributes
+        |> Tag.withBody (styles + body)
+        |> Tag.toString
 
 module Svg =
     let withSize size (svg:Svg) =
@@ -52,27 +74,8 @@ module Svg =
         |> ofGroup
         |> withViewbox Point.origin (Area.fromPoints (Point.ofFloats plot.Minimum) (Point.ofFloats plot.Maximum))
 
-    let toString svg =
-        let attributes =
-            match svg.Size with | Some size -> Area.toAttributes size | None -> []
-            @ match svg.Viewbox with | Some viewbox -> [Attribute.createXML "viewBox" ((Point.toString viewbox.Minimum) + " " + (Area.toString viewbox.Size))] | None -> []
-
-        let styles =
-          let namedStyles = svg.Body |> Body.toStyles |> Styles.named
-          if Seq.isEmpty namedStyles then
-            ""
-          else
-            Styles.toString namedStyles
-
-        let body =
-            svg.Body
-            |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> Group.toString)
-            |> String.concat ""
-
-        Tag.create "svg"
-        |> Tag.withAttributes attributes
-        |> Tag.withBody (styles + body)
-        |> Tag.toString
+    let toString (svg : Svg) =
+        svg.ToString()
 
     let toHtml title svg =
         "<!DOCTYPE html>\n<html>\n<head>\n<title>" + title + "</title>\n</head>\n<body>\n" + (toString svg) + "\n</body>\n</html>\n"

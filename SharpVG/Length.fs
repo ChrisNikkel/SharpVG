@@ -6,6 +6,13 @@ type Length =
     | Pixels of int
     | Em of float
     | Percent of float
+    override this.ToString() =
+        let round (n:float) = Math.Round(n, 4)
+        match this with
+            | UserSpace u -> sprintf "%g" (round u)
+            | Pixels p -> sprintf "%d" p + "px"
+            | Em e -> sprintf "%g" (round e) + "em"
+            | Percent p -> sprintf "%g" (round p) + "%"
 
 module Length =
 
@@ -39,13 +46,8 @@ module Length =
     let ofPercent =
         Percent
 
-    let toString length =
-        let round (n:float) = Math.Round(n, 4)
-        match length with
-            | UserSpace u -> sprintf "%g" (round u)
-            | Pixels p -> sprintf "%d" p + "px"
-            | Em e -> sprintf "%g" (round e) + "em"
-            | Percent p -> sprintf "%g" (round p) + "%"
+    let toString (length : Length) =
+        length.ToString()
 
     let toFloat length =
         match length with

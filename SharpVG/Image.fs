@@ -10,6 +10,9 @@ with
     static member ToTag image =
         Tag.create "image" |> Tag.withAttributes ((Point.toAttributes image.UpperLeft) @ (Area.toAttributes image.Size) @ [Attribute.createXML "xlink:href" image.Source])
 
+    override this.ToString() =
+        this |> Image.ToTag |> Tag.toString
+
 module Image =
 
     let create upperLeft size source =
@@ -18,5 +21,5 @@ module Image =
     let toTag =
         Image.ToTag
 
-    let toString =
-        toTag >> Tag.toString
+    let toString (image : Image) =
+        image.ToString()

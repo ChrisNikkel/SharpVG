@@ -41,6 +41,9 @@ with
             )
         |> Tag.addBody text.Body
 
+    override this.ToString() =
+        this |> Text.ToTag |> Tag.toString
+
 module Text =
     let create upperLeft body =
         { UpperLeft = upperLeft; Body = body; FontFamily = None; FontSize = None; Anchor = None }
@@ -60,4 +63,5 @@ module Text =
     let toTag =
         Text.ToTag
 
-    let toString text = text |> toTag |> Tag.toString
+    let toString (text : Text) =
+        text.ToString()

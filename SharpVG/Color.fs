@@ -1,5 +1,7 @@
 namespace SharpVG
 
+open System
+
 type Colors =
     | AliceBlue
     | AntiqueWhite
@@ -148,16 +150,8 @@ type Colors =
     | WhiteSmoke
     | Yellow
     | YellowGreen
-
-type Color =
-    | Name of Colors
-    | SmallHex of int16  // #rgb
-    | Hex of int  // #rrggbb
-    | Values of byte * byte * byte // 0 - 255
-    | Percents of float * float * float // 0.0% - 100.0%
-
-module Colors =
-    let toString = function
+    override this.ToString() =
+        match this with
         | AliceBlue -> "AliceBlue"
         | AntiqueWhite -> "AntiqueWhite"
         | Aqua -> "Aqua"
@@ -306,6 +300,21 @@ module Colors =
         | Yellow -> "Yellow"
         | YellowGreen -> "YellowGreen"
 
+type Color =
+    | Name of Colors
+    | SmallHex of int16  // #rgb
+    | Hex of int  // #rrggbb
+    | Values of byte * byte * byte // 0 - 255
+    | Percents of float * float * float // 0.0% - 100.0%
+with
+    override this.ToString() =
+        match this with
+            | Name n -> n.ToString().ToLower()
+            | SmallHex sh -> String.Format("0x{0:x}", sh)
+            | Hex h -> String.Format("0x{0:x}", h)
+            | Values (r, g, b) -> "rgb(" + string r + "," + string g + "," + string b + ")"
+            | Percents (r, g, b) -> "rgb(" + string r + "%," + string g + "%," + string b + "%)"
+
 module Color =
     open System
 
@@ -324,10 +333,5 @@ module Color =
     let ofPercents =
         Percents
 
-    let toString color =
-        match color with
-            | Name n -> (Colors.toString n).ToLower()
-            | SmallHex sh -> String.Format("0x{0:x}", sh)
-            | Hex h -> String.Format("0x{0:x}", h)
-            | Values (r, g, b) -> "rgb(" + string r + "," + string g + "," + string b + ")"
-            | Percents (r, g, b) -> "rgb(" + string r + "%," + string g + "%," + string b + "%)"
+    let toString (color :Color) =
+        color.ToString()

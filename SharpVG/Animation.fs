@@ -79,6 +79,8 @@ with
         |> Tag.addAttributes (attributes @ (targetToAttribute animation.Target) @ (additiveToAttribute animation.Additive))
         |> Tag.addAttributes (animation.Timing |> Timing.toAttributes)
 
+    override this.ToString() =
+            this |> Animation.ToTag |> Tag.toString
 
 module Animation =
 
@@ -123,5 +125,6 @@ module Animation =
     let toTag =
         Animation.ToTag
 
-    let toString animation = animation |> toTag |> Tag.toString
+    let toString (animation : Animation) =
+        animation.ToString()
 

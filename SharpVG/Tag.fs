@@ -6,6 +6,14 @@ type Tag =
         Attributes: List<Attribute>;
         Body: string option;
     }
+with
+    override this.ToString() =
+        let attributesToString attributes = (attributes |> List.map Attribute.toString |> String.concat " ")
+        match (List.isEmpty this.Attributes), this with
+        | false, { Name = n; Attributes = a; Body = Some(b) } -> "<" + n + " " + (attributesToString a) + ">" + b + "</" + n + ">"
+        | false, { Name = n; Attributes = a; Body = None } -> "<" + n + " " + (attributesToString a) + "/>"
+        | true, { Name = n; Attributes = a; Body = Some(b) } -> "<" + n + ">" + b + "</" + n + ">"
+        | true, { Name = n; Attributes = a; Body = None } -> "<" + n + "/>"
 
 module Tag =
 
@@ -34,7 +42,7 @@ module Tag =
         |> withAttributes (attributes @ tag.Attributes)
 
     let insertAttribute attribute tag =
-        tag 
+        tag
         |> insertAttributes (List.singleton attribute)
 
     let addBody body tag =
@@ -45,10 +53,5 @@ module Tag =
                 | None -> body
         )
 
-    let toString tag =
-        let attributesToString attributes = (attributes |> List.map Attribute.toString |> String.concat " ")
-        match (List.isEmpty tag.Attributes), tag with
-        | false, { Name = n; Attributes = a; Body = Some(b) } -> "<" + n + " " + (attributesToString a) + ">" + b + "</" + n + ">"
-        | false, { Name = n; Attributes = a; Body = None } -> "<" + n + " " + (attributesToString a) + "/>"
-        | true, { Name = n; Attributes = a; Body = Some(b) } -> "<" + n + ">" + b + "</" + n + ">"
-        | true, { Name = n; Attributes = a; Body = None } -> "<" + n + "/>"
+    let toString (tag : Tag) =
+        tag.ToString()
