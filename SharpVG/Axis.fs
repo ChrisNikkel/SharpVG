@@ -22,8 +22,8 @@ module Axis =
         }
 
     let toElements axis =
-        let yAxis = Line.create (Point.create Length.empty (Length.ofFloat (snd axis.Minimum))) (Point.create Length.empty (Length.ofFloat (snd axis.Maximum))) |> Element.ofLine |> Element.withStyle axis.Style
-        let xAxis = Line.create (Point.create (Length.ofFloat (fst axis.Minimum)) Length.empty) (Point.create (Length.ofFloat (fst axis.Maximum)) Length.empty) |> Element.ofLine |> Element.withStyle axis.Style
+        let yAxis = Line.create (Point.create Length.empty (Length.ofFloat (snd axis.Minimum))) (Point.create Length.empty (Length.ofFloat (snd axis.Maximum))) |> Element.create |> Element.withStyle axis.Style
+        let xAxis = Line.create (Point.create (Length.ofFloat (fst axis.Minimum)) Length.empty) (Point.create (Length.ofFloat (fst axis.Maximum)) Length.empty) |> Element.create |> Element.withStyle axis.Style
 
         match axis.Visible with
             | true, true -> seq [xAxis; yAxis]

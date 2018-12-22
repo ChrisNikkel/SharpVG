@@ -5,6 +5,11 @@ type Circle =
         Center: Point
         Radius: Length
     }
+with
+    static member ToTag circle =
+        Tag.create "circle"
+        |> Tag.withAttributes ((Attribute.createXML "r" (Length.toString circle.Radius)) :: (Point.toAttributesWithModifier "c" "" circle.Center))
+
 
 module Circle =
     let create center radius =
@@ -13,9 +18,8 @@ module Circle =
             Radius = radius
         }
 
-    let toTag circle =
-        Tag.create "circle"
-        |> Tag.withAttributes ((Attribute.createXML "r" (Length.toString circle.Radius)) :: (Point.toAttributesWithModifier "c" "" circle.Center))
+    let toTag =
+        Circle.ToTag
 
     let toString =
         toTag >> Tag.toString

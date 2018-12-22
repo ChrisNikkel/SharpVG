@@ -13,7 +13,7 @@ module Tests =
       let style = Style.createWithStroke <| Values(r, g, b)
       let element =
         Rect.create Point.origin Area.full
-          |> Element.ofRect
+          |> Element.create
           |> Element.withStyle style
           |> Element.toString
 
@@ -26,7 +26,7 @@ module Tests =
         let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat p, o, fo
         let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let line = Line.create point1 point2
-        let tag = line |> Element.ofLine |> Element.withStyle style |> Element.toString
+        let tag = line |> Element.create |> Element.withStyle style |> Element.toString
 
         checkBodylessTag "line" tag
 
@@ -37,7 +37,7 @@ module Tests =
         let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat p, o, fo
         let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let rect = Rect.create point area
-        let tag = rect |> Element.ofRect |> Element.withStyle style |> Element.toString
+        let tag = rect |> Element.create |> Element.withStyle style |> Element.toString
 
         checkBodylessTag "rect" tag
 
@@ -47,7 +47,7 @@ module Tests =
         let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat p, o, fo
         let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let circle = Circle.create point (Length.ofFloat radius)
-        let tag = circle |> Element.ofCircle |> Element.withStyle style |> Element.toString
+        let tag = circle |> Element.create |> Element.withStyle style |> Element.toString
 
         checkBodylessTag "circle" tag
 
@@ -58,7 +58,7 @@ module Tests =
         let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat p, o, fo
         let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let ellipse = Ellipse.create point1 point2
-        let tag = ellipse |> Element.ofEllipse |> Element.withStyle style |> Element.toString
+        let tag = ellipse |> Element.create |> Element.withStyle style |> Element.toString
 
         checkBodylessTag "ellipse" tag
 
@@ -67,7 +67,7 @@ module Tests =
         let point = Point.ofFloats (x, y)
         let area = Area.ofFloats (h, w)
         let image = Image.create point area "test.jpg"
-        let tag = image |> Element.ofImage |> Element.toString
+        let tag = image |> Element.create |> Element.toString
 
         checkBodylessTag "image" tag
 
@@ -77,7 +77,7 @@ module Tests =
         let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat p, o, fo
         let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let text = Text.create point "test"
-        let tag = text |> Element.ofText |> Element.withStyle style |> Element.toString
+        let tag = text |> Element.create |> Element.withStyle style |> Element.toString
 
         checkTag "text" tag
 
@@ -93,7 +93,7 @@ module Tests =
         let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let circle = Circle.create point (Length.ofFloat radius)
         let animation = Animation.createMotion timing path None
-        let tag = circle |> Element.ofCircle |> Element.withStyle style |> Element.withAnimation animation |> Element.toString
+        let tag = circle |> Element.create |> Element.withStyle style |> Element.withAnimation animation |> Element.toString
 
         checkTag "circle" tag
 
@@ -112,13 +112,13 @@ module Tests =
         let area = Area.create length length
 
         let graphics = seq {
-            yield Image.create point area "myimage1.jpg" |> Element.ofImage
-            yield Image.create point area "myimage2.jpg" |> Element.ofImage |> Element.withStyle style1
-            yield Text.create point "Hello World!" |> Element.ofText |> Element.withStyle style2
-            yield Line.create point point |> Element.ofLine |> Element.withStyle style1
-            yield Rect.create point area |> Element.ofRect |> Element.withStyle style2
-            yield Circle.create point length |> Element.ofCircle
-            yield Ellipse.create point point |> Element.ofEllipse |> Element.withStyle style1
+            yield Image.create point area "myimage1.jpg" |> Element.create
+            yield Image.create point area "myimage2.jpg" |> Element.create |> Element.withStyle style1
+            yield Text.create point "Hello World!" |> Element.create |> Element.withStyle style2
+            yield Line.create point point |> Element.create |> Element.withStyle style1
+            yield Rect.create point area |> Element.create |> Element.withStyle style2
+            yield Circle.create point length |> Element.create
+            yield Ellipse.create point point |> Element.create |> Element.withStyle style1
         }
 
         let html = graphics |> Svg.ofSeq |> Svg.toHtml "SVG Demo"

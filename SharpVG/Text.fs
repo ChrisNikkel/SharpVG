@@ -14,24 +14,8 @@ type Text =
         FontSize: int option
         Anchor: TextAnchor option
     }
-
-module Text =
-    let create upperLeft body =
-        { UpperLeft = upperLeft; Body = body; FontFamily = None; FontSize = None; Anchor = None }
-
-    let withFont family size text =
-        { text with FontFamily = Some(family); FontSize = Some(size) }
-
-    let withFontFamily family text =
-        { text with FontFamily = Some(family) }
-
-    let withFontSize size text =
-        { text with FontSize = Some(size) }
-
-    let withAnchor anchor text =
-        { text with Anchor = Some(anchor) }
-
-    let toTag text =
+with
+    static member ToTag text =
         Tag.create "text"
         |> Tag.withAttributes (Point.toAttributes text.UpperLeft)
         |> Tag.addAttributes
@@ -56,5 +40,24 @@ module Text =
                         | None -> []
             )
         |> Tag.addBody text.Body
+
+module Text =
+    let create upperLeft body =
+        { UpperLeft = upperLeft; Body = body; FontFamily = None; FontSize = None; Anchor = None }
+
+    let withFont family size text =
+        { text with FontFamily = Some(family); FontSize = Some(size) }
+
+    let withFontFamily family text =
+        { text with FontFamily = Some(family) }
+
+    let withFontSize size text =
+        { text with FontSize = Some(size) }
+
+    let withAnchor anchor text =
+        { text with Anchor = Some(anchor) }
+
+    let toTag =
+        Text.ToTag
 
     let toString text = text |> toTag |> Tag.toString

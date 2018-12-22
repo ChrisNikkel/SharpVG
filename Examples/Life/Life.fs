@@ -99,7 +99,7 @@ let main argv =
 
     let makeElement x y =
         let point = Point.create <| Length.ofFloat (float x * cellSize) <| Length.ofFloat (float y * cellSize)
-        Circle.create point <| Length.ofFloat (cellSize / 2.0) |> Element.ofCircle
+        Circle.create point <| Length.ofFloat (cellSize / 2.0) |> Element.create
 
     let addAnimation element times =
         let duration = TimeSpan.FromSeconds(delay)

@@ -1,9 +1,29 @@
 namespace SharpVG
 
+type Polygon =
+    {
+        Points: seq<Point>
+    }
+with
+    static member ToTag polygon =
+        Tag.create "polygon" |> Tag.withAttribute (Attribute.createXML "points" <| Points.toString polygon.Points)
+
+    override this.ToString() =
+        this |> Polygon.ToTag |> Tag.toString
+
 module Polygon =
 
-    let toTag points =
-        Tag.create "polygon" |> Tag.withAttribute (Attribute.createXML "points" <| Points.toString points)
+    let ofSeq points =
+        { Points = points }
 
-    let toString points =
-        points |> toTag |> Tag.toString
+    let ofList points =
+        { Points = points |> Seq.ofList }
+
+    let ofArray points =
+        { Points = points |> Seq.ofArray }
+
+    let toTag =
+        Polygon.ToTag
+
+    let toString (polygon : Polygon) =
+        polygon.ToString()

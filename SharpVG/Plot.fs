@@ -49,7 +49,7 @@ module Plot =
         let min, max = discoverSize values
 
         values
-            |> List.map (fun p -> Circle.create (Point.ofFloats p) (Length.ofInt 1) |> Element.ofCircle)
+            |> List.map (fun p -> Circle.create (Point.ofFloats p) (Length.ofInt 1) |> Element.create)
             |> create min max
             |> withAxis (Axis.create min max)
 
@@ -65,7 +65,7 @@ module Plot =
         values
             |> List.scan (fun acc p -> acc |> Path.addAbsolute PathType.LineTo (Point.ofFloats p)) path
             |> List.last
-            |> Element.ofPath
+            |> Element.create
             |> Seq.singleton
             |> create min max
             |> withAxis (Axis.create min max)

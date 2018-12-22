@@ -23,7 +23,7 @@ let opaque, translucent = 1.0, 0.5
 let createRect p c o =
     let style = Style.createWithFill c |> Style.withOpacity 0.5
     let rect = Rect.create (Point.ofInts p) boxArea
-    Element.ofRect rect |> Element.withStyle style
+    Element.create rect |> Element.withStyle style
 
 let render position =
     let pos1, pos2 = position

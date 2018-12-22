@@ -46,6 +46,39 @@ type Animation =
         Target: string option
         Additive: Additive option
     }
+with
+    static member ToTag animation =
+        let calculationModeToAttribute c =
+            let createCalculationMode mode = List.singleton (Attribute.createXML "calculationMode" mode)
+            match c with
+                | Some CalculationMode.Discrete -> createCalculationMode "discrete"
+                | Some CalculationMode.Linear -> createCalculationMode "linear"
+                | Some CalculationMode.Paced -> createCalculationMode "paced"
+                | Some CalculationMode.Spline -> createCalculationMode "spline"
+                | None -> []
+
+        let additiveToAttribute a =
+            let createAdditive mode = List.singleton (Attribute.createXML "additive" mode)
+            match a with
+                | Some Additive.Replace -> createAdditive "replace"
+                | Some Additive.Sum -> createAdditive "sum"
+                | None -> []
+
+        let targetToAttribute t =
+            match t with
+                | Some(t) -> List.singleton (Attribute.createXML "xlink:href" t)
+                | None -> []
+
+        let name, attributes =
+            match animation.AnimationType with
+                | Set c -> "set", [Attribute.createXML "attributeName" c.AttributeName; Attribute.createXML "attributeType" (AttributeType.toString c.AttributeType); Attribute.createXML "to" c.AttributeValue]
+                | Animate c -> "animate", [Attribute.createXML "attributeName" c.AttributeName; Attribute.createXML "attributeType" (AttributeType.toString c.AttributeType); Attribute.createXML "from" c.AttributeFromValue; Attribute.createXML "to" c.AttributeToValue]
+                | Transform (f, t) -> "animateTransform", [Attribute.createXML "attributeName" "transform"; Attribute.createXML "attributeType" "XML"; Attribute.createXML "type" (Transform.getTypeName f); Attribute.createXML "from" (f |> Transform.toString); Attribute.createXML "to" (t |> Transform.toString)]
+                | Motion m -> "animateMotion", [m.Path |> Path.toAttribute] @ (calculationModeToAttribute m.CalculationMode)
+        Tag.create name
+        |> Tag.addAttributes (attributes @ (targetToAttribute animation.Target) @ (additiveToAttribute animation.Additive))
+        |> Tag.addAttributes (animation.Timing |> Timing.toAttributes)
+
 
 module Animation =
 
@@ -87,37 +120,8 @@ module Animation =
     let withTarget target animation =
         {animation with Target = Some(target) }
 
-    let toTag animation =
-        let calculationModeToAttribute c =
-            let createCalculationMode mode = List.singleton (Attribute.createXML "calculationMode" mode)
-            match c with
-                | Some CalculationMode.Discrete -> createCalculationMode "discrete"
-                | Some CalculationMode.Linear -> createCalculationMode "linear"
-                | Some CalculationMode.Paced -> createCalculationMode "paced"
-                | Some CalculationMode.Spline -> createCalculationMode "spline"
-                | None -> []
-
-        let additiveToAttribute a =
-            let createAdditive mode = List.singleton (Attribute.createXML "additive" mode)
-            match a with
-                | Some Additive.Replace -> createAdditive "replace"
-                | Some Additive.Sum -> createAdditive "sum"
-                | None -> []
-
-        let targetToAttribute t =
-            match t with
-                | Some(t) -> List.singleton (Attribute.createXML "xlink:href" t)
-                | None -> []
-
-        let name, attributes =
-            match animation.AnimationType with
-                | Set c -> "set", [Attribute.createXML "attributeName" c.AttributeName; Attribute.createXML "attributeType" (AttributeType.toString c.AttributeType); Attribute.createXML "to" c.AttributeValue]
-                | Animate c -> "animate", [Attribute.createXML "attributeName" c.AttributeName; Attribute.createXML "attributeType" (AttributeType.toString c.AttributeType); Attribute.createXML "from" c.AttributeFromValue; Attribute.createXML "to" c.AttributeToValue]
-                | Transform (f, t) -> "animateTransform", [Attribute.createXML "attributeName" "transform"; Attribute.createXML "attributeType" "XML"; Attribute.createXML "type" (Transform.getTypeName f); Attribute.createXML "from" (f |> Transform.toString); Attribute.createXML "to" (t |> Transform.toString)]
-                | Motion m -> "animateMotion", [m.Path |> Path.toAttribute] @ (calculationModeToAttribute m.CalculationMode)
-        Tag.create name
-        |> Tag.addAttributes (attributes @ (targetToAttribute animation.Target) @ (additiveToAttribute animation.Additive))
-        |> Tag.addAttributes (animation.Timing |> Timing.toAttributes)
+    let toTag =
+        Animation.ToTag
 
     let toString animation = animation |> toTag |> Tag.toString
 

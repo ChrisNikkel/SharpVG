@@ -23,7 +23,7 @@ let insideTriangles t =
   ]
 
 let triangleToPolygon t =
-  [t.A; t.B; t.C] |> Element.ofPolygon
+  [ t.A; t.B; t.C ] |> Polygon.ofList |> Element.create
 
 let rec recursiveTriangles t iteration =
   let it = t |> List.collect insideTriangles;
@@ -74,7 +74,7 @@ let main argv =
     List.map2 (Animation.createTransform timing)
       [sizeStart; rotationStart; offsetStart]
       [sizeEnd; rotationEnd; offsetEnd]
-    |> List.map (Animation.withAdditive Additive.Sum >> Element.ofAnimation)
+    |> List.map (Animation.withAdditive Additive.Sum >> Element.create)
 
   recursiveTriangles startingTriangle iterations
     |> List.map (triangleToPolygon >> (Element.withStyle style))

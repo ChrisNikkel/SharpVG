@@ -10,6 +10,9 @@ type Attribute =
         Value: string
         Type: AttributeType
     }
+with
+    override this.ToString() =
+        this.Name + "=" + "\"" + this.Value + "\""
 
 module Attribute =
 
@@ -22,9 +25,10 @@ module Attribute =
     let createCSS =
         create AttributeType.CSS
 
-    let toString attribute =
-        attribute.Name + "=" + "\"" + attribute.Value + "\""
+    let toString (attribute : Attribute) =
+        attribute.ToString()
 
+// TODO: Move this into default ToString() for AttributeType
 module AttributeType =
     let toString = function
         | AttributeType.CSS -> "CSS"

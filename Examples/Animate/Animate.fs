@@ -13,9 +13,9 @@ let main argv =
         |> Seq.map
             (
                 function
-                    | 1 -> Circle.create Point.origin (Length.ofFloat 10.0) |> Element.ofCircle
-                    | 2 -> Ellipse.create Point.origin Point.origin |> Element.ofEllipse
-                    | 3 -> Rect.create Point.origin (Area.ofFloats (10.0, 10.0)) |> Element.ofRect
+                    | 1 -> Circle.create Point.origin (Length.ofFloat 10.0) |> Element.create
+                    | 2 -> Ellipse.create Point.origin Point.origin |> Element.create
+                    | 3 -> Rect.create Point.origin (Area.ofFloats (10.0, 10.0)) |> Element.create
                     | _ -> failwith "inconceivable"
             )
     let fileName = "Animate.html"

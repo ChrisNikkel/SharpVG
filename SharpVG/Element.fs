@@ -1,21 +1,9 @@
 namespace SharpVG
 
-type BaseElement =
-    | Line of Line
-    | Text of Text
-    | Image of Image
-    | Circle of Circle
-    | Ellipse of Ellipse
-    | Rect of Rect
-    | Polygon of seq<Point>
-    | Polyline of seq<Point>
-    | Path of Path
-    | Animation of Animation
-
 type Element = {
         Id: string option
         Classes: seq<string>
-        Element: BaseElement
+        BaseTag: Tag
         Style: Style option
         Transform: Transform option
         Animations: seq<Animation>
@@ -23,17 +11,17 @@ type Element = {
 
 module Element =
 
-    let create element =
+    let inline create< ^T when ^T: (static member ToTag: ^T -> Tag)> taggable =
         {
             Id = None
             Classes = Seq.empty
-            Element = element
+            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = None
             Transform = None
             Animations = Seq.empty
         }
 
-    let withStyle style (element:Element) =
+    let withStyle style element =
         { element with Style = Some style }
 
     let withTransform transform element =
@@ -60,17 +48,6 @@ module Element =
     let addClass className element =
         element.Classes |> Seq.append (Seq.singleton className)
 
-    let ofLine line = create (Line line)
-    let ofText text = create (Text text)
-    let ofImage image = create (Image image)
-    let ofCircle circle = create (Circle circle)
-    let ofEllipse ellipse = create (Ellipse ellipse)
-    let ofRect rect = create (Rect rect)
-    let ofPolygon polygon = create (Polygon polygon)
-    let ofPolyline polyline = create (Polyline polyline)
-    let ofPath path = create (Path path)
-    let ofAnimation animation = create (Animation animation)
-
     let toTag element =
         let styleClass =
             match element.Style with
@@ -82,17 +59,7 @@ module Element =
                 | Some n -> element.Classes |> Seq.append (Seq.singleton n)
                 | None -> element.Classes
 
-        match element.Element with
-            | Line line -> line |> Line.toTag
-            | Text text -> text |> Text.toTag
-            | Image image -> image |> Image.toTag
-            | Circle circle -> circle |> Circle.toTag
-            | Ellipse ellipse -> ellipse |> Ellipse.toTag
-            | Rect rect -> rect |> Rect.toTag
-            | Polygon polygon -> polygon |> Polygon.toTag
-            | Polyline polyline -> polyline |> Polyline.toTag
-            | Path path -> path |> Path.toTag
-            | Animation animation -> animation |> Animation.toTag
+        element.BaseTag
         |> Tag.insertAttributes
             (
                 [

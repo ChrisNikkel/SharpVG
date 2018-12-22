@@ -9,6 +9,39 @@ type Style =
         FillOpacity: float option;
         Name: string option;
     }
+with
+    static member private MapToString f style =
+        [
+            style.Stroke |> Option.map (Color.toString >> (f "stroke"));
+            style.StrokeWidth |> Option.map (Length.toString >> (f "stroke-width"));
+            style.Fill |> Option.map (Color.toString >> (f "fill"));
+            style.Opacity |> Option.map (string >> (f "opacity"));
+            style.FillOpacity |> Option.map (string >> (f "fill-opacity"))
+        ] |> List.choose id
+
+    static member ToAttributes style =
+        Style.MapToString Attribute.createCSS style
+
+    static member ToString style =
+        let stylePartToString name value = name + ":" + value
+        Style.MapToString stylePartToString style  |> String.concat ";"
+
+    static member ToCssString style =
+        (match style.Name with | Some name  -> "." + name + " " | None -> "") + "{" + (style |> Style.ToString) + "}"
+    static member ToTag style =
+        Tag.create "style"
+        |> Tag.withAttribute (Attribute.createCSS "type" "text/css")
+        |> Tag.withBody ("<![CDATA[" + (Style.ToCssString style) + "]]>")
+
+type Styles =
+    {
+        Styles: seq<Style>
+    }
+with
+    static member ToTag styles =
+        Tag.create "style"
+        |> Tag.withAttribute (Attribute.createCSS "type" "text/css")
+        |> Tag.withBody ("<![CDATA[" + (styles |> Seq.map Style.ToCssString |> String.concat " ") + "]]>")
 
 module Style =
     let empty =
@@ -56,39 +89,24 @@ module Style =
     let isNamed style =
         style.Name.IsSome
 
-    let private mapToString f style =
-        [
-            style.Stroke |> Option.map (Color.toString >> (f "stroke"));
-            style.StrokeWidth |> Option.map (Length.toString >> (f "stroke-width"));
-            style.Fill |> Option.map (Color.toString >> (f "fill"));
-            style.Opacity |> Option.map (string >> (f "opacity"));
-            style.FillOpacity |> Option.map (string >> (f "fill-opacity"))
-        ] |> List.choose id
+    let toAttributes =
+        Style.ToAttributes
 
-    let toAttributes style =
-        mapToString Attribute.createCSS style
-
-    let toString style =
-        let stylePartToString name value =
-           name + ":" + value
-        mapToString stylePartToString style  |> String.concat ";"
+    let toString =
+        Style.ToString
 
     let toAttribute style =
         Attribute.createCSS "style" (toString style)
 
-    let toCssString style =
-        (match style.Name with | Some name  -> "." + name + " " | None -> "") + "{" + (style |> toString) + "}"
+    let toCssString =
+        Style.ToCssString
 
-    let toTag style =
-        Tag.create "style"
-        |> Tag.withAttribute (Attribute.createCSS "type" "text/css")
-        |> Tag.withBody ("<![CDATA[" + (toCssString style) + "]]>")
+    let toTag =
+        Style.ToTag
 
 module Styles =
-    let toTag styles =
-        Tag.create "style"
-        |> Tag.withAttribute (Attribute.createCSS "type" "text/css")
-        |> Tag.withBody ("<![CDATA[" + (styles |> Seq.map Style.toCssString |> String.concat " ") + "]]>")
+    let toTag =
+        Styles.ToTag
 
     let toString styles =
         styles |> toTag |> Tag.toString

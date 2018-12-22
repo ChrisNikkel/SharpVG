@@ -5,6 +5,10 @@ type Ellipse =
         Center: Point
         Radius: Point
     }
+with
+    static member ToTag circle =
+        Tag.create "ellipse"
+        |> Tag.withAttributes ((Point.toAttributesWithModifier "c" "" circle.Center) @ (Point.toAttributesWithModifier "r" "" circle.Radius))
 
 module Ellipse =
     let create center radius =
@@ -13,9 +17,8 @@ module Ellipse =
             Radius = radius
         }
 
-    let toTag circle =
-        Tag.create "ellipse"
-        |> Tag.withAttributes ((Point.toAttributesWithModifier "c" "" circle.Center) @ (Point.toAttributesWithModifier "r" "" circle.Radius))
+    let toTag  =
+        Ellipse.ToTag
 
     let toString =
         toTag >> Tag.toString

@@ -19,25 +19,12 @@ type PathPart =
     | LengthPart of PathPositioning*PathType*Point
     | ClosePath
 
-type Path = seq<PathPart>
-
-module Path =
-
-    let empty = Seq.empty
-
-    let add pathPositioning pathType point path =
-        Seq.append path (Seq.singleton (LengthPart(pathPositioning, pathType, point)))
-
-    let addRelative pathType point path =
-        add Relative pathType point path
-
-    let addAbsolute pathType point path =
-        add Absolute pathType point path
-
-    let addClosePath path =
-        Seq.append path (Seq.singleton ClosePath)
-
-    let toDataString path =
+type Path =
+    {
+        PathParts: seq<PathPart>
+    }
+with
+    static member ToDataString path =
         let pathTypeToString pathType =
             match pathType with
                     | LengthPart(positioning, style, point) ->
@@ -57,16 +44,45 @@ module Path =
                             | Relative -> letter.ToLower()
                         + (Point.toStringWithSeparator " " point)
                     | ClosePath -> "Z"
-        path
+        path.PathParts
         |> Seq.map pathTypeToString
         |> String.concat " "
+    static member ToTag path =
+        Tag.create "path"
+            |> Tag.withAttribute (Attribute.createXML "d" (path |> Path.ToDataString))
+
+module Path =
+
+    let empty = { PathParts = Seq.empty }
+
+// TODO: Add helper functions for seq, list, array to path
+(*
+    let ofSeq pathType parts =
+        { PathParts = parts }
+
+    let ofList pathType parts =
+        { PathParts = parts |> Seq.ofList }
+
+    let ofArray pathType parts =
+        { PathParts = parts |> Seq.ofArray }
+*)
+    let add pathPositioning pathType point path =
+        { path with PathParts = Seq.append path.PathParts (Seq.singleton (LengthPart(pathPositioning, pathType, point))) }
+
+    let addRelative pathType point path =
+        add Relative pathType point path
+
+    let addAbsolute pathType point path =
+        add Absolute pathType point path
+
+    let addClosePath path =
+        { path with PathParts = Seq.append path.PathParts (Seq.singleton ClosePath) }
 
     let toAttribute path =
-        Attribute.createXML "path" (path |> toDataString)
+        Attribute.createXML "path" (path |> Path.ToDataString)
 
-    let toTag path =
-        Tag.create "path"
-        |> Tag.withAttribute (Attribute.createXML "d" (path |> toDataString))
+    let toTag =
+        Path.ToTag
 
     let toString path =
         path |> toTag |> Tag.toString
