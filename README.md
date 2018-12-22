@@ -26,8 +26,7 @@ let area = Area.ofInts (50, 50)
 let style = Style.create (Name Colors.Cyan) (Name Colors.Blue) (Length.ofInt 3) 1.0
 
 Rect.create upperLeft area
-  |> Element.create
-  |> Element.withStyle style
+  |> Element.createWithStyle style
   |> Element.toString
   |> printf "%A"
 ```
@@ -42,8 +41,7 @@ let radius = Length.ofInt 50
 let style = Style.create (Name Colors.Violet) (Name Colors.Indigo) (Length.ofInt 3) 1.0
 
 Circle.create center radius
-  |> Element.create
-  |> Element.withStyle style
+  |> Element.createWithStyle style
   |> Svg.ofElement
   |> Svg.toHtml "Example"
   |> printf "%s"
