@@ -53,14 +53,14 @@ module Style =
     let withName name (style : Style) =
         { style with Name = Some(name) }
 
-    let createWithPen (pen : Pen) =
-        { Stroke = Some(pen.Stroke); Opacity = pen.Opacity; StrokeWidth = pen.Width; Fill = None; FillOpacity = None; Name = None; }
+    let createWithPen pen =
+        { Stroke = Some(pen.Color); Opacity = pen.Opacity; StrokeWidth = pen.Width; Fill = None; FillOpacity = None; Name = None; }
 
-    let withStrokePen (pen : Pen)  style =
-        { style with Stroke = Some(pen.Stroke); Opacity = pen.Opacity; StrokeWidth = pen.Width }
+    let withStrokePen pen style =
+        { style with Stroke = Some(pen.Color); Opacity = pen.Opacity; StrokeWidth = pen.Width }
 
-    let withFillPen (pen : Pen)  style =
-        { style with Fill = Some(pen.Stroke); FillOpacity = pen.Opacity }
+    let withFillPen pen style =
+        { style with Fill = Some(pen.Color); FillOpacity = pen.Opacity }
 
     let withFill fill style =
         { style with Fill = Some(fill) }

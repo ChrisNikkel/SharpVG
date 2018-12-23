@@ -2,14 +2,14 @@ namespace SharpVG
 
 type Pen =
     {
-        Stroke: Color;
+        Color: Color;
         Opacity: float option;
         Width: Length option;
     }
 
 module Pen =
-    let create stroke =
-        { Stroke = stroke; Opacity = None; Width = None }
+    let create color =
+        { Color = color; Opacity = None; Width = None }
 
     let red =
         create (Name Colors.Red)
@@ -25,6 +25,7 @@ module Pen =
 
     let gray =
         create (Name Colors.Gray)
+
     let yellow =
         create (Name Colors.Yellow)
 
@@ -37,14 +38,14 @@ module Pen =
     let white =
         create (Name Colors.White)
 
-    let createWithOpacity stroke opacity =
-        { Stroke = stroke; Opacity = Some(opacity); Width = None }
+    let createWithOpacity color opacity =
+        { Color = color; Opacity = Some(opacity); Width = None }
 
-    let createWithWidth stroke width =
-        { Stroke = stroke; Opacity = None; Width = Some(width) }
+    let createWithWidth color width =
+        { Color = color; Opacity = None; Width = Some(width) }
 
-    let createWithOpacityAndWidth stroke opacity width =
-        { Stroke = stroke; Opacity = Some(opacity); Width = Some(width) }
+    let createWithOpacityAndWidth color opacity width =
+        { Color = color; Opacity = Some(opacity); Width = Some(width) }
 
     let withOpacity opacity pen =
         { pen with Opacity = Some(opacity) }
