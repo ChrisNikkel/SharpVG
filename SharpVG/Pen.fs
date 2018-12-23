@@ -34,6 +34,9 @@ module Pen =
     let orange =
         create (Name Colors.Orange)
 
+    let white =
+        create (Name Colors.White)
+
     let createWithOpacity stroke opacity =
         { Stroke = stroke; Opacity = Some(opacity); Width = None }
 
