@@ -23,11 +23,10 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
 ```F#
 let upperLeft = Point.ofInts (10, 10)
 let area = Area.ofInts (50, 50)
-let style = Style.create (Name Colors.Cyan) (Name Colors.Blue) (Length.ofInt 3) 1.0
+let style = Style.create (Name Colors.Cyan) (Name Colors.Blue) (Length.ofInt 3) 1.0 1.0
 
 Rect.create upperLeft area
   |> Element.createWithStyle style
-  |> Element.toString
   |> printf "%O"
 ```
 
@@ -38,7 +37,7 @@ Rect.create upperLeft area
 ```F#
 let center = Point.ofInts (60, 60)
 let radius = Length.ofInt 50
-let style = Style.create (Name Colors.Violet) (Name Colors.Indigo) (Length.ofInt 3) 1.0
+let style = Style.create (Name Colors.Violet) (Name Colors.Indigo) (Length.ofInt 3) 1.0 1.0
 
 Circle.create center radius
   |> Element.createWithStyle style
