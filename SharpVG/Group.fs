@@ -56,7 +56,7 @@ module Group =
 
     let rec toStyleSet group =
         group.Body
-            |> Seq.map (function | Element(e) -> e.Style |> Option.toList |> Set.ofList | Group(g) -> g |> toStyleSet)
+            |> Seq.map (function | Element(e) -> e.Body.Style |> Option.toList |> Set.ofList | Group(g) -> g |> toStyleSet)
             |> Seq.reduce (+)
 
     let rec toString group =
@@ -85,6 +85,6 @@ module Body =
         |> Seq.map (fun b ->
             match b with
                 | Group(g) -> g |> Group.toStyleSet
-                | Element(e) -> e.Style |> Option.toList |> Set.ofList)
+                | Element(e) -> e.Body.Style |> Option.toList |> Set.ofList)
         |> Seq.reduce (+)
         |> Set.toSeq

@@ -1,38 +1,46 @@
 namespace SharpVG
 
-type Element = {
-        Name: string option
+type ElementBody = {
         Classes: seq<string>
         BaseTag: Tag
         Style: Style option
         Transform: Transform option
         Animations: seq<Animation>
     }
+
+type ElementIdentity = Unnamed | Named of string
+
+type Element =
+    {
+        Identity : ElementIdentity
+        Body : ElementBody
+    }
 with
     static member ToTag element =
+        let body = element.Body
         let styleClass =
-            match element.Style with
+            match body.Style with
                 | Some s -> s.Name
                 | None -> None
 
         let classes =
             match styleClass with
-                | Some n -> element.Classes |> Seq.append (Seq.singleton n)
-                | None -> element.Classes
+                | Some n -> body.Classes |> Seq.append (Seq.singleton n)
+                | None -> body.Classes
 
-        element.BaseTag
+        body.BaseTag
+        |> Tag.insertAttributes (match element.Identity with Named name -> [ Attribute.createCSS "id" name ] | Unnamed -> [])
         |> Tag.insertAttributes
             (
                 [
-                    element.Name |> Option.map (Attribute.createCSS "id" >> List.singleton)
                     classes |> Seq.map (Attribute.createCSS "class") |> Seq.toList |> Option.Some
-                    element.Style |> Option.filter (not << Style.isNamed) |> Option.map Style.toAttributes
-                    element.Transform |> Option.map (Transform.toAttribute >> List.singleton)
+                    body.Style |> Option.filter (not << Style.isNamed) |> Option.map Style.toAttributes
+                    body.Transform |> Option.map (Transform.toAttribute >> List.singleton)
                 ]
                 |> List.choose id
                 |> List.concat
             )
-        |> if element.Animations |> Seq.isEmpty then id else Tag.addBody (element.Animations |> Seq.map Animation.toString |> String.concat "")
+        |> if body.Animations |> Seq.isEmpty then id else Tag.addBody (body.Animations |> Seq.map Animation.toString |> String.concat "")
 
     override this.ToString() =
         this |> Element.ToTag |> Tag.toString
@@ -41,60 +49,69 @@ module Element =
 
     let inline create< ^T when ^T: (static member ToTag: ^T -> Tag)> taggable =
         {
-            Name = None
-            Classes = Seq.empty
-            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
-            Style = None
-            Transform = None
-            Animations = Seq.empty
+            Identity = Unnamed
+            Body =
+                {
+                    Classes = Seq.empty
+                    BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+                    Style = None
+                    Transform = None
+                    Animations = Seq.empty
+                }
         }
 
     let inline createWithStyle< ^T when ^T: (static member ToTag: ^T -> Tag)> style taggable =
         {
-            Name = None
-            Classes = Seq.empty
-            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
-            Style = Some(style)
-            Transform = None
-            Animations = Seq.empty
+            Identity = Unnamed
+            Body =
+                {
+                    Classes = Seq.empty
+                    BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+                    Style = Some(style)
+                    Transform = None
+                    Animations = Seq.empty
+                }
         }
 
-    let inline createWithId< ^T when ^T: (static member ToTag: ^T -> Tag)> id taggable =
+    let inline createWithName< ^T when ^T: (static member ToTag: ^T -> Tag)> name taggable =
         {
-            Name = Some(id)
-            Classes = Seq.empty
-            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
-            Style = None
-            Transform = None
-            Animations = Seq.empty
+            Identity = Named name
+            Body =
+                {
+                    Classes = Seq.empty
+                    BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+                    Style = None
+                    Transform = None
+                    Animations = Seq.empty
+                }
         }
 
-    let withStyle style element =
-        { element with Style = Some style }
+    let withStyle style (element : Element) =
+        { element with Body = { element.Body with Style = Some style } }
 
-    let withTransform transform element =
-        { element with Transform = Some transform }
+    let withTransform transform (element : Element) =
+        { element with Body = { element.Body with Transform = Some transform } }
 
-    let withAnimation animation element =
-        { element with Animations = Seq.singleton animation }
+    let withAnimation animation (element : Element) =
+        { element with Body = { element.Body with Animations = Seq.singleton animation } }
 
-    let withAnimations animations element =
-        { element with Animations = animations }
+    let withAnimations animations (element : Element) =
+        { element with Body = { element.Body with Animations = animations } }
 
-    let addAnimation animation element =
-        element.Animations |> Seq.append (Seq.singleton animation)
+    let addAnimation animation (element : Element) =
+        { element with Body = { element.Body with Animations = element.Body.Animations |> Seq.append (Seq.singleton animation) } }
 
     let withName name (element : Element) =
-        { element with Name = Some name }
+        { element with Identity = Named name }
 
-    let withClass className element =
-        { element with Classes = Seq.singleton className }
+    let withClass className (element : Element) =
+        { element with Body = { element.Body with Classes = Seq.singleton className } }
 
-    let withClasses classes element =
-        { element with Classes = classes }
+    let withClasses classes (element : Element) =
+        { element with Body = { element.Body with Classes = classes } }
 
-    let addClass className element =
-        element.Classes |> Seq.append (Seq.singleton className)
+    let addClass className (element : Element) =
+        { element with Body = { element.Body with Classes = element.Body.Classes |> Seq.append (Seq.singleton className) } }
 
     let toTag =
         Element.ToTag
