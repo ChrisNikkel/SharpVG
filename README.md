@@ -2,7 +2,7 @@
 
 [![Travis CI Build Status](https://travis-ci.org/ChrisNikkel/SharpVG.svg?branch=master)](https://travis-ci.org/ChrisNikkel/SharpVG) [![Join the chat at https://gitter.im/SharpVG/Lobby](https://badges.gitter.im/SharpVG/Lobby.svg)](https://gitter.im/SharpVG/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-A .NET Core library for F# to generate vector graphics in SVG format.
+A .NET Standard library for F# to generate vector graphics in SVG format.
 
 _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions](https://github.com/ChrisNikkel/SharpVG/issues) are greatly appreciated._
 
@@ -23,11 +23,10 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
 ```F#
 let upperLeft = Point.ofInts (10, 10)
 let area = Area.ofInts (50, 50)
-let style = Style.create (Name Colors.Cyan) (Name Colors.Blue) (Length.ofInt 3) 1.0
+let style = Style.create (Name Colors.Cyan) (Name Colors.Blue) (Length.ofInt 3) 1.0 1.0
 
 Rect.create upperLeft area
   |> Element.createWithStyle style
-  |> Element.toString
   |> printf "%O"
 ```
 
@@ -38,7 +37,7 @@ Rect.create upperLeft area
 ```F#
 let center = Point.ofInts (60, 60)
 let radius = Length.ofInt 50
-let style = Style.create (Name Colors.Violet) (Name Colors.Indigo) (Length.ofInt 3) 1.0
+let style = Style.create (Name Colors.Violet) (Name Colors.Indigo) (Length.ofInt 3) 1.0 1.0
 
 Circle.create center radius
   |> Element.createWithStyle style
