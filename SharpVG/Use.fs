@@ -16,8 +16,10 @@ with
 
 module Use =
 
-    let create name position : Use =
-        { Name = name; Position = position; Size = None }
+    let create element position : Use =
+        match element with
+            | Named name -> { Name = name; Position = position; Size = None }
+            | Unnamed -> failwith "Can not use an element without a name"
 
     let toTag =
         Use.ToTag
