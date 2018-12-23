@@ -59,6 +59,16 @@ module Element =
             Animations = Seq.empty
         }
 
+    let inline createWithId< ^T when ^T: (static member ToTag: ^T -> Tag)> id taggable =
+        {
+            Id = Some(id)
+            Classes = Seq.empty
+            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+            Style = None
+            Transform = None
+            Animations = Seq.empty
+        }
+
     let withStyle style element =
         { element with Style = Some style }
 
