@@ -30,6 +30,20 @@
         "panel" : "dedicated"
       },
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "pack",
+      "command": "dotnet pack SharpVG -c Release -o nupkgs",
+      "type": "shell",
+      "group": {
+        "kind" : "build",
+        "isDefault" : true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel" : "dedicated"
+      },
+      "problemMatcher": "$msCompile"
     }
   ]
 }
