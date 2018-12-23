@@ -8,7 +8,7 @@ type TextAnchor =
 
 type Text =
     {
-        UpperLeft: Point
+        Position: Point
         Body: string
         FontFamily: string option
         FontSize: int option
@@ -17,7 +17,7 @@ type Text =
 with
     static member ToTag text =
         Tag.create "text"
-        |> Tag.withAttributes (Point.toAttributes text.UpperLeft)
+        |> Tag.withAttributes (Point.toAttributes text.Position)
         |> Tag.addAttributes
             (
                     match text.FontFamily with
@@ -45,8 +45,8 @@ with
         this |> Text.ToTag |> Tag.toString
 
 module Text =
-    let create upperLeft body =
-        { UpperLeft = upperLeft; Body = body; FontFamily = None; FontSize = None; Anchor = None }
+    let create position body =
+        { Position = position; Body = body; FontFamily = None; FontSize = None; Anchor = None }
 
     let withFont family size text =
         { text with FontFamily = Some(family); FontSize = Some(size) }

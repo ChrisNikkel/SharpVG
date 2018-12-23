@@ -2,21 +2,21 @@ namespace SharpVG
 
 type Image =
     {
-        UpperLeft: Point
+        Position: Point
         Size: Area
         Source: string
     }
 with
     static member ToTag image =
-        Tag.create "image" |> Tag.withAttributes ((Point.toAttributes image.UpperLeft) @ (Area.toAttributes image.Size) @ [Attribute.createXML "xlink:href" image.Source])
+        Tag.create "image" |> Tag.withAttributes ((Point.toAttributes image.Position) @ (Area.toAttributes image.Size) @ [Attribute.createXML "xlink:href" image.Source])
 
     override this.ToString() =
         this |> Image.ToTag |> Tag.toString
 
 module Image =
 
-    let create upperLeft size source =
-        { UpperLeft = upperLeft; Size = size; Source = source }
+    let create position size source =
+        { Position = position; Size = size; Source = source }
 
     let toTag =
         Image.ToTag

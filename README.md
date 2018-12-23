@@ -21,11 +21,11 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
 ## Examples
 
 ```F#
-let upperLeft = Point.ofInts (10, 10)
+let position = Point.ofInts (10, 10)
 let area = Area.ofInts (50, 50)
 let style = Style.create (Name Colors.Cyan) (Name Colors.Blue) (Length.ofInt 3) 1.0 1.0
 
-Rect.create upperLeft area
+Rect.create position area
   |> Element.createWithStyle style
   |> printf "%O"
 ```
