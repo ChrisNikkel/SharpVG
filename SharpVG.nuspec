@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>SharpVG</id>
+    <title>SharpVG</title>
+    <version>0.0.1</version>
+    <iconUrl></iconUrl>
+    <description>
+      Create SVG vector graphics in F#
+    </description>
+    <summary>
+      A .NET Standard library for F# to generate vector graphics in SVG format
+    </summary>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <authors>Chris Nikkel</authors>
+    <copyright>Copyright Â© Chris Nikkel 2018</copyright>
+    <licenseUrl>https://github.com/ChrisNikkel/SharpVG/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/ChrisNikkel/SharpVG</projectUrl>
+    <tags>Graphics, F#, Fable, SVG, vector graphics</tags>
+  </metadata>
+  <files>
+    <file src="SharpVG/*.fs/**" target="src" />
+    <file src="SharpVG/SharpVG.fsproj" target="src" />
+    <file src="README.md" target="src" />
+    <file src="Tests/**" exclude="*" />
+    <file src="Examples/**" exclude="*" />
+    <file src="Helpers/**" exclude="*" />
+    <file src=".git/**" exclude="*" />
+    <file src=".vscode/**" exclude="*" />
+    <file src="node_modules/**" exclude="*"/>
+  </files>
+</package>
