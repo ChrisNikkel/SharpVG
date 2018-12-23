@@ -1,7 +1,7 @@
 namespace SharpVG
 
 type Element = {
-        Id: string option
+        Name: string option
         Classes: seq<string>
         BaseTag: Tag
         Style: Style option
@@ -24,7 +24,7 @@ with
         |> Tag.insertAttributes
             (
                 [
-                    element.Id |> Option.map (Attribute.createCSS "id" >> List.singleton)
+                    element.Name |> Option.map (Attribute.createCSS "id" >> List.singleton)
                     classes |> Seq.map (Attribute.createCSS "class") |> Seq.toList |> Option.Some
                     element.Style |> Option.filter (not << Style.isNamed) |> Option.map Style.toAttributes
                     element.Transform |> Option.map (Transform.toAttribute >> List.singleton)
@@ -41,7 +41,7 @@ module Element =
 
     let inline create< ^T when ^T: (static member ToTag: ^T -> Tag)> taggable =
         {
-            Id = None
+            Name = None
             Classes = Seq.empty
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = None
@@ -51,7 +51,7 @@ module Element =
 
     let inline createWithStyle< ^T when ^T: (static member ToTag: ^T -> Tag)> style taggable =
         {
-            Id = None
+            Name = None
             Classes = Seq.empty
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = Some(style)
@@ -61,7 +61,7 @@ module Element =
 
     let inline createWithId< ^T when ^T: (static member ToTag: ^T -> Tag)> id taggable =
         {
-            Id = Some(id)
+            Name = Some(id)
             Classes = Seq.empty
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = None
@@ -84,8 +84,8 @@ module Element =
     let addAnimation animation element =
         element.Animations |> Seq.append (Seq.singleton animation)
 
-    let withId id element =
-        { element with Id = Some id }
+    let withName name (element : Element) =
+        { element with Name = Some name }
 
     let withClass className element =
         { element with Classes = Seq.singleton className }
