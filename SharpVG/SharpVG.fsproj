@@ -39,6 +39,7 @@
     <Compile Include="Rect.fs" />
     <Compile Include="Text.fs" />
     <Compile Include="Script.fs" />
+    <Compile Include="Pen.fs" />
     <Compile Include="Style.fs" />
     <Compile Include="Timing.fs" />
     <Compile Include="Transform.fs" />
