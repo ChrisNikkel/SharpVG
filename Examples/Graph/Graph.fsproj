@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SharpVG\SharpVG.fsproj" />
+    <ProjectReference Include="..\..\Helpers\Helpers.fsproj" />
   </ItemGroup>
 
 </Project>

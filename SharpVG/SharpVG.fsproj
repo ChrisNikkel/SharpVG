@@ -33,8 +33,4 @@
     <Compile Include="Svg.fs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Helpers\Helpers.fsproj" />
-  </ItemGroup>
-
 </Project>
