@@ -13,8 +13,6 @@ with
 
 module Polyline =
 
-    let empty =
-        { Points = Seq.empty }
     let create points =
         { Points = points }
 

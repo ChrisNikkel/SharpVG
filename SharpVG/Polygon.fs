@@ -12,8 +12,6 @@ with
         this |> Polygon.ToTag |> Tag.toString
 
 module Polygon =
-    let empty =
-        { Points = Seq.empty }
 
     let create points =
         { Points = points }
