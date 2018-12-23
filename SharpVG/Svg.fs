@@ -1,20 +1,15 @@
 namespace SharpVG
 
-type Viewbox = {
-    Minimum: Point
-    Size: Area
-}
-
 type Svg = {
     Body: Body
     Size: Area option
-    Viewbox: Viewbox option
+    ViewBox: ViewBox option
 }
 with
     override this.ToString() =
         let attributes =
             match this.Size with | Some size -> Area.toAttributes size | None -> []
-            @ match this.Viewbox with | Some viewbox -> [Attribute.createXML "viewBox" ((Point.toString viewbox.Minimum) + " " + (Area.toString viewbox.Size))] | None -> []
+            @ match this.ViewBox with | Some viewBox -> ViewBox.toAttributes viewBox | None -> []
 
         let styles =
           let namedStyles = this.Body |> Body.toStyles |> Styles.named
@@ -37,8 +32,8 @@ module Svg =
     let withSize size (svg:Svg) =
         { svg with Size = Some(size) }
 
-    let withViewbox minimum size (svg:Svg) =
-        { svg with Viewbox = Some({ Minimum = minimum; Size = size }) }
+    let withViewBox viewBox (svg:Svg) =
+        { svg with ViewBox = Some(viewBox) }
 
     /// <summary>
     /// This function takes seqence of elements and creates a simple svg object.
@@ -49,7 +44,7 @@ module Svg =
         {
             Body = seq |> Seq.map (fun e -> Element(e))
             Size = None
-            Viewbox = None
+            ViewBox = None
         }
 
     let ofList list =
@@ -65,14 +60,14 @@ module Svg =
         {
             Body = seq { yield Group(group) }
             Size = Some(Area.full);
-            Viewbox = None
+            ViewBox = None
         }
 
     let ofPlot plot =
         plot
         |> Plot.toGroup
         |> ofGroup
-        |> withViewbox Point.origin (Area.fromPoints (Point.ofFloats plot.Minimum) (Point.ofFloats plot.Maximum))
+        |> withViewBox (ViewBox.create Point.origin (Area.fromPoints (Point.ofFloats plot.Minimum) (Point.ofFloats plot.Maximum)))
 
     let toString (svg : Svg) =
         svg.ToString()

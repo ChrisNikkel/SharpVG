@@ -81,7 +81,7 @@ let main argv =
     |> List.append animations
     |> Group.ofList |> Svg.ofGroup
     |> Svg.withSize (Area.ofFloats (triangleLength, triangleLength))
-    |> Svg.withViewbox Point.origin Area.full
+    |> Svg.withViewBox (ViewBox.create Point.origin Area.full)
     |> Svg.toHtml "SVG Triangle Example"
     |> saveToFile fileName
 
