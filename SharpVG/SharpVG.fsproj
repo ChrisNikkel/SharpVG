@@ -45,6 +45,7 @@
     <Compile Include="Transform.fs" />
     <Compile Include="Animation.fs" />
     <Compile Include="ViewBox.fs" />
+    <Compile Include="Symbol.fs" />
     <Compile Include="Element.fs" />
     <Compile Include="Group.fs" />
     <Compile Include="Axis.fs" />
