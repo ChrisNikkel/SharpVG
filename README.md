@@ -2,11 +2,13 @@
 
 A .NET Standard library for F# to generate vector graphics in SVG format.
 
+_[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions](https://github.com/ChrisNikkel/SharpVG/issues) are greatly appreciated._
+
+[Source code on GitHub](https://github.com/ChrisNikkel/SharpVG)
+
 [![Travis CI Build Status](https://travis-ci.org/ChrisNikkel/SharpVG.svg?branch=master)](https://travis-ci.org/ChrisNikkel/SharpVG) [![Join the chat at https://gitter.im/SharpVG/Lobby](https://badges.gitter.im/SharpVG/Lobby.svg)](https://gitter.im/SharpVG/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)[![NuGet Badge](https://buildstats.info/nuget/SharpVG)](https://www.nuget.org/packages/SharpVG/)
 
-[![Build history](https://buildstats.info/travisci/chart/ChrisNikkel/SharpVG)](https://travis-ci.org/ChrisNikkel/SharpVG)
-
-_[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions](https://github.com/ChrisNikkel/SharpVG/issues) are greatly appreciated._
+[![Build history](https://buildstats.info/travisci/chart/ChrisNikkel/SharpVG?showStats=false)](https://travis-ci.org/ChrisNikkel/SharpVG)
 
 ## Why SharpVG?
 
