@@ -9,6 +9,7 @@ with
     static member ToTag anchor =
         Tag.create "a"
         |> Tag.withAttributes [ Attribute.createXML "href" anchor.Url ]
+        |> Tag.withBody (anchor.Elements |> Seq.map Element.toString |> String.concat "")
 
     override this.ToString() =
        this |> Anchor.ToTag |> Tag.toString

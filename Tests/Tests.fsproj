@@ -23,6 +23,7 @@
     <Compile Include="TestStyle.fs" />
     <Compile Include="TestTag.fs" />
     <Compile Include="TestText.fs" />
+    <Compile Include="TestAnchor.fs" />
     <Compile Include="TestTiming.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
