@@ -23,7 +23,7 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
 ```F#
 let position = Point.ofInts (10, 10)
 let area = Area.ofInts (50, 50)
-let style = Style.create (Name Colors.Cyan) (Name Colors.Blue) (Length.ofInt 3) 1.0 1.0
+let style = Style.create (Color.ofName Colors.Cyan) (Color.ofName Colors.Blue) (Length.ofInt 3) 1.0 1.0
 
 Rect.create position area
   |> Element.createWithStyle style
@@ -37,7 +37,7 @@ Rect.create position area
 ```F#
 let center = Point.ofInts (60, 60)
 let radius = Length.ofInt 50
-let style = Style.create (Name Colors.Violet) (Name Colors.Indigo) (Length.ofInt 3) 1.0 1.0
+let style = Style.create (Color.ofName Colors.Violet) (Color.ofName Colors.Indigo) (Length.ofInt 3) 1.0 1.0
 
 Circle.create center radius
   |> Element.createWithStyle style
