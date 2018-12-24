@@ -83,6 +83,6 @@ module Plot =
             |> Option.fold (fun _ a -> Axis.toElements a) Seq.empty<Element>
             |> Group.ofSeq
             |> Group.addElements (plot.PlotElements |> Seq.collect (fun pe -> pe.Elements |> Seq.map (Element.withStyle pe.Style)))
-            |> Group.withId "MyPlot"
+            |> Group.withName "MyPlot"
             |> Group.asCartesian yOffset (Length.ofFloat (snd plot.Maximum))
 

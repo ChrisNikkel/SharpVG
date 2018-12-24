@@ -17,9 +17,12 @@ with
 module Use =
 
     let create element position : Use =
-        match element with
-            | Named name -> { Name = name; Position = position; Size = None }
-            | Unnamed -> failwith "Can not use an element without a name"
+        match Element.tryGetName element with
+            | Some name -> { Name = name; Position = position; Size = None }
+            | None -> failwith "Can not use an element without a name"
+
+    let tryCreate element position : Use option =
+        Element.tryGetName element |> Option.map (fun name -> { Name = name; Position = position; Size = None })
 
     let toTag =
         Use.ToTag

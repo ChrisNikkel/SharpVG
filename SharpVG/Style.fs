@@ -51,7 +51,7 @@ module Style =
         { Fill = None; Stroke = None; StrokeWidth = None; Opacity = None; FillOpacity = None; Name = None; }
 
     let withName name (style : Style) =
-        { style with Name = Some(name) }
+        { style with Name = Option.ofObj name }
 
     let createWithPen pen =
         { Stroke = Some(pen.Color); Opacity = pen.Opacity; StrokeWidth = pen.Width; Fill = None; FillOpacity = None; Name = None; }
@@ -81,7 +81,7 @@ module Style =
         { Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity); FillOpacity = Some(fillOpacity); Name = None }
 
     let createNamed fill stroke strokeWidth opacity fillOpacity name =
-        { Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity); FillOpacity = Some(fillOpacity); Name = Some(name) }
+        { Fill = Some(fill); Stroke = Some(stroke); StrokeWidth = Some(strokeWidth); Opacity = Some(opacity); FillOpacity = Some(fillOpacity); Name = Option.ofObj name }
 
     let createWithFill fill =
         empty |> withFill fill

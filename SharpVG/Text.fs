@@ -49,7 +49,7 @@ module Text =
         { Position = position; Body = body; FontFamily = None; FontSize = None; Anchor = None }
 
     let withFont family size text =
-        { text with FontFamily = Some(family); FontSize = Some(size) }
+        { text with FontFamily = Option.ofObj family; FontSize = Some(size) }
 
     let withFontFamily family text =
         { text with FontFamily = Some(family) }

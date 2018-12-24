@@ -1,7 +1,7 @@
 ﻿namespace SharpVG
 
 type Group = {
-    Id: string option
+    Name: string option
     Body: Body
     Transforms: seq<Transform>
 }
@@ -13,11 +13,11 @@ and Body =
 
 module Group =
     let empty =
-        { Id = None; Body = Seq.empty<GroupElement>; Transforms = Seq.empty }
+        { Name = None; Body = Seq.empty<GroupElement>; Transforms = Seq.empty }
 
     let ofSeq seq =
         {
-            Id = None
+            Name = None
             Body = seq |> Seq.map (fun e -> Element(e))
             Transforms = Seq.empty
         }
@@ -37,8 +37,8 @@ module Group =
     let withTransform transform group =
         { group with Transforms = Seq.singleton transform }
 
-    let withId idName (group:Group) =
-        { group with Id = Some idName }
+    let withName name (group:Group) =
+        { group with Name = Option.ofObj name }
 
     let addTransform transform group =
         group |> withTransforms (Seq.append (Seq.singleton transform) group.Transforms)
@@ -56,7 +56,7 @@ module Group =
 
     let rec toStyleSet group =
         group.Body
-            |> Seq.map (function | Element(e) -> e.Body.Style |> Option.toList |> Set.ofList | Group(g) -> g |> toStyleSet)
+            |> Seq.map (function | Element(e) -> e.Style |> Option.toList |> Set.ofList | Group(g) -> g |> toStyleSet)
             |> Seq.reduce (+)
 
     let rec toString group =
@@ -72,7 +72,7 @@ module Group =
 
         let attributes =
             [
-                group.Id |> Option.map (Attribute.createXML "Id")
+                group.Name |> Option.map (Attribute.createXML "Id")
                 (if group.Transforms |> Seq.isEmpty then None else Some (group.Transforms |> Transforms.toAttribute))
             ]
             |> List.choose id
@@ -85,6 +85,6 @@ module Body =
         |> Seq.map (fun b ->
             match b with
                 | Group(g) -> g |> Group.toStyleSet
-                | Element(e) -> e.Body.Style |> Option.toList |> Set.ofList)
+                | Element(e) -> e.Style |> Option.toList |> Set.ofList)
         |> Seq.reduce (+)
         |> Set.toSeq

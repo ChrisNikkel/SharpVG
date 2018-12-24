@@ -27,7 +27,7 @@ module Tag =
         { tag with Attributes = attributes }
 
     let withBody body tag =
-        { tag with Body = Some(body) }
+        { tag with Body = Option.ofObj body }
 
     let addAttributes attributes tag =
         tag
