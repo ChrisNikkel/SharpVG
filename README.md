@@ -17,7 +17,7 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
   - All basic SVG elements are supported: [line](https://github.com/ChrisNikkel/SharpVG/wiki/Line), [circle](https://github.com/ChrisNikkel/SharpVG/wiki/Circle), [ellipse](https://github.com/ChrisNikkel/SharpVG/wiki/Ellipse), [rect](https://github.com/ChrisNikkel/SharpVG/wiki/Rect), [text](https://github.com/ChrisNikkel/SharpVG/wiki/Text), [polygon](https://github.com/ChrisNikkel/SharpVG/wiki/Polygon), [polyline](https://github.com/ChrisNikkel/SharpVG/wiki/polyLine), [path](https://github.com/ChrisNikkel/SharpVG/wiki/Path), [image](https://github.com/ChrisNikkel/SharpVG/wiki/Image), and [groups](https://github.com/ChrisNikkel/SharpVG/wiki/Group)
   - No understanding of SVG is required and its as easy as using seq, list, or array
   - No external dependencies other than SharpVG are required
-  - .NET Core cross platform support on Windows, Linux, and OSX
+  - .NET Standard cross platform support on Windows, Linux, and OSX
   - Limited support for SVG animations
   - Limited support for cartesian plotting
   - Reusable styles

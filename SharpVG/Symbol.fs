@@ -34,7 +34,7 @@ module Symbol =
     let withReference reference (symbol : Symbol) =
         { symbol with Reference = reference }
 
-    let withBody elements symbol =
+    let withBody elements (symbol : Symbol) =
         { symbol with Elements = elements }
 
     let addElements elements symbol =
