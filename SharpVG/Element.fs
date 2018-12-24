@@ -59,9 +59,9 @@ module Element =
             Animations = Seq.empty
         }
 
-    let inline createWithId< ^T when ^T: (static member ToTag: ^T -> Tag)> id taggable =
+    let inline createWithName< ^T when ^T: (static member ToTag: ^T -> Tag)> name taggable =
         {
-            Name = Some(id)
+            Name = Option.ofObj name
             Classes = Seq.empty
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = None
@@ -95,6 +95,17 @@ module Element =
 
     let addClass className element =
         element.Classes |> Seq.append (Seq.singleton className)
+
+    let getName element =
+        match element.Name with
+            | Some name -> name
+            | None -> failwith "Can not get the name of an unnamed element"
+
+    let tryGetName element =
+        element.Name
+
+    let isNamed (element : Element) =
+        element.Name.IsSome
 
     let toTag =
         Element.ToTag
