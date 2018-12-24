@@ -11,6 +11,8 @@ and GroupElement =
 and Body =
     seq<GroupElement>
 
+//TODO : implemnt static member ToString to allow it to be used in Svg again
+
 module Group =
     let empty =
         { Name = None; Body = Seq.empty<GroupElement>; Transforms = Seq.empty }
