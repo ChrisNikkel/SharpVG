@@ -23,6 +23,7 @@
     <Compile Include="TestStyle.fs" />
     <Compile Include="TestTag.fs" />
     <Compile Include="TestText.fs" />
+    <Compile Include="TestGroup.fs" />
     <Compile Include="TestAnchor.fs" />
     <Compile Include="TestSymbol.fs" />
     <Compile Include="TestUse.fs" />

@@ -5,17 +5,42 @@ type Group = {
     Body: Body
     Transforms: seq<Transform>
 }
+with
+    static member ToTag group =
+        let rec toString group =
+            group
+            |> toTag
+            |> Tag.toString
+        and toTag group =
+            let body = group.Body |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> toString) |> String.concat ""
+
+            let attributes =
+                [
+                    group.Name |> Option.map (Attribute.createXML "Id")
+                    (if group.Transforms |> Seq.isEmpty then None else Some (group.Transforms |> Transforms.toAttribute))
+                ]
+                |> List.choose id
+
+            (if attributes |> List.isEmpty then Tag.create "g" else Tag.create "g" |> (Tag.withAttributes attributes)) |> Tag.withBody body
+        toTag group
+    override this.ToString() =
+        Group.ToTag this |> Tag.toString
+
 and GroupElement =
     | Group of Group
     | Element of Element
 and Body =
     seq<GroupElement>
 
+
 //TODO : implemnt static member ToString to allow it to be used in Svg again
 
 module Group =
     let empty =
         { Name = None; Body = Seq.empty<GroupElement>; Transforms = Seq.empty }
+
+    let create =
+        empty
 
     let ofSeq seq =
         {
@@ -30,7 +55,7 @@ module Group =
     let ofArray array =
         array |> Seq.ofArray |> ofSeq
 
-    let private withBody body (group:Group) =
+    let withBody body (group:Group) =
         { group with Body = body }
 
     let withTransforms transforms group =
@@ -61,25 +86,11 @@ module Group =
             |> Seq.map (function | Element(e) -> e.Style |> Option.toList |> Set.ofList | Group(g) -> g |> toStyleSet)
             |> Seq.reduce (+)
 
-    let rec toString group =
-        group
-        |> toTag
-        |> Tag.toString
+    let toTag group =
+        Group.ToTag group
 
-    and toTag group =
-        let body =
-            group.Body
-            |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> toString)
-            |> String.concat ""
-
-        let attributes =
-            [
-                group.Name |> Option.map (Attribute.createXML "Id")
-                (if group.Transforms |> Seq.isEmpty then None else Some (group.Transforms |> Transforms.toAttribute))
-            ]
-            |> List.choose id
-
-        (if attributes |> List.isEmpty then Tag.create "g" else Tag.create "g" |> (Tag.withAttributes attributes)) |> Tag.withBody body
+    let toString (group : Group) =
+        group.ToString()
 
 module Body =
     let toStyles body =
