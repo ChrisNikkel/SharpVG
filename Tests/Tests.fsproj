@@ -24,6 +24,8 @@
     <Compile Include="TestTag.fs" />
     <Compile Include="TestText.fs" />
     <Compile Include="TestAnchor.fs" />
+    <Compile Include="TestSymbol.fs" />
+    <Compile Include="TestUse.fs" />
     <Compile Include="TestTiming.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
