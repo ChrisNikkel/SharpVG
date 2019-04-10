@@ -67,7 +67,7 @@ Circle.create center radius
 Clone the repository:
 ```bash
 git clone https://github.com/ChrisNikkel/SharpVG.git
-cd SharpVG
+cd SharpVG/SharpVG
 ```
 
 Start the build:
@@ -85,7 +85,6 @@ Run the examples:
 dotnet run -p Examples\Triangle\Triangle.fsproj
 dotnet run -p Examples\Life\Life.fsproj
 dotnet run -p Examples\Graph\Graph.fsproj
-dotnet run -p Examples\Animate\Animate.fsproj
 ```
 
 Run the [Fable](http://fable.io) example ([prerequisites](http://fable.io/pages/prerequisites.html)):
