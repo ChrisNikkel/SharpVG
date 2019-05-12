@@ -18,6 +18,7 @@ type PathPositioning =
 type PathPart =
     | LengthPart of PathPositioning*PathType*Point
     | ClosePath
+    | PathString of string
 
 type Path =
     {
@@ -44,6 +45,7 @@ with
                             | Relative -> letter.ToLower()
                         + (Point.toStringWithSeparator " " point)
                     | ClosePath -> "Z"
+                    | PathString(s) -> s
         path.PathParts
         |> Seq.map pathTypeToString
         |> String.concat " "
@@ -80,6 +82,9 @@ module Path =
 
     let addClosePath path =
         { path with PathParts = Seq.append path.PathParts (Seq.singleton ClosePath) }
+
+    let addPathString pathString path = 
+        { path with PathParts = Seq.append path.PathParts (Seq.singleton (PathString(pathString))) }
 
     let toAttribute path =
         Attribute.createXML "path" (path |> Path.ToDataString)

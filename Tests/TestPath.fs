@@ -53,3 +53,12 @@ module TestPath =
     let ``create ellipticalArc`` () =
         Assert.Equal("<path d=\"A0 0\"/>", Path.empty |> Path.addAbsolute PathType.EllipticalArc Point.origin |> Path.toString)
 
+    [<Fact>]
+    let ``create path by addPathString`` () =
+        Assert.Equal("<path d=\"M0 0 a20 40 0 1 1 0 40\"/>", 
+                     Path.empty 
+                     |> Path.addAbsolute PathType.MoveTo Point.origin 
+                     |> Path.addRelative PathType.EllipticalArc (Point.ofFloats (20.0, 40.0))
+                     |> Path.addPathString "0 1 1 0 40"
+                     |> Path.toString)
+
