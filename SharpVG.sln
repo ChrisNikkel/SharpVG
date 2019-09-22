@@ -19,10 +19,6 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Triangle", "Examples\Triang
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{14030B52-964A-4830-9A92-7586532EEC55}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bounce", "Bounce", "{9BE12FC0-BC24-47DB-B1BA-82B1C9549346}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Bounce", "Examples\Bounce\src\Bounce.fsproj", "{BECFC0BB-DADF-4645-9BB5-2702F63C37C0}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
