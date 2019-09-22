@@ -9,7 +9,15 @@ type PathType =
     | SmoothCurveTo
     | QuadraticBezierCurveTo
     | SmoothQuadraticBezierCurveTo
-    | EllipticalArc
+
+type EllipticalArcParameters =
+    {
+        Radius: Point
+        RotationXAxis: int
+        LargeArc: bool
+        Sweep: bool
+        Point: Point
+    }
 
 type PathPositioning =
     | Relative
@@ -17,6 +25,7 @@ type PathPositioning =
 
 type PathPart =
     | LengthPart of PathPositioning*PathType*Point
+    | EllipticalArc of PathPositioning*EllipticalArcParameters
     | ClosePath
 
 type Path =
@@ -25,28 +34,42 @@ type Path =
     }
 with
     static member ToDataString path =
-        let pathTypeToString pathType =
+        let pointPathTypeToString pathType =
             match pathType with
-                    | LengthPart(positioning, style, point) ->
-                        let letter =
-                            match style with
-                                | MoveTo -> "M"
-                                | LineTo -> "L"
-                                | HorizontalLineTo -> "H"
-                                | VerticalLineTo -> "V"
-                                | CurveTo -> "C"
-                                | SmoothCurveTo -> "S"
-                                | QuadraticBezierCurveTo -> "Q"
-                                | SmoothQuadraticBezierCurveTo -> "T"
-                                | EllipticalArc -> "A"
-                        match positioning with
-                            | Absolute -> letter
-                            | Relative -> letter.ToLower()
-                        + (Point.toStringWithSeparator " " point)
-                    | ClosePath -> "Z"
+                | MoveTo -> "M"
+                | LineTo -> "L"
+                | HorizontalLineTo -> "H"
+                | VerticalLineTo -> "V"
+                | CurveTo -> "C"
+                | SmoothCurveTo -> "S"
+                | QuadraticBezierCurveTo -> "Q"
+                | SmoothQuadraticBezierCurveTo -> "T"
+
+        let applyPositioning positioning (letter : string) =
+            match positioning with
+                | Absolute -> letter
+                | Relative -> letter.ToLower()
+
+        let flagToValue flag =
+            if flag then "1" else "0"
+
+        let pathPartToString pathPart =
+            match pathPart with
+                | LengthPart(positioning, pathType, point) ->
+                    applyPositioning positioning (pointPathTypeToString pathType) + (Point.toStringWithSeparator " " point)
+                | EllipticalArc(positioning, p) ->
+                    (applyPositioning positioning "A") +
+                    Point.toString p.Radius + " " +
+                    string p.RotationXAxis + " " +
+                    flagToValue p.LargeArc + "," +
+                    flagToValue p.Sweep + " " +
+                    Point.toString p.Point
+                | ClosePath -> "Z"
+
         path.PathParts
-        |> Seq.map pathTypeToString
-        |> String.concat " "
+            |> Seq.map pathPartToString
+            |> String.concat " "
+
     static member ToTag path =
         Tag.create "path"
             |> Tag.withAttribute (Attribute.createXML "d" (path |> Path.ToDataString))
@@ -77,6 +100,10 @@ module Path =
 
     let addAbsolute pathType point path =
         add Absolute pathType point path
+
+    let addEllipticalArc pathPositioning radius rotationXAxis largeArc sweep point path =
+        let ellipticalArc = { Radius = radius; RotationXAxis = rotationXAxis; LargeArc = largeArc; Sweep = sweep; Point = point }
+        { path with PathParts = Seq.append path.PathParts (Seq.singleton (EllipticalArc (pathPositioning, ellipticalArc))) }
 
     let addClosePath path =
         { path with PathParts = Seq.append path.PathParts (Seq.singleton ClosePath) }
