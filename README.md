@@ -19,12 +19,11 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
   - No external dependencies other than SharpVG are required
   - .NET Standard cross platform support on Windows, Linux, and OSX
   - Limited support for SVG animations
-  - Limited support for cartesian plotting
   - Reusable styles
 
-## Try it now
+## Try SharpVG
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ChrisNikkel/SharpVG/master)
+Run the interactive notebook: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ChrisNikkel/SharpVG/master)
 
 ## Examples
 
