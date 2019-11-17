@@ -87,7 +87,6 @@ Run the examples:
 ```bash
 dotnet run -p Examples\Triangle\Triangle.fsproj
 dotnet run -p Examples\Life\Life.fsproj
-dotnet run -p Examples\Graph\Graph.fsproj
 ```
 
 Run the [Fable](http://fable.io) example ([prerequisites](http://fable.io/pages/prerequisites.html)):
