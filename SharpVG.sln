@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Animate", "Examples\Animate\Animate.fsproj", "{BF442C9D-EC65-4F3B-8E49-72289EE9A337}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Graph", "Examples\Graph\Graph.fsproj", "{AFBABCC2-D8BD-48E7-997D-883B9ECAEFD8}"
-EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Helpers", "Helpers\Helpers.fsproj", "{F5868A96-B1F8-4243-92BF-D6DAEC9E593A}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Life", "Examples\Life\Life.fsproj", "{AFD8CD25-24B7-4F0D-A2C6-50500B686667}"
