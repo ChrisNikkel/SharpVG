@@ -2,7 +2,6 @@ language: csharp
 mono:
  - latest
 dotnet: 3.0.100
-dist: trusty
 script:
  - dotnet restore
  - dotnet build
