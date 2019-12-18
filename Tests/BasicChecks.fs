@@ -55,7 +55,6 @@ let checkBodylessTag name tag =
     Assert.True(isDepthNoMoreThanOne '<' '>' tag)
     Assert.True(happensEvenly '"' tag)
     Assert.True(happensEvenly ''' tag)
-    Assert.True(tag.Contains name)
     Assert.True(isTagEnclosed tag)
 
 let checkTag name tag =
@@ -63,4 +62,3 @@ let checkTag name tag =
     Assert.True(isDepthNoMoreThanOne '<' '>' tag)
     Assert.True(happensEvenly '"' tag)
     Assert.True(happensEvenly ''' tag)
-    Assert.True(tag.Contains name)

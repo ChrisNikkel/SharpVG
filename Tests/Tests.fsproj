@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
@@ -37,9 +37,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
-    <PackageReference Include="FsCheck" Version="2.13.0" />
-    <PackageReference Include="FsCheck.Xunit" Version="2.13.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+    <PackageReference Include="FsCheck" Version="2.14.0" />
+    <PackageReference Include="FsCheck.Xunit" Version="2.14.0" />
     <PackageReference Include="Xunit" Version="2.4.1" />
     <PackageReference Include="Xunit.Runner.VisualStudio" Version="2.4.1" />
   </ItemGroup>
