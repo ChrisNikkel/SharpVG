@@ -10,6 +10,9 @@ type Element = {
     }
 with
     static member ToTag element =
+        element.BaseTag
+
+    static member ToFullTag element =
         let styleClass =
             match element.Style with
                 | Some s -> s.Name
@@ -35,7 +38,7 @@ with
         |> if element.Animations |> Seq.isEmpty then id else Tag.addBody (element.Animations |> Seq.map Animation.toString |> String.concat "")
 
     override this.ToString() =
-        this |> Element.ToTag |> Tag.toString
+        this |> Element.ToFullTag |> Tag.toString
 
 module Element =
 
