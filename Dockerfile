@@ -51,11 +51,11 @@ RUN dotnet help
 
 # Copy notebooks
 
-COPY ./NotebookExamples/ ${HOME}/Notebooks/
+COPY ./Examples/Notebooks/ ${HOME}/Notebooks/
 
 # Copy package sources
 
-COPY ./NuGet.config ${HOME}/nuget.config
+COPY ./Examples/Notebooks/NuGet.config ${HOME}/nuget.config
 
 RUN chown -R ${NB_UID} ${HOME}
 USER ${USER}
@@ -73,4 +73,4 @@ RUN dotnet interactive jupyter install
 ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
 # Set root to Notebooks
-WORKDIR ${HOME}/notebooks/
+WORKDIR ${HOME}/Notebooks/
