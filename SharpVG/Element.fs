@@ -72,6 +72,16 @@ module Element =
             Animations = Seq.empty
         }
 
+    let inline createFull< ^T when ^T: (static member ToTag: ^T -> Tag)> name classes style transform animations taggable =
+        {
+            Name = name
+            Classes = classes
+            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+            Style = style
+            Transform = transform
+            Animations = animations
+        }
+
     let withStyle style element =
         { element with Style = Some style }
 
@@ -98,11 +108,6 @@ module Element =
 
     let addClass className element =
         element.Classes |> Seq.append (Seq.singleton className)
-
-    let getName element =
-        match element.Name with
-            | Some name -> name
-            | None -> failwith "Can not get the name of an unnamed element"
 
     let tryGetName element =
         element.Name

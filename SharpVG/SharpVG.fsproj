@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>0.0.6</Version>
+    <Version>0.0.7</Version>
     <VersionSuffix>alpha</VersionSuffix>
     <Authors>Chris Nikkel</Authors>
     <Product>SharpVG</Product>
@@ -51,6 +51,7 @@
     <Compile Include="Symbol.fs" />
     <Compile Include="Use.fs" />
     <Compile Include="Group.fs" />
+    <Compile Include="Graphic.fs" />
     <Compile Include="Axis.fs" />
     <Compile Include="Plot.fs" />
     <Compile Include="Svg.fs" />
