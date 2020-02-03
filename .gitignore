@@ -189,6 +189,7 @@ ClientBin/
 *.publishsettings
 node_modules/
 orleans.codegen.cs
+symbolCache.db
 
 # RIA/Silverlight projects
 Generated_Code/
