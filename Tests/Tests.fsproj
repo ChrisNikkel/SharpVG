@@ -28,6 +28,7 @@
     <Compile Include="TestSymbol.fs" />
     <Compile Include="TestUse.fs" />
     <Compile Include="TestTiming.fs" />
+    <Compile Include="TestTransform.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
