@@ -10,6 +10,7 @@ type Graphic =
     | Line of Line
     | Rect of Rect
     | Text of Text
+    | Use of Use
 
 module Graphic = 
     let ofPath path =
@@ -39,6 +40,9 @@ module Graphic =
     let ofText text =
         Text(text)
 
+    let ofUse u =
+        Use(u)
+
     let toElement graphic =     
         match graphic with
             | Path(p) -> Element.create p
@@ -50,3 +54,4 @@ module Graphic =
             | Line(l) -> Element.create l
             | Rect(r) -> Element.create r
             | Text(t) -> Element.create t
+            | Use(u) -> Element.create u
