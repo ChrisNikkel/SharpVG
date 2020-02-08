@@ -5,7 +5,7 @@ type Element = {
         Classes: seq<string>
         BaseTag: Tag
         Style: Style option
-        Transform: Transform option
+        Transforms: seq<Transform>
         Animations: seq<Animation>
     }
 with
@@ -30,7 +30,7 @@ with
                     element.Name |> Option.map (Attribute.createCSS "id" >> List.singleton)
                     classes |> Seq.map (Attribute.createCSS "class") |> Seq.toList |> Option.Some
                     element.Style |> Option.filter (not << Style.isNamed) |> Option.map Style.toAttributes
-                    element.Transform |> Option.map (Transform.toAttribute >> List.singleton)
+                    if Seq.isEmpty element.Transforms then None else Some [ element.Transforms |> Transforms.toAttribute ]
                 ]
                 |> List.choose id
                 |> List.concat
@@ -48,7 +48,7 @@ module Element =
             Classes = Seq.empty
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = None
-            Transform = None
+            Transforms = Seq.empty
             Animations = Seq.empty
         }
 
@@ -58,7 +58,7 @@ module Element =
             Classes = Seq.empty
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = Some(style)
-            Transform = None
+            Transforms = Seq.empty
             Animations = Seq.empty
         }
 
@@ -68,7 +68,7 @@ module Element =
             Classes = Seq.empty
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = None
-            Transform = None
+            Transforms = Seq.empty
             Animations = Seq.empty
         }
 
@@ -78,7 +78,7 @@ module Element =
             Classes = classes
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = style
-            Transform = transform
+            Transforms = Seq.empty
             Animations = animations
         }
 
@@ -86,7 +86,10 @@ module Element =
         { element with Style = Some style }
 
     let withTransform transform element =
-        { element with Transform = Some transform }
+        { element with Transforms = Seq.singleton transform }
+
+    let withTransforms transforms element =
+        { element with Transforms = transforms }
 
     let withAnimation animation element =
         { element with Animations = Seq.singleton animation }

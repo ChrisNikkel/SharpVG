@@ -55,10 +55,10 @@ module Group =
     let withBody body (group:Group) =
         { group with Body = body }
 
-    let withTransforms transforms group =
+    let withTransforms transforms (group:Group) =
         { group with Transforms = transforms }
 
-    let withTransform transform group =
+    let withTransform transform (group:Group) =
         { group with Transforms = Seq.singleton transform }
 
     let withName name (group:Group) =
