@@ -57,3 +57,22 @@ module TestPath =
     let ``create ellipticalArc`` () =
         Assert.Equal("<path d=\"A0,0 -90 0,0 0,0\"/>", Path.empty |> Path.addEllipticalArcCurveTo Absolute Point.origin -90.0 false false Point.origin |> Path.toString)
 
+    [<Fact>]
+    let ``create partial triangle using absolutes`` () =
+        let paritalTriangle =
+            Path.empty
+                |> Path.addMoveTo Absolute (Point.ofFloats (10.0, 10.0))
+                |> Path.addLineTo Absolute (Point.ofFloats (90.0, 90.0))
+                |> Path.addVerticalLineTo Absolute (Length.ofFloat 10.0)
+                |> Path.addHorizontalLineTo Absolute (Length.ofFloat 50.0)
+        Assert.Equal("<path d=\"M10,10 L90,90 V10 H50\"/>", paritalTriangle |> Path.toString)
+
+    [<Fact>]
+    let ``create partial triangle using relatives`` () =
+        let paritalTriangle =
+            Path.empty
+                |> Path.addMoveTo Absolute (Point.ofFloats (110.0, 10.0))
+                |> Path.addLineTo Relative (Point.ofFloats (80.0, 80.0))
+                |> Path.addVerticalLineTo Relative (Length.ofFloat -80.0)
+                |> Path.addHorizontalLineTo Relative (Length.ofFloat -40.0)
+        Assert.Equal("<path d=\"M110,10 l80,80 v-80 h-40\"/>", paritalTriangle |> Path.toString)
