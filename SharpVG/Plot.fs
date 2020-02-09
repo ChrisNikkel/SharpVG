@@ -61,9 +61,9 @@ module Plot =
 
     let line values =
         let min, max = discoverSize values
-        let path = Path.empty |> Path.addAbsolute PathType.MoveTo (Point.ofFloats (List.head values))
+        let path = Path.empty |> Path.addMoveTo Absolute (Point.ofFloats (List.head values))
         values
-            |> List.scan (fun acc p -> acc |> Path.addAbsolute PathType.LineTo (Point.ofFloats p)) path
+            |> List.scan (fun acc p -> acc |> Path.addLineTo Absolute (Point.ofFloats p)) path
             |> List.last
             |> Element.create
             |> Seq.singleton
