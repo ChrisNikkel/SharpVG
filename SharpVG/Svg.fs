@@ -19,9 +19,12 @@ with
             Styles.toString namedStyles
 
         let body =
-            this.Body
-            |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> Group.toString)
-            |> String.concat ""
+            if Seq.isEmpty this.Body then
+              ""
+            else
+              this.Body
+              |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> Group.toString)
+              |> String.concat ""
 
         Tag.create "svg"
         |> Tag.withAttributes attributes
