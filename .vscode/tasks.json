@@ -18,6 +18,20 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "build release",
+      "command": "dotnet build -c Release",
+      "type": "shell",
+      "group": {
+        "kind" : "build",
+        "isDefault" : true
+      },
+      "presentation": {
+        "reveal" : "always",
+        "panel" : "dedicated"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
       "label": "test",
       "command": "dotnet test Tests",
       "type": "shell",
