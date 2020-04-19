@@ -81,7 +81,7 @@ module Group =
     let rec toStyleSet group =
         group.Body
             |> Seq.map (function | Element(e) -> e.Style |> Option.toList |> Set.ofList | Group(g) -> g |> toStyleSet)
-            |> Seq.reduce (+)
+            |> Seq.fold (+) Set.empty
 
     let toTag group =
         Group.ToTag group
@@ -91,13 +91,10 @@ module Group =
 
 module Body =
     let toStyles body =
-        if Seq.isEmpty body then
-            Seq.empty
-        else
-            body
-            |> Seq.map (fun b ->
-                match b with
-                    | Group(g) -> g |> Group.toStyleSet
-                    | Element(e) -> e.Style |> Option.toList |> Set.ofList)
-            |> Seq.reduce (+)
-            |> Set.toSeq
+        body
+        |> Seq.map (fun b ->
+            match b with
+                | Group(g) -> g |> Group.toStyleSet
+                | Element(e) -> e.Style |> Option.toList |> Set.ofList)
+        |> Seq.fold (+) Set.empty
+        |> Set.toSeq
