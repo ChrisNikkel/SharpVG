@@ -8,7 +8,8 @@ type Svg = {
 with
     override this.ToString() =
         let attributes =
-            match this.Size with | Some size -> Area.toAttributes size | None -> []
+            Attribute.create AttributeType.XML "xmlns" "http://www.w3.org/2000/svg"
+            :: match this.Size with | Some size -> Area.toAttributes size | None -> []
             @ match this.ViewBox with | Some viewBox -> ViewBox.toAttributes viewBox | None -> []
 
         let styles =
