@@ -120,4 +120,4 @@ The library is available under the MIT license. For more information see the [li
 
 ## Maintainer(s)
 
-  - [@ChrisNikkel](https://githu://github.com/ChrisNikkel/SharpVG/wikib.com/ChrisNikkel)
+  - [@ChrisNikkel](https://github.com/ChrisNikkel)
