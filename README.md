@@ -70,7 +70,7 @@ Circle.create center radius
 Clone the repository:
 ```bash
 git clone https://github.com/ChrisNikkel/SharpVG.git
-cd SharpVG/SharpVG
+cd SharpVG
 ```
 
 Start the build:
