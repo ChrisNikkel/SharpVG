@@ -73,7 +73,7 @@ let itemByNumber number =
 [<EntryPoint>]
 let main argv =
 
-    let fileName = "Life.html"
+    let fileName = getProgramPath + "Life.html"
 
     let iterations, delay, cellSize = 100, 0.25, 15.0
     let size = 70
@@ -125,5 +125,6 @@ let main argv =
     |> Svg.toHtml "SVG Life Example"
     |> saveToFile fileName
 
-    openFile fileName
+    printfn "Created %s" fileName
+
     0 // return an integer exit code

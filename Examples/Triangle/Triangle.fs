@@ -39,7 +39,7 @@ let offset x y =  Transform.createTranslate (Length.ofFloat x) |> Transform.with
 
 [<EntryPoint>]
 let main argv =
-  let fileName = "Triangle.html"
+  let fileName = getProgramPath + "Triangle.html"
   let style =
     {
       Stroke = Some(Name Colors.Black);
@@ -84,5 +84,8 @@ let main argv =
     |> Svg.withViewBox (ViewBox.create Point.origin Area.full)
     |> Svg.toHtml "SVG Triangle Example"
     |> saveToFile fileName
+
+  printfn "Created %s" fileName
+
 
   0
