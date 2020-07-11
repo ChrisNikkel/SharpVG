@@ -12,19 +12,19 @@ with
             @ match this.ViewBox with | Some viewBox -> ViewBox.toAttributes viewBox | None -> []
 
         let styles =
-          let namedStyles = this.Body |> Body.toStyles |> Styles.named
-          if Seq.isEmpty namedStyles then
-            ""
-          else
-            Styles.toString namedStyles
+            let namedStyles = this.Body |> Body.toStyles |> Styles.named
+            if Seq.isEmpty namedStyles then
+                ""
+            else
+                Styles.toString namedStyles
 
         let body =
             if Seq.isEmpty this.Body then
-              ""
+                ""
             else
-              this.Body
-              |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> Group.toString)
-              |> String.concat ""
+                this.Body
+                |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> Group.toString)
+                |> String.concat ""
 
         Tag.create "svg"
         |> Tag.withAttributes attributes
