@@ -85,8 +85,8 @@ dotnet test Tests
 
 Run the examples:
 ```bash
-dotnet run -p Examples\Triangle\Triangle.fsproj
-dotnet run -p Examples\Life\Life.fsproj
+dotnet run -p Examples/Triangle/Triangle.fsproj
+dotnet run -p Examples/Life/Life.fsproj
 ```
 
 Explore interactively:
