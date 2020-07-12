@@ -18,7 +18,7 @@ with
         |> Tag.withBody (symbol.Elements |> Seq.map Element.toString |> String.concat "")
 
     override this.ToString() =
-       this |> Symbol.ToTag |> Tag.toString
+        this |> Symbol.ToTag |> Tag.toString
 
 module Symbol =
 

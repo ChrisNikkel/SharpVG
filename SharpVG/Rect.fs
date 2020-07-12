@@ -14,7 +14,7 @@ with
         |> Tag.addAttributes (match rect.CornerRadius with Some(cr) -> Point.toAttributesWithModifier "r" "" cr | _ -> [])
 
     override this.ToString() =
-       this |> Rect.ToTag |> Tag.toString
+        this |> Rect.ToTag |> Tag.toString
 
 module Rect =
     let create position size =

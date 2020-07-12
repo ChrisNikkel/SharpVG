@@ -18,7 +18,7 @@ module TestTransform =
         Assert.DoesNotContain(" ", transform)
         Assert.Contains(",", transform)
         Assert.EndsWith(")\"", transform)
- 
+
     [<Fact>]
     let ``create a few transforms`` =
         let lengthA, lengthB, lengthC, lengthD, lengthE, lengthF = Length.ofInt 3, Length.ofInt 1, Length.ofInt -1, Length.ofInt 3, Length.ofInt 30, Length.ofInt 40

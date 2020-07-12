@@ -15,7 +15,7 @@ with
 
 
     override this.ToString() =
-       this |> Use.ToTag |> Tag.toString
+        this |> Use.ToTag |> Tag.toString
 
 module Use =
 

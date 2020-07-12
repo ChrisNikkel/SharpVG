@@ -12,7 +12,7 @@ with
         |> Tag.withBody (anchor.Elements |> Seq.map Element.toString |> String.concat "")
 
     override this.ToString() =
-       this |> Anchor.ToTag |> Tag.toString
+        this |> Anchor.ToTag |> Tag.toString
 
 module Anchor =
     let create url =

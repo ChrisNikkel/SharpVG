@@ -10,14 +10,14 @@ module Tests =
 
     [<SvgProperty>]
     let ``create rect with style`` (r, g, b) =
-      let style = Style.createWithStroke <| Values(r, g, b)
-      let element =
-        Rect.create Point.origin Area.full
-          |> Element.createWithStyle style
-          |> Element.toString
+        let style = Style.createWithStroke <| Values(r, g, b)
+        let element =
+            Rect.create Point.origin Area.full
+                |> Element.createWithStyle style
+                |> Element.toString
 
-      let result = sprintf "<rect stroke=\"rgb(%d,%d,%d)\" x=\"0\" y=\"0\" width=\"100%%\" height=\"100%%\"/>" r g b
-      Assert.Equal(result, element);
+        let result = sprintf "<rect stroke=\"rgb(%d,%d,%d)\" x=\"0\" y=\"0\" width=\"100%%\" height=\"100%%\"/>" r g b
+        Assert.Equal(result, element);
 
     [<SvgProperty>]
     let ``draw lines`` (x1, y1, x2, y2, c, r, g, b, p, o, fo) =

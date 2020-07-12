@@ -12,7 +12,7 @@ type Graphic =
     | Text of Text
     | Use of Use
 
-module Graphic = 
+module Graphic =
     let ofPath path =
         Path(path)
 
@@ -43,10 +43,10 @@ module Graphic =
     let ofUse u =
         Use(u)
 
-    let toElement graphic =     
+    let toElement graphic =
         match graphic with
             | Path(p) -> Element.create p
-            | Polygon(p) -> Element.create p 
+            | Polygon(p) -> Element.create p
             | Polyline(p) -> Element.create p
             | Image(i) -> Element.create i
             | Circle(c) -> Element.create c
