@@ -52,8 +52,6 @@
     <Compile Include="Use.fs" />
     <Compile Include="Group.fs" />
     <Compile Include="Graphic.fs" />
-    <Compile Include="Axis.fs" />
-    <Compile Include="Plot.fs" />
     <Compile Include="Svg.fs" />
   </ItemGroup>
 

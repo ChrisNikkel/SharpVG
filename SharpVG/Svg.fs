@@ -67,12 +67,6 @@ module Svg =
             ViewBox = None
         }
 
-    let ofPlot plot =
-        plot
-        |> Plot.toGroup
-        |> ofGroup
-        |> withViewBox (ViewBox.create Point.origin (Area.fromPoints (Point.ofFloats plot.Minimum) (Point.ofFloats plot.Maximum)))
-
     let toString (svg : Svg) =
         svg.ToString()
 
