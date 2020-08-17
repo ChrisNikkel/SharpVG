@@ -20,6 +20,9 @@ module Ellipse =
             Radius = radius
         }
 
+    let ofCircle (circle : Circle) =
+        create circle.Center (Point.create circle.Radius circle.Radius)
+
     let toTag  =
         Ellipse.ToTag
 
