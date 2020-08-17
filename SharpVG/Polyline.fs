@@ -25,6 +25,15 @@ module Polyline =
     let ofArray points =
         { Points = points |> Seq.ofArray }
 
+    let ofPolygon (polygon : Polygon) =
+        let firstPoint = if Seq.length polygon.Points > 0 then Seq.head polygon.Points |> Seq.singleton else Seq.empty
+        let points = Polygon.toPoints polygon
+
+        Seq.append points firstPoint |> ofSeq
+
+    let toPoints polyline =
+        polyline.Points
+
     let toTag =
         Polyline.ToTag
 
