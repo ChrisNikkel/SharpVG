@@ -1,0 +1,49 @@
+#!fsharp
+
+#r "nuget:SharpVG"
+
+open SharpVG
+open System
+open Microsoft.DotNet.Interactive.FSharp.FSharpKernelHelpers;
+
+#!fsharp
+
+let position = Point.ofInts (10, 10)
+let area = Area.ofInts (50, 50)
+let style = Style.create (Color.ofName Colors.LightBlue) (Color.ofName Colors.Blue) (Length.ofInt 3) 1.0 1.0
+let showSvg svg = display(HtmlString(Svg.toString svg)) 
+let t = Rect.create position area |> Element.createWithStyle style |> Svg.ofElement
+showSvg t
+
+#!fsharp
+
+let black, white = Color.ofName Black, Color.ofName White
+let opaque = 1.0
+let style = Style.create black white Length.one opaque opaque
+let location = Point.ofInts (10, 10)
+let size = Area.ofInts (5, 5)
+let rectangle = Rect.create location size |> Element.create
+
+let rotate degrees = Transform.createRotate (float degrees) (Length.ofInt 20) (Length.ofInt 20)
+let rotationStart, rotationEnd = rotate 0, rotate 720
+
+let scale = Length.ofInt >> Transform.createScale
+let sizeStart, sizeEnd = scale 1, scale 6
+
+let offset x y =  Transform.createTranslate (Length.ofInt x) |> Transform.withY (Length.ofInt y)
+let offsetStart, offsetEnd = offset 0 0, offset 7 7
+
+let duration s = TimeSpan.FromSeconds(float s)
+let start, finish = duration 0, duration 6
+let repetition = { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = None }
+let timing = Timing.create start |> Timing.withDuration finish |> Timing.withRepetition repetition
+let timedAnimation = Animation.createTransform timing
+
+let animationValues = List.map2 timedAnimation [sizeStart; rotationStart; offsetStart] [sizeEnd; rotationEnd; offsetEnd]
+let animations = List.map (Animation.withAdditive Additive.Sum) animationValues
+
+let decoratedRectangle = rectangle |> Element.withStyle style |> Element.withAnimations animations
+
+let shapesSvg = decoratedRectangle |> Svg.ofElement
+
+showSvg shapesSvg
