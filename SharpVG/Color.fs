@@ -316,7 +316,6 @@ with
             | Percents (r, g, b) -> "rgb(" + string r + "%," + string g + "%," + string b + "%)"
 
 module Color =
-    open System
 
     let ofName =
         Name
@@ -335,3 +334,297 @@ module Color =
 
     let toString (color :Color) =
         color.ToString()
+
+    let aliceBlue = ofName AliceBlue
+
+    let antiqueWhite = ofName AntiqueWhite
+
+    let aqua = ofName Aqua
+
+    let aquamarine = ofName Aquamarine
+
+    let azure = ofName Azure
+
+    let beige = ofName Beige
+
+    let bisque = ofName Bisque
+
+    let black = ofName Black
+
+    let blanchedAlmond = ofName BlanchedAlmond
+
+    let blue = ofName Blue
+
+    let blueViolet = ofName BlueViolet
+
+    let brown = ofName Brown
+
+    let burlyWood = ofName BurlyWood
+
+    let cadetBlue = ofName CadetBlue
+
+    let chartreuse = ofName Chartreuse
+
+    let chocolate = ofName Chocolate
+
+    let coral = ofName Coral
+
+    let cornflowerBlue = ofName CornflowerBlue
+
+    let cornSilk = ofName CornSilk
+
+    let crimson = ofName Crimson
+
+    let cyan = ofName Cyan
+
+    let darkBlue = ofName DarkBlue
+
+    let darkCyan = ofName DarkCyan
+
+    let darkGoldenRod = ofName DarkGoldenRod
+
+    let darkGray = ofName DarkGray
+
+    let darkGreen = ofName DarkGreen
+
+    let darkGrey = ofName DarkGrey
+
+    let darkKhaki = ofName DarkKhaki
+
+    let darkMagenta = ofName DarkMagenta
+
+    let darkOliveGreen = ofName DarkOliveGreen
+
+    let darkOrange = ofName DarkOrange
+
+    let darkOrchid = ofName DarkOrchid
+
+    let darkRed = ofName DarkRed
+
+    let darkSalmon = ofName DarkSalmon
+
+    let darkSeaGreen = ofName DarkSeaGreen
+
+    let darkSlateBlue = ofName DarkSlateBlue
+
+    let darkSlateGray = ofName DarkSlateGray
+
+    let darkSlateGrey = ofName DarkSlateGrey
+
+    let darkTurquoise = ofName DarkTurquoise
+
+    let darkViolet = ofName DarkViolet
+
+    let deepPink = ofName DeepPink
+
+    let deepSkyBlue = ofName DeepSkyBlue
+
+    let dimGray = ofName DimGray
+
+    let dimGrey = ofName DimGrey
+
+    let dodgerBlue = ofName DodgerBlue
+
+    let fireBrick = ofName FireBrick
+
+    let floralWhite = ofName FloralWhite
+
+    let forestGreen = ofName ForestGreen
+
+    let fuchsia = ofName Fuchsia
+
+    let gainsboro = ofName Gainsboro
+
+    let ghostWhite = ofName GhostWhite
+
+    let gold = ofName Gold
+
+    let goldenRod = ofName GoldenRod
+
+    let gray = ofName Gray
+
+    let grey = ofName Grey
+
+    let green = ofName Green
+
+    let greenYellow = ofName GreenYellow
+
+    let honeyDew = ofName HoneyDew
+
+    let hotPink = ofName HotPink
+
+    let indianRed = ofName IndianRed
+
+    let indigo = ofName Indigo
+
+    let ivory = ofName Ivory
+
+    let khaki = ofName Khaki
+
+    let lavender = ofName Lavender
+
+    let lavenderBlush = ofName LavenderBlush
+
+    let lawnGreen = ofName LawnGreen
+
+    let lemonChiffon = ofName LemonChiffon
+
+    let lightBlue = ofName LightBlue
+
+    let lightCoral = ofName LightCoral
+
+    let lightCyan = ofName LightCyan
+
+    let lightGoldenRodYellow = ofName LightGoldenRodYellow
+
+    let lightGray = ofName LightGray
+
+    let lightGreen = ofName LightGreen
+
+    let lightGrey = ofName LightGrey
+
+    let lightPink = ofName LightPink
+
+    let lightSalmon = ofName LightSalmon
+
+    let lightSeaGreen = ofName LightSeaGreen
+
+    let lightSkyBlue = ofName LightSkyBlue
+
+    let lightSlateGray = ofName LightSlateGray
+
+    let lightSlateGrey = ofName LightSlateGrey
+
+    let lightSteelBlue = ofName LightSteelBlue
+
+    let lightYellow = ofName LightYellow
+
+    let lime = ofName Lime
+
+    let limeGreen = ofName LimeGreen
+
+    let linen = ofName Linen
+
+    let magenta = ofName Magenta
+
+    let maroon = ofName Maroon
+
+    let mediumAquamarine = ofName MediumAquamarine
+
+    let mediumBlue = ofName MediumBlue
+
+    let mediumOrchid = ofName MediumOrchid
+
+    let mediumPurple = ofName MediumPurple
+
+    let mediumSeaGreen = ofName MediumSeaGreen
+
+    let mediumSlateBlue = ofName MediumSlateBlue
+
+    let mediumSpringGreen = ofName MediumSpringGreen
+
+    let mediumTurquoise = ofName MediumTurquoise
+
+    let mediumVioletRed = ofName MediumVioletRed
+
+    let midnightBlue = ofName MidnightBlue
+
+    let mintCream = ofName MintCream
+
+    let mistyRose = ofName MistyRose
+
+    let moccasin = ofName Moccasin
+
+    let navajoWhite = ofName NavajoWhite
+
+    let navy = ofName Navy
+
+    let oldLace = ofName OldLace
+
+    let olive = ofName Olive
+
+    let oliveDrab = ofName OliveDrab
+
+    let orange = ofName Orange
+
+    let orangeRed = ofName OrangeRed
+
+    let orchid = ofName Orchid
+
+    let paleGoldenRod = ofName PaleGoldenRod
+
+    let paleGreen = ofName PaleGreen
+
+    let paleTurquoise = ofName PaleTurquoise
+
+    let paleVioletRed = ofName PaleVioletRed
+
+    let papayaWhip = ofName PapayaWhip
+
+    let peachPuff = ofName PeachPuff
+
+    let peru = ofName Peru
+
+    let pink = ofName Pink
+
+    let plum = ofName Plum
+
+    let powderBlue = ofName PowderBlue
+
+    let purple = ofName Purple
+
+    let red = ofName Red
+
+    let rosyBrown = ofName RosyBrown
+
+    let royalBlue = ofName RoyalBlue
+
+    let saddleBrown = ofName SaddleBrown
+
+    let salmon = ofName Salmon
+
+    let sandyBrown = ofName SandyBrown
+
+    let seaGreen = ofName SeaGreen
+
+    let seaShell = ofName SeaShell
+
+    let sienna = ofName Sienna
+
+    let silver = ofName Silver
+
+    let skyBlue = ofName SkyBlue
+
+    let slateBlue = ofName SlateBlue
+
+    let slateGray = ofName SlateGray
+
+    let slateGrey = ofName SlateGrey
+
+    let snow = ofName Snow
+
+    let springGreen = ofName SpringGreen
+
+    let steelBlue = ofName SteelBlue
+
+    let tan = ofName Tan
+
+    let teal = ofName Teal
+
+    let thistle = ofName Thistle
+
+    let tomato = ofName Tomato
+
+    let turquoise = ofName Turquoise
+
+    let violet = ofName Violet
+
+    let wheat = ofName Wheat
+
+    let white = ofName White
+
+    let whiteSmoke = ofName WhiteSmoke
+
+    let yellow = ofName Yellow
+
+    let yellowGreen = ofName YellowGreen
