@@ -25,6 +25,9 @@ module Polygon =
     let ofArray points =
         { Points = points |> Seq.ofArray }
 
+    let toPoints polygon =
+        polygon.Points
+
     let toTag =
         Polygon.ToTag
 
