@@ -99,6 +99,15 @@ Circle.create Point.origin (Length.ofInt 10) |> printf "%O";;
 Circle.create Point.origin (Length.ofInt 10) |> Element.create |> Svg.ofElement |> Svg.toHtml "Example";;
 #quit;;
 ```
+
+Explore interactively with a Notebook:
+
+Install Visual Studio Code plugin for [Interactive Notebooks](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.dotnet-interactive-vscode)
+
+```bash
+Code Examples/Notebooks/SharpVG.dib
+```
+
 ## Documentation
 
 Read the documentation [here](https://github.com/ChrisNikkel/SharpVG/wiki).
