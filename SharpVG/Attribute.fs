@@ -28,9 +28,9 @@ module Attribute =
     let toString (attribute : Attribute) =
         attribute.ToString()
 
-// TODO: Move this into default ToString() for AttributeType
 module AttributeType =
-    let toString = function
+    let toString attributeType =
+        match attributeType with
         | AttributeType.CSS -> "CSS"
         | AttributeType.XML -> "XML"
         | _ -> failwith "Unknown AttributeType"
