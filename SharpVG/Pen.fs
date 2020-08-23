@@ -3,28 +3,31 @@ namespace SharpVG
 type Pen =
     {
         Color: Color;
-        Opacity: float option;
-        Width: Length option;
+        Opacity: float;
+        Width: Length;
     }
 
 module Pen =
+    let private defaultWidth = Length.one
+    let private defaultOpacity = 1.0
+
     let create color =
-        { Color = color; Opacity = None; Width = None }
+        { Color = color; Opacity = defaultOpacity; Width = defaultWidth }
 
     let createWithOpacity color opacity =
-        { Color = color; Opacity = Some(opacity); Width = None }
+        { Color = color; Opacity = opacity; Width = defaultWidth }
 
     let createWithWidth color width =
-        { Color = color; Opacity = None; Width = Some(width) }
+        { Color = color; Opacity = defaultOpacity; Width = width }
 
     let createWithOpacityAndWidth color opacity width =
-        { Color = color; Opacity = Some(opacity); Width = Some(width) }
+        { Color = color; Opacity = opacity; Width = width }
 
     let withOpacity opacity pen =
-        { pen with Opacity = Some(opacity) }
+        { pen with Opacity = opacity }
 
     let withWidth width (pen : Pen) =
-        { pen with Width = Some(width) }
+        { pen with Width = width }
 
     let aliceBlue = Color.ofName AliceBlue |> create
 

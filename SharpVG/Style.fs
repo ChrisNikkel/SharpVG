@@ -54,13 +54,13 @@ module Style =
         { style with Name = Option.ofObj name }
 
     let createWithPen pen =
-        { Stroke = Some(pen.Color); Opacity = pen.Opacity; StrokeWidth = pen.Width; Fill = None; FillOpacity = None; Name = None; }
+        { Stroke = Some(pen.Color); Opacity = Some(pen.Opacity); StrokeWidth = Some(pen.Width); Fill = None; FillOpacity = None; Name = None; }
 
     let withStrokePen pen style =
-        { style with Stroke = Some(pen.Color); Opacity = pen.Opacity; StrokeWidth = pen.Width }
+        { style with Stroke = Some(pen.Color); Opacity = Some(pen.Opacity); StrokeWidth = Some(pen.Width) }
 
     let withFillPen pen style =
-        { style with Fill = Some(pen.Color); FillOpacity = pen.Opacity }
+        { style with Fill = Some(pen.Color); FillOpacity = Some(pen.Opacity) }
 
     let withFill fill style =
         { style with Fill = Some(fill) }
