@@ -55,3 +55,10 @@ module Length =
             | Pixels p -> float p
             | Em e -> e
             | Percent p -> p
+
+    let toInt length =
+        match length with
+            | UserSpace u -> int u
+            | Pixels p -> p
+            | Em e -> int e
+            | Percent p -> int p

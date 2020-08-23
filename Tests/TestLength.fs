@@ -35,8 +35,15 @@ module TestLength =
         Assert.Equal("2.1%", 2.1 |> Length.ofPercent |> Length.toString)
 
     [<SvgProperty>]
-    let ``what goes in must come out`` (x) =
+    let ``what goes in must come out (float)`` (x) =
         Assert.Equal(x, x |> Length.ofUserSpace |> Length.toFloat)
         Assert.Equal(x, x |> Length.ofEm |> Length.toFloat)
         Assert.Equal(x, x |> Length.ofPercent |> Length.toFloat)
         Assert.Equal(int x, x |> int |> Length.ofPixels |> Length.toFloat |> int)
+
+    [<SvgProperty>]
+    let ``what goes in must come out (int)`` (x) =
+        Assert.Equal(int x, x |> Length.ofUserSpace |> Length.toInt)
+        Assert.Equal(int x, x |> Length.ofEm |> Length.toInt)
+        Assert.Equal(int x, x |> Length.ofPercent |> Length.toInt)
+        Assert.Equal(int x, x |> int |> Length.ofPixels |> Length.toInt)
