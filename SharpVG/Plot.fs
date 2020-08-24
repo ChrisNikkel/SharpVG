@@ -86,4 +86,6 @@ module Plot =
             |> Group.withName "MyPlot"
             |> Group.asCartesian yOffset (Length.ofFloat (snd plot.Maximum))
 
-//let f x y w h = x−(w/2),−(y−h/2)
+    // Given a width and height of a screen, this will convert from a 0, 0 in the upper left to 0, 0 in the middle of the screen
+    let screenToCartesian x y w h =
+        (x - (w / 2.0)), (0.0 - (y - h / 2.0))
