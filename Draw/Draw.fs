@@ -40,24 +40,38 @@ module Draw =
         let x, y = pointToXYFloat position
         PointF(x, y)
 
+
+    // TODO: Fix converstions to actually map to the right colors
+    let colorToDrawingColor color =
+        match color with
+        | Name name -> Color.FromName(name.ToString())
+        | SmallHex smallHex -> Color.FromArgb(int smallHex)
+        | Hex hex -> Color.FromArgb(hex)
+        | Values (r, g, b) -> Color.FromArgb(int r, int g, int b)
+        | Percents (r, g, b) -> Color.FromArgb(int r, int g, int b)
+
+    // TODO: Add opacity
+    let penToDrawPen pen =
+        new Pen((colorToDrawingColor pen.Color), (lengthToScreenFloat pen.Width))
+
     let drawPolyline pen (polyline : Polyline) (graphics : System.Drawing.Graphics) =
         let points =
             polyline.Points
             |> Seq.map pointToPointFloat
             |> Seq.toArray
 
-        graphics.DrawLines(pen, points)
+        graphics.DrawLines((penToDrawPen pen), points)
         graphics
 
     let drawPolygon pen polygon (graphics : System.Drawing.Graphics) =
         drawPolyline pen (Polyline.ofPolygon polygon) graphics
 
-    let drawRectangle (pen : Pen) (rect : SharpVG.Rect) (graphics : System.Drawing.Graphics) =
+    let drawRectangle pen (rect : SharpVG.Rect) (graphics : System.Drawing.Graphics) =
         let x, y = pointToXYInt rect.Position
         let width, height = areaToXYInt rect.Size
         let rectangleToDraw = Rectangle(x, y, width, height)
 
-        graphics.DrawRectangle(pen, rectangleToDraw)
+        graphics.DrawRectangle((penToDrawPen pen), rectangleToDraw)
         graphics
 
     let drawImage image (graphics : System.Drawing.Graphics) =
@@ -74,7 +88,7 @@ module Draw =
         let x, y = cx - rx, cy - ry
         let width, height = 2 * rx, 2 * ry
 
-        graphics.DrawEllipse(pen, x, y, width, height)
+        graphics.DrawEllipse((penToDrawPen pen), x, y, width, height)
         graphics
 
     let drawCircle pen circle (graphics : System.Drawing.Graphics) =
@@ -84,23 +98,7 @@ module Draw =
         let x1, y1 = pointToXYInt line.Point1
         let x2, y2 = pointToXYInt line.Point2
 
-        graphics.DrawLine(pen, x1, y1, x2, y2)
+        graphics.DrawLine((penToDrawPen pen), x1, y1, x2, y2)
         graphics
 
 
-    // TODO: Fix converstions to actually map to the right colors
-    let colorToDrawingColor color =
-        match color with
-        | Name name -> Color.FromName(name.ToString())
-        | SmallHex smallHex -> Color.FromArgb(int smallHex)
-        | Hex hex -> Color.FromArgb(hex)
-        | Values (r, g, b) -> Color.FromArgb(int r, int g, int b)
-        | Percents (r, g, b) -> Color.FromArgb(int r, int g, int b)
-
-
-    // TODO: Handle styles with fill, strokeWidth, opacity, fillOpacity, color or no stroke color
-    let styleToPen style =
-        let defaultStrokeColor = Color.ofName Colors.Black
-
-        let brush = new System.Drawing.SolidBrush(colorToDrawingColor (Option.defaultValue defaultStrokeColor style.Stroke));
-        new Pen(brush)
