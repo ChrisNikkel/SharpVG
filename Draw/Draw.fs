@@ -4,7 +4,6 @@ open SharpVG
 open System.Drawing
 
 module Draw =
-
     // TODO: develop way to translate between the various coordinate systems
     let lengthToScreenInt length =
         match length with
