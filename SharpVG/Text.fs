@@ -6,6 +6,15 @@ type TextAnchor =
     | End
     | Inherit
 
+type TextDecoration =
+    | Underline
+    | StrikeThrough
+
+type WritingMode =
+    | HorizontalTopToBottom
+    | VerticalRightToLeft
+    | VerticalLeftToRight
+
 type Text =
     {
         Position: Point
@@ -14,6 +23,8 @@ type Text =
         FontSize: float option
         Anchor: TextAnchor option
         LetterSpacing: float option
+        Decoration: TextDecoration option
+        WritingMode: WritingMode option
     }
 with
     static member ToTag text =
@@ -42,8 +53,23 @@ with
             )
         |> Tag.addAttributes
             (
+                    match text.Decoration with
+                        | Some(Underline) -> [Attribute.createXML "text-decoration" "underline"]
+                        | Some(StrikeThrough) -> [Attribute.createXML "text-decoration" "line-through"]
+                        | None -> []
+            )
+        |> Tag.addAttributes
+            (
                     match text.LetterSpacing with
                         | Some(letterSpacing) -> [Attribute.createXML "letter-spacing" (string letterSpacing)]
+                        | None -> []
+            )
+        |> Tag.addAttributes
+            (
+                    match text.WritingMode with
+                        | Some(HorizontalTopToBottom) -> [Attribute.createXML "writing-mode" "horizontal-tb"]
+                        | Some(VerticalRightToLeft) -> [Attribute.createXML "writing-mode" "vertical-rl"]
+                        | Some(VerticalLeftToRight) -> [Attribute.createXML "writing-mode" "vertical-left"]
                         | None -> []
             )
         |> Tag.addBody text.Body
@@ -53,7 +79,7 @@ with
 
 module Text =
     let create position body =
-        { Position = position; Body = body; FontFamily = None; FontSize = None; Anchor = None; LetterSpacing = None; }
+        { Position = position; Body = body; FontFamily = None; FontSize = None; Anchor = None; LetterSpacing = None; Decoration = None; WritingMode = None}
 
     let withFont family size text =
         { text with FontFamily = Option.ofObj family; FontSize = Some(size) }
@@ -69,6 +95,12 @@ module Text =
 
     let withLetterSpacing letterSpacing text =
         { text with LetterSpacing = Some(letterSpacing) }
+
+    let withWritingMode writingMode text =
+        { text with WritingMode = Some(writingMode) }
+
+    let withDecoration decoration text =
+        { text with Decoration = Some(decoration) }
 
     let toTag =
         Text.ToTag
