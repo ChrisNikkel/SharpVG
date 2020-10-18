@@ -29,6 +29,7 @@
     <Compile Include="TestUse.fs" />
     <Compile Include="TestTiming.fs" />
     <Compile Include="TestTransform.fs" />
+    <Compile Include="TestAnimation.fs" />
     <Compile Include="TestPen.fs" />
     <Compile Include="TestGraphic.fs" />
     <Compile Include="TestSvg.fs" />
