@@ -66,7 +66,7 @@ with
 
         let targetToAttribute t =
             match t with
-                | Some(t) -> List.singleton (Attribute.createXML "xlink:href" t)
+                | Some(t) -> List.singleton (Attribute.createXML "xlink:href" ("#" + t))
                 | None -> []
 
         let name, attributes =
