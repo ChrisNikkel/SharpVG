@@ -11,7 +11,7 @@ open Microsoft.DotNet.Interactive.FSharp.FSharpKernelHelpers;
 let position = Point.ofInts (10, 10)
 let area = Area.ofInts (50, 50)
 let style = Style.create (Color.ofName Colors.LightBlue) (Color.ofName Colors.Blue) (Length.ofInt 3) 1.0 1.0
-let showSvg svg = display(HtmlString(Svg.toString svg)) 
+let showSvg svg = display(HTML(Svg.toString svg))
 let t = Rect.create position area |> Element.createWithStyle style |> Svg.ofElement
 showSvg t
 
