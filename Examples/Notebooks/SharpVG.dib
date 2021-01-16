@@ -4,7 +4,6 @@
 
 open SharpVG
 open System
-open Microsoft.DotNet.Interactive.FSharp.FSharpKernelHelpers;
 
 #!fsharp
 
