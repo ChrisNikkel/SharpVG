@@ -6,9 +6,11 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
 
 [Source code on GitHub](https://github.com/ChrisNikkel/SharpVG)
 
-[![Travis CI Build Status](https://travis-ci.org/ChrisNikkel/SharpVG.svg?branch=master)](https://travis-ci.org/ChrisNikkel/SharpVG) [![Join the chat at https://gitter.im/SharpVG/Lobby](https://badges.gitter.im/SharpVG/Lobby.svg)](https://gitter.im/SharpVG/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)[![NuGet Badge](https://buildstats.info/nuget/SharpVG)](https://www.nuget.org/packages/SharpVG/)
+[![NuGet Info](https://buildstats.info/nuget/SharpVG?includePreReleases=true)](https://www.nuget.org/packages/SharpVG/)
 
-[![Build history](https://buildstats.info/travisci/chart/ChrisNikkel/SharpVG?showStats=false)](https://travis-ci.org/ChrisNikkel/SharpVG)
+![.NET Core](https://github.com/ChrisNikkel/SharpVG/workflows/.NET%20Core/badge.svg)
+
+[![Build history](https://buildstats.info/github/chart/ChrisNikkel/SharpVG?branch=master)](https://github.com/ChrisNikkel/SharpVG/actions)
 
 ## Why SharpVG?
 

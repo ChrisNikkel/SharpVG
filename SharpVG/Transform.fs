@@ -51,7 +51,7 @@ module Transform =
             | Rotate (a, Some (x, _)) -> Rotate (a, Some (x, y))
             | _ -> failwith ("Not able to set y with transform of type: " + getTypeName transform)
 
-    let toStringWithSeparator separator transform =
+    let private parametersToStringWithSeparator separator transform =
         let s = separator
         match transform with
             | Matrix (a, b, c, d, e, f) ->  Length.toString a + s + Length.toString b + s + Length.toString c + s + Length.toString d + s + Length.toString e + s + Length.toString f
@@ -60,15 +60,15 @@ module Transform =
             | Rotate (a, None) | SkewX a | SkewY a -> string a
             | Rotate (a, Some (x, y)) -> string a + s + Length.toString x + s + Length.toString y
 
-    let toString =
-        toStringWithSeparator " "
+    let parametersToString =
+        parametersToStringWithSeparator " "
 
-    let toStringWithStyle transform =
-        getTypeName transform + "(" + toStringWithSeparator "," transform + ")"
+    let toString transform =
+        getTypeName transform + "(" + parametersToStringWithSeparator "," transform + ")"
 
     let toAttribute transform =
-        Attribute.createXML "transform" (toStringWithStyle transform)
+        Attribute.createXML "transform" (toString transform)
 
 module Transforms =
     let toAttribute transforms =
-        Attribute.createXML "transform" (transforms |> Seq.map Transform.toStringWithStyle |> String.concat " ")
+        Attribute.createXML "transform" (transforms |> Seq.map Transform.toString |> String.concat " ")
