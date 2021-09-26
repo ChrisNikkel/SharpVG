@@ -46,6 +46,31 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "test (debug)",
+      "command": "dotnet",
+      "type": "shell",
+      "group": {
+        "kind" : "test",
+        "isDefault" : true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel" : "dedicated"
+      },
+      "args": [
+        "test",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "options":{
+        "cwd": "${workspaceFolder}/Tests",
+        "env": {
+          "VSTEST_HOST_DEBUG": "1"
+        }
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
       "label": "pack",
       "command": "dotnet pack SharpVG -c Release -o nupkgs",
       "type": "shell",
