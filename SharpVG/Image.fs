@@ -8,7 +8,7 @@ type Image =
     }
 with
     static member ToTag image =
-        Tag.create "image" |> Tag.withAttributes ((Point.toAttributes image.Position) @ (Area.toAttributes image.Size) @ [Attribute.createXML "xlink:href" image.Source])
+        Tag.create "image" |> Tag.withAttributes ((Point.toAttributes image.Position) @ (Area.toAttributes image.Size) @ [Attribute.createXML "href" image.Source])
 
     override this.ToString() =
         this |> Image.ToTag |> Tag.toString
