@@ -34,7 +34,6 @@ with
             ]
             |> List.choose id
             |> List.concat
-            // TODO: Remove duplicate attributes such as HREF where Image (as source) or Elements might have them
 
         element.BaseTag
         |> Tag.insertAttributes attributes

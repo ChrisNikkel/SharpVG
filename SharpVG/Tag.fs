@@ -31,7 +31,7 @@ module Tag =
 
     let addAttributes attributes tag =
         tag
-        |> withAttributes (tag.Attributes @ attributes)
+        |> withAttributes (tag.Attributes @ attributes |> List.distinctBy (fun attribute -> attribute.Name))
 
     let addAttribute attribute tag =
         tag
@@ -39,7 +39,7 @@ module Tag =
 
     let insertAttributes attributes tag =
         tag
-        |> withAttributes (attributes @ tag.Attributes)
+        |> withAttributes (attributes @ tag.Attributes |> List.distinctBy (fun attribute -> attribute.Name))
 
     let insertAttribute attribute tag =
         tag
