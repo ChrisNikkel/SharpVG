@@ -31,7 +31,7 @@ type FinalState = // fill
 
 type Timing =
     {
-        Begin: TimeSpan
+        Begin: TimeSpan // TODO: make optional
         Duration: DurationValue option
         End: TimeSpan option
         Minimum: TimeSpan option

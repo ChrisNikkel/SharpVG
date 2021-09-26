@@ -44,6 +44,7 @@ type Animation =
         AnimationType: AnimationType
         Timing: Timing
         Additive: Additive option
+        KeyTimes: list<double> option
     }
 with
     static member ToTag animation =
@@ -56,16 +57,17 @@ with
                 | Some CalculationMode.Spline -> createCalculationMode "spline"
                 | None -> []
 
-        let additiveToAttribute a =
+        let additiveToAttribute additive =
             let createAdditive mode = List.singleton (Attribute.createXML "additive" mode)
-            match a with
+            match additive with
                 | Some Additive.Replace -> createAdditive "replace"
                 | Some Additive.Sum -> createAdditive "sum"
                 | None -> []
 
-        let targetToAttribute t =
-            match t with
-                | Some(t) -> List.singleton (Attribute.createXML "xlink:href" ("#" + t))
+        let keyTimesToAttribute keyTimes =
+            let createKeyTimes keyTimes = keyTimes |> List.map string |> (String.concat ";") |> (Attribute.createXML "keyTimes")
+            match keyTimes with
+                | Some keyTimes -> List.singleton (createKeyTimes keyTimes)
                 | None -> []
 
         let name, attributes =
@@ -74,8 +76,9 @@ with
                 | Animate c -> "animate", [Attribute.createXML "attributeName" c.AttributeName; Attribute.createXML "attributeType" (AttributeType.toString c.AttributeType); Attribute.createXML "from" c.AttributeFromValue; Attribute.createXML "to" c.AttributeToValue]
                 | Transform (f, t) -> "animateTransform", [Attribute.createXML "attributeName" "transform"; Attribute.createXML "attributeType" "XML"; Attribute.createXML "type" (Transform.getTypeName f); Attribute.createXML "from" (f |> Transform.parametersToString); Attribute.createXML "to" (t |> Transform.parametersToString)]
                 | Motion m -> "animateMotion", [m.Path |> Path.toAttribute] @ (calculationModeToAttribute m.CalculationMode)
+
         Tag.create name
-        |> Tag.addAttributes (attributes @ (additiveToAttribute animation.Additive))
+        |> Tag.addAttributes (attributes @ (keyTimesToAttribute animation.KeyTimes) @ (additiveToAttribute animation.Additive))
         |> Tag.addAttributes (animation.Timing |> Timing.toAttributes)
 
     override this.ToString() =
@@ -88,6 +91,7 @@ module Animation =
             AnimationType = Transform (From = fromTransform, To = toTransform)
             Timing = timing
             Additive = None
+            KeyTimes = None
         }
 
     let createSet timing attributeType attributeName attributeValue =
@@ -95,6 +99,7 @@ module Animation =
             AnimationType = Set {AttributeName = attributeName; AttributeValue = attributeValue; AttributeType = attributeType }
             Timing = timing
             Additive = None
+            KeyTimes = None
         }
 
     let createAnimation timing attributeType attributeName attributeFromValue attributeToValue =
@@ -102,6 +107,7 @@ module Animation =
             AnimationType = Animate {AttributeName = attributeName; AttributeFromValue = attributeFromValue; AttributeToValue = attributeToValue; AttributeType = attributeType }
             Timing = timing
             Additive = None
+            KeyTimes = None
         }
 
     let createMotion timing path calculationMode =
@@ -109,10 +115,21 @@ module Animation =
             AnimationType = Motion {Path = path; CalculationMode = calculationMode}
             Timing = timing
             Additive = None
+            KeyTimes = None
         }
 
     let withAdditive additive animation =
-        {animation with Additive = Some(additive) }
+        { animation with Additive = Some(additive) }
+
+    let withKeyTimes keyTimes animation =
+        { animation with KeyTimes = Some(keyTimes) }
+
+    let addKeyTime keyTime animation =
+        let keyTimes =
+            match animation.KeyTimes with
+                | Some(keyTimes) -> keyTime |> List.singleton |> (List.append keyTimes)
+                | None -> List.singleton keyTime
+        withKeyTimes keyTimes animation
 
     let toTag =
         Animation.ToTag

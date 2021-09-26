@@ -18,7 +18,7 @@ module TestAnimation =
 
 
     [<Fact>]
-    let ``create bouncing effect on orangge circle`` () =
+    let ``create bouncing effect on orange circle`` () =
         let circle = Circle.create (Point.ofInts (50, 50)) (Length.ofInt 30)
         let style = Style.empty |> Style.withFill (Name Colors.Orange)
         let targetName = "orange-circle"
@@ -28,3 +28,24 @@ module TestAnimation =
 
         Assert.Equal("<circle id=\"orange-circle\" fill=\"orange\" r=\"30\" cx=\"50\" cy=\"50\"/>", circleWithStyle |> Element.toString)
         Assert.Equal("<animate href=\"#orange-circle\" attributeName=\"cy\" attributeType=\"XML\" from=\"50\" to=\"250\" begin=\"1s\" dur=\"3s\"/>", circleAnimation |> Element.toString)
+
+    (*
+    <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="60" cy="10" r="10">
+            <animate attributeName="cx" dur="4s" repeatCount="indefinite"
+                values="60 ; 110 ; 60 ; 10 ; 60" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"/>
+            <animate attributeName="cy" dur="4s" repeatCount="indefinite"
+                values="10 ; 60 ; 110 ; 60 ; 10" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"/>
+        </circle>
+    </svg>
+    *)
+
+    [<Fact>]
+    let ``create animation with list of key times`` () =
+        let circle = Circle.create (Point.ofInts (60, 10)) (Length.ofInt 10)
+        let repetition =  { RepeatCount = RepeatCountValue.Indefinite ; RepeatDuration = None }  // TODO: Create helper for Repetition to avoid need to create records
+        let timing = Timing.create (TimeSpan(0, 0, 0, 0)) |> Timing.withRepetition repetition |> Timing.withDuration (TimeSpan(0, 0, 0, 4))
+        let animation = Animation.createAnimation timing AttributeType.XML "cx" "60" "110" |> Animation.withKeyTimes [ 0.0; 0.25; 0.5; 0.75; 1.0 ]
+        let circleElementWithAnimation = circle |> Element.create |> (Element.withAnimation animation)
+
+        Assert.Equal("<circle r=\"10\" cx=\"60\" cy=\"10\"><animate attributeName=\"cx\" attributeType=\"XML\" from=\"60\" to=\"110\" keyTimes=\"0;0.25;0.5;0.75;1\" repeatCount=\"indefinite\" begin=\"0s\" dur=\"4s\"/></circle>", circleElementWithAnimation |> Element.toString)
