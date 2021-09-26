@@ -43,7 +43,6 @@ type Animation =
     {
         AnimationType: AnimationType
         Timing: Timing
-        Target: string option
         Additive: Additive option
     }
 with
@@ -76,7 +75,7 @@ with
                 | Transform (f, t) -> "animateTransform", [Attribute.createXML "attributeName" "transform"; Attribute.createXML "attributeType" "XML"; Attribute.createXML "type" (Transform.getTypeName f); Attribute.createXML "from" (f |> Transform.parametersToString); Attribute.createXML "to" (t |> Transform.parametersToString)]
                 | Motion m -> "animateMotion", [m.Path |> Path.toAttribute] @ (calculationModeToAttribute m.CalculationMode)
         Tag.create name
-        |> Tag.addAttributes (attributes @ (targetToAttribute animation.Target) @ (additiveToAttribute animation.Additive))
+        |> Tag.addAttributes (attributes @ (additiveToAttribute animation.Additive))
         |> Tag.addAttributes (animation.Timing |> Timing.toAttributes)
 
     override this.ToString() =
@@ -88,7 +87,6 @@ module Animation =
         {
             AnimationType = Transform (From = fromTransform, To = toTransform)
             Timing = timing
-            Target = None
             Additive = None
         }
 
@@ -96,7 +94,6 @@ module Animation =
         {
             AnimationType = Set {AttributeName = attributeName; AttributeValue = attributeValue; AttributeType = attributeType }
             Timing = timing
-            Target = None
             Additive = None
         }
 
@@ -104,7 +101,6 @@ module Animation =
         {
             AnimationType = Animate {AttributeName = attributeName; AttributeFromValue = attributeFromValue; AttributeToValue = attributeToValue; AttributeType = attributeType }
             Timing = timing
-            Target = None
             Additive = None
         }
 
@@ -112,15 +108,11 @@ module Animation =
         {
             AnimationType = Motion {Path = path; CalculationMode = calculationMode}
             Timing = timing
-            Target = None
             Additive = None
         }
 
     let withAdditive additive animation =
         {animation with Additive = Some(additive) }
-
-    let withTarget target animation =
-        {animation with Target = Some(target) }
 
     let toTag =
         Animation.ToTag

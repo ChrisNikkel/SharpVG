@@ -16,6 +16,7 @@ module TestAnimation =
         printf "%s" (Animation.toString animation)
         Assert.Equal("<animateTransform attributeName=\"transform\" attributeType=\"XML\" type=\"matrix\" from=\"3 1 -1 3 30 40\" to=\"40 30 3 -1 1 3\" begin=\"1s\"/>", animation |> Animation.toString)
 
+
     [<Fact>]
     let ``create bouncing effect on orangge circle`` () =
         let circle = Circle.create (Point.ofInts (50, 50)) (Length.ofInt 30)
@@ -23,8 +24,7 @@ module TestAnimation =
         let targetName = "orange-circle"
         let circleWithStyle = circle |> Element.createWithName targetName |> Element.withStyle style
         let timing = Timing.create (TimeSpan(0, 0, 0, 1)) |> Timing.withDuration (TimeSpan(0, 0, 3))
-        let animation = Animation.createAnimation timing AttributeType.XML "cy" "50" "250"
-        let circleAnimation = animation |> Animation.withTarget targetName
+        let circleAnimation = Animation.createAnimation timing AttributeType.XML "cy" "50" "250" |> Element.create |> Element.withHref ("#" + targetName)
 
         Assert.Equal("<circle id=\"orange-circle\" fill=\"orange\" r=\"30\" cx=\"50\" cy=\"50\"/>", circleWithStyle |> Element.toString)
-        Assert.Equal("<animate attributeName=\"cy\" attributeType=\"XML\" from=\"50\" to=\"250\" xlink:href=\"#orange-circle\" begin=\"1s\" dur=\"3s\"/>", circleAnimation |> Animation.toString)
+        Assert.Equal("<animate href=\"#orange-circle\" attributeName=\"cy\" attributeType=\"XML\" from=\"50\" to=\"250\" begin=\"1s\" dur=\"3s\"/>", circleAnimation |> Element.toString)

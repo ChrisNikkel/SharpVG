@@ -5,6 +5,7 @@ type Element = {
         Classes: seq<string>
         BaseTag: Tag
         Style: Style option
+        Href: string option
         Transforms: seq<Transform>
         Animations: seq<Animation>
     }
@@ -23,18 +24,19 @@ with
                 | Some n -> element.Classes |> Seq.append (Seq.singleton n)
                 | None -> element.Classes
 
-        element.BaseTag
-        |> Tag.insertAttributes
-            (
-                [
+        let attributes =
+            [
                     element.Name |> Option.map (Attribute.createCSS "id" >> List.singleton)
                     classes |> Seq.map (Attribute.createCSS "class") |> Seq.toList |> Option.Some
                     element.Style |> Option.filter (not << Style.isNamed) |> Option.map Style.toAttributes
+                    element.Href |> Option.map (Attribute.createCSS "href" >> List.singleton)
                     if Seq.isEmpty element.Transforms then None else Some [ element.Transforms |> Transforms.toAttribute ]
-                ]
-                |> List.choose id
-                |> List.concat
-            )
+            ]
+            |> List.choose id
+            |> List.concat
+
+        element.BaseTag
+        |> Tag.insertAttributes attributes
         |> if element.Animations |> Seq.isEmpty then id else Tag.addBody (element.Animations |> Seq.map Animation.toString |> String.concat "")
 
     override this.ToString() =
@@ -48,6 +50,7 @@ module Element =
             Classes = Seq.empty
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = None
+            Href = None
             Transforms = Seq.empty
             Animations = Seq.empty
         }
@@ -58,6 +61,7 @@ module Element =
             Classes = Seq.empty
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = Some(style)
+            Href = None
             Transforms = Seq.empty
             Animations = Seq.empty
         }
@@ -68,6 +72,7 @@ module Element =
             Classes = Seq.empty
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = None
+            Href = None
             Transforms = Seq.empty
             Animations = Seq.empty
         }
@@ -78,6 +83,7 @@ module Element =
             Classes = classes
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = style
+            Href = None
             Transforms = Seq.empty
             Animations = animations
         }
@@ -102,6 +108,9 @@ module Element =
 
     let withName name (element : Element) =
         { element with Name = Some name }
+
+    let withHref href (element : Element) =
+        { element with Href = Some href }
 
     let withClass className element =
         { element with Classes = Seq.singleton className }
