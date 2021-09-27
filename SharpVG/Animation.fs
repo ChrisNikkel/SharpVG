@@ -44,7 +44,7 @@ type Animation =
         AnimationType: AnimationType
         Timing: Timing
         Additive: Additive option
-        KeyTimes: list<double> option
+        KeyTimes: list<double>
     }
 with
     static member ToTag animation =
@@ -65,10 +65,7 @@ with
                 | None -> []
 
         let keyTimesToAttribute keyTimes =
-            let createKeyTimes keyTimes = keyTimes |> List.map string |> (String.concat ";") |> (Attribute.createXML "keyTimes")
-            match keyTimes with
-                | Some keyTimes -> List.singleton (createKeyTimes keyTimes)
-                | None -> []
+            if List.isEmpty keyTimes then [] else keyTimes |> List.map string |> (String.concat ";") |> (Attribute.createXML "keyTimes") |> List.singleton
 
         let name, attributes =
             match animation.AnimationType with
@@ -91,7 +88,7 @@ module Animation =
             AnimationType = Transform (From = fromTransform, To = toTransform)
             Timing = timing
             Additive = None
-            KeyTimes = None
+            KeyTimes = List.empty
         }
 
     let createSet timing attributeType attributeName attributeValue =
@@ -99,7 +96,7 @@ module Animation =
             AnimationType = Set {AttributeName = attributeName; AttributeValue = attributeValue; AttributeType = attributeType }
             Timing = timing
             Additive = None
-            KeyTimes = None
+            KeyTimes = List.empty
         }
 
     let createAnimation timing attributeType attributeName attributeFromValue attributeToValue =
@@ -107,7 +104,7 @@ module Animation =
             AnimationType = Animate {AttributeName = attributeName; AttributeFromValue = attributeFromValue; AttributeToValue = attributeToValue; AttributeType = attributeType }
             Timing = timing
             Additive = None
-            KeyTimes = None
+            KeyTimes = List.empty
         }
 
     let createMotion timing path calculationMode =
@@ -115,20 +112,17 @@ module Animation =
             AnimationType = Motion {Path = path; CalculationMode = calculationMode}
             Timing = timing
             Additive = None
-            KeyTimes = None
+            KeyTimes = List.empty
         }
 
     let withAdditive additive animation =
         { animation with Additive = Some(additive) }
 
     let withKeyTimes keyTimes animation =
-        { animation with KeyTimes = Some(keyTimes) }
+        { animation with KeyTimes = keyTimes }
 
     let addKeyTime keyTime animation =
-        let keyTimes =
-            match animation.KeyTimes with
-                | Some(keyTimes) -> keyTime |> List.singleton |> (List.append keyTimes)
-                | None -> List.singleton keyTime
+        let keyTimes = animation.KeyTimes |> (List.append keyTime)
         withKeyTimes keyTimes animation
 
     let toTag =
