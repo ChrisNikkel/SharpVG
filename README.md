@@ -23,6 +23,11 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
   - Limited support for SVG animations
   - Reusable styles
 
+## SharpVG Goals
+  - To enable easy cross platform graphics in F#
+  - To create simple and clear DSL
+  - To reduce invalid state and runtime problems
+
 ## Try SharpVG
 
 Run the interactive notebook: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ChrisNikkel/SharpVG/master)
