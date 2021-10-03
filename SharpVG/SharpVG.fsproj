@@ -56,6 +56,7 @@
     <Compile Include="Group.fs" />
     <Compile Include="Graphic.fs" />
     <Compile Include="Svg.fs" />
+    <Compile Include="HtmlCanvas.fs" />
   </ItemGroup>
 
 </Project>

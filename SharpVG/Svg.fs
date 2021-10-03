@@ -39,6 +39,7 @@ module Svg =
     let withViewBox viewBox (svg:Svg) =
         { svg with ViewBox = Some(viewBox) }
 
+    // TODO: Add documentation to all the things
     /// <summary>
     /// This function takes seqence of elements and creates a simple svg object.
     /// </summary>
