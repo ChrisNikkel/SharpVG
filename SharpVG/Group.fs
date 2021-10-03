@@ -1,7 +1,7 @@
 ﻿namespace SharpVG
 
 type Group = {
-    Name: string option
+    Name: ElementId option
     Body: Body
     Transforms: seq<Transform>
 }

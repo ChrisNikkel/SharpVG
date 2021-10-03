@@ -2,7 +2,7 @@ namespace SharpVG
 
 type Use =
     {
-        Name : string
+        Name : ElementId
         Position : Point
         Size : Area option
     }

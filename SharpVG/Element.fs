@@ -1,7 +1,7 @@
 namespace SharpVG
 
 type Element = {
-        Name: string option
+        Name: ElementId option
         Classes: seq<string>
         BaseTag: Tag
         Style: Style option
