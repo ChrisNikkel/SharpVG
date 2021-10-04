@@ -24,7 +24,7 @@ with
         |> Tag.toString
 
 module HtmlCanvas =
-    let withSize size (canvas : Canvas) =
+    let withSize size (canvas : HtmlCanvas) =
         { canvas with Size = Some(size) }
 
     let ofSeq seq =
@@ -42,7 +42,7 @@ module HtmlCanvas =
     let ofArray array =
         array |> Seq.ofArray |> ofSeq
 
-    let toString (canvas : Canvas) =
+    let toString (canvas : HtmlCanvas) =
         canvas.ToString()
 
     let toHtml title canvas =

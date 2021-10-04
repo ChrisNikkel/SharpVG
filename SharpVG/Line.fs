@@ -6,13 +6,13 @@ type Line =
         Point2: Point
     }
 with
-    static member this.ToTag line =
+    static member ToTag line =
         Tag.create "line"
             |> Tag.withAttributes (Point.toAttributesWithModifier "" "1" line.Point1)
             |> Tag.addAttributes (Point.toAttributesWithModifier "" "2" line.Point2)
 
-    static member ToHtmlCanvas line =
-        line.ToTag line |> (Tag.withHtmlCanvasCode "ctx.moveTo(" + this.Point.toString Point1 + ");ctx.lineTo(" + Point.toString Point2 + ");ctx.stroke();") List.empty
+    static member ToHtmlCanvas (line : Line) =
+        Line.ToTag line |> Tag.withHtmlCanvasCode ("ctx.moveTo(" + Point.toString line.Point1 + ");ctx.lineTo(" + Point.toString line.Point2 + ");ctx.stroke();") List.empty
 
     override this.ToString() =
         Line.ToTag this |> Tag.toString
