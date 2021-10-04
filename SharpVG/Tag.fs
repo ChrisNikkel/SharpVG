@@ -1,10 +1,17 @@
 namespace SharpVG
 
+type HtmlCanvasCode =
+    {
+        Code : string
+        Parameters : string list
+    }
+
 type Tag =
     {
-        Name: string;
-        Attributes: List<Attribute>;
-        Body: string option;
+        Name : string
+        Attributes : Attribute list
+        Body : string option
+        HtmlCanvasCode : HtmlCanvasCode option
     }
 with
     override this.ToString() =
@@ -18,7 +25,10 @@ with
 module Tag =
 
     let create name =
-        { Name = name; Attributes = List.empty; Body = None }
+        { Name = name; Attributes = List.empty; Body = None; HtmlCanvasCode = None }
+
+    let withHtmlCanvasCode code parameters tag =
+        { tag with HtmlCanvasCode = Some { Code = code; Parameters = parameters } }
 
     let withAttribute attribute tag =
         { tag with Attributes = List.singleton attribute }

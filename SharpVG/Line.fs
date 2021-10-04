@@ -9,10 +9,10 @@ with
     static member this.ToTag line =
         Tag.create "line"
             |> Tag.withAttributes (Point.toAttributesWithModifier "" "1" line.Point1)
-            |> Tag.addAttributes (Point.toAttributesWithModifier "" git checkout -b  "2" line.Point2)
+            |> Tag.addAttributes (Point.toAttributesWithModifier "" "2" line.Point2)
 
-    static member ToHtmlCanvas =
-        "ctx.moveTo(" + Point.toString Point1 + ");ctx.lineTo(" + Point.toString Point2 + ");ctx.stroke();"
+    static member ToHtmlCanvas line =
+        line.ToTag line |> (Tag.withHtmlCanvasCode "ctx.moveTo(" + this.Point.toString Point1 + ");ctx.lineTo(" + Point.toString Point2 + ");ctx.stroke();") List.empty
 
     override this.ToString() =
         Line.ToTag this |> Tag.toString
