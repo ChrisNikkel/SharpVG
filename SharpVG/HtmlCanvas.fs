@@ -17,7 +17,6 @@ with
                 this.Body
                 |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> Group.toString)
                 |> String.concat ""
-                |> String.
 
         Tag.create "canvas"
         |> Tag.withAttributes attributes
