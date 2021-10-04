@@ -12,7 +12,8 @@ with
             |> Tag.addAttributes (Point.toAttributesWithModifier "" "2" line.Point2)
 
     static member ToHtmlCanvas (line : Line) =
-        Line.ToTag line |> Tag.withHtmlCanvasCode ("ctx.moveTo(" + Point.toString line.Point1 + ");ctx.lineTo(" + Point.toString line.Point2 + ");ctx.stroke();") List.empty
+        let parameters = [(Point.toString line.Point1); (Point.toString line.Point2)]
+        Tag.withHtmlCanvasCode "ctx.moveTo(%1%);ctx.lineTo(%2%);" parameters (Line.ToTag line)
 
     override this.ToString() =
         Line.ToTag this |> Tag.toString
