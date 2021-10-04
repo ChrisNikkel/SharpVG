@@ -44,6 +44,7 @@ with
 
 module Element =
 
+    // TODO: Move away from static member to just member
     let inline create< ^T when ^T: (static member ToTag: ^T -> Tag)> taggable =
         {
             Name = None
