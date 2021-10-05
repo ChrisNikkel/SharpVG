@@ -55,7 +55,7 @@ type ColorMatrix =
         static member ToTag colorMatrix =
             Tag.create "feColorMatrix" |>
             match colorMatrix with
-                | Matrix(matrix) -> Tag.withAttributes [(Attribute.createXML "type" "matrix"); Attribute.createXML "values" (System.String.Concat(matrix |> List.map string |> Array.ofList, " "))]
+                | Matrix(matrix) -> Tag.withAttributes [(Attribute.createXML "type" "matrix"); Attribute.createXML "values" (matrix |> List.map string |> String.concat " ")]
                 | Saturate(saturate) -> Tag.withAttributes [(Attribute.createXML "type" "saturate"); Attribute.createXML "values" (string saturate)]
                 | HueRotate(hueRotate) -> Tag.withAttributes [(Attribute.createXML "type" "hueRotate"); Attribute.createXML "values" (string hueRotate)]
                 | LuminanceToAlpha -> id
@@ -84,13 +84,13 @@ type DiffuseLighting =
     {
         SurfaceScale : float
         DiffuseConstant : float
-        KernelUnitLength : float option
+        KernelUnitLength : float // TODO: Make optional
     }
 
 type Flood =
     {
         Color : Color
-        Opacity : float option // TODO: Constrain to 0 to 1.0 or make type for percent
+        Opacity : float // TODO: Make optional and onstrain to 0 to 1.0 or make type for percent
     }
 
 type GaussianBlur =
@@ -124,7 +124,7 @@ with
             | ColorMatrix (colorMatrix) -> ColorMatrix.ToTag colorMatrix
             | Composite (composite) -> Tag.create "feComposite" |> Tag.withAttribute (Attribute.createXML "operator" (composite.ToString()))
             | DiffuseLighting (diffuseLighting) -> Tag.create "feDiffuseLighting" // TODO: Add attributes
-            | Flood (flood) -> Tag.create "Flood" // TODO: Add attributes
+            | Flood (flood) -> Tag.create "Flood" |> Tag.withAttributes [Attribute.createXML "flood-color" (flood.Color |> Color.toString); Attribute.createXML "flood-opacity" (string flood.Opacity)]
             | GaussianBlur (gaussianBlur) -> Tag.create "feGaussianBlur" // TODO: Add attributes
             | Image (image) -> Tag.create "feImage" // TODO: Add attributes
             | Offset (offset) -> Tag.create "feOffset" // TODO: Add attributes
