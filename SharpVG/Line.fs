@@ -6,7 +6,7 @@ type Line =
         Point2: Point
     }
 with
-    static member this.ToTag line =
+    static member ToTag line =
         Tag.create "line"
             |> Tag.withAttributes (Point.toAttributesWithModifier "" "1" line.Point1)
             |> Tag.addAttributes (Point.toAttributesWithModifier "" "2" line.Point2)
