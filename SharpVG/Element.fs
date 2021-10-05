@@ -85,7 +85,7 @@ module Element =
             BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = style
             Href = None
-            Transforms = Seq.empty
+            Transforms = transform
             Animations = animations
         }
 
