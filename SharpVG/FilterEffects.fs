@@ -40,12 +40,28 @@ type EdgeMode =
     | Duplicate
     | Wrap
     | NoEdge
+    override this.ToString() =
+        match this with
+            | Duplicate -> "Duplicate"
+            | Wrap -> "Wrap"
+            | NoEdge -> "NoEdge"
 
 type ColorMatrix =
     | Matrix of int list // TODO: Convert top a 5x4 matrix object of some sort
     | Saturate of float // TODO: Constrain to 0 to 1.0 or make type for percent
     | HueRotate of float // TODO: Make type for degrees
     | LuminanceToAlpha
+    with
+        static member ToTag colorMatrix =
+            Tag.create "feColorMatrix" |>
+            match colorMatrix with
+                | Matrix(matrix) -> Tag.withAttributes [(Attribute.createXML "type" "matrix"); Attribute.createXML "values" (System.String.Concat(matrix |> List.map string |> Array.ofList, " "))]
+                | Saturate(saturate) -> Tag.withAttributes [(Attribute.createXML "type" "saturate"); Attribute.createXML "values" (string saturate)]
+                | HueRotate(hueRotate) -> Tag.withAttributes [(Attribute.createXML "type" "hueRotate"); Attribute.createXML "values" (string hueRotate)]
+                | LuminanceToAlpha -> id
+
+        override this.ToString() =
+            this |> ColorMatrix.ToTag |> Tag.toString
 
 type Composite =
     | Over
@@ -55,7 +71,15 @@ type Composite =
     | Xor
     | Lighter
     | Arithmetic
-
+    override this.ToString() =
+        match this with
+            | Over -> "Over"
+            | In -> "In"
+            | Out -> "Out"
+            | Atop -> "Atop"
+            | Xor -> "Xor"
+            | Lighter -> "Lighter"
+            | Arithmetic -> "Arithmetic"
 type DiffuseLighting =
     {
         SurfaceScale : float
@@ -97,8 +121,8 @@ with
     static member ToTag filterEffects =
         match filterEffects with
             | Blend (blend) -> Tag.create "feBlend" |> Tag.withAttribute (Attribute.createXML "mode" (blend.ToString()))
-            | ColorMatrix (colorMatrix) -> Tag.create "feColorMatrix" // TODO: Add attributes
-            | Composite (composite) -> Tag.create "feComposite" // TODO: Add attributes
+            | ColorMatrix (colorMatrix) -> ColorMatrix.ToTag colorMatrix
+            | Composite (composite) -> Tag.create "feComposite" |> Tag.withAttribute (Attribute.createXML "operator" (composite.ToString()))
             | DiffuseLighting (diffuseLighting) -> Tag.create "feDiffuseLighting" // TODO: Add attributes
             | Flood (flood) -> Tag.create "Flood" // TODO: Add attributes
             | GaussianBlur (gaussianBlur) -> Tag.create "feGaussianBlur" // TODO: Add attributes
