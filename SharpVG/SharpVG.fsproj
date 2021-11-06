@@ -46,7 +46,7 @@
     <Compile Include="Timing.fs" />
     <Compile Include="Transform.fs" />
     <Compile Include="Animation.fs" />
-    <Compile Include="FilterEffects.fs" />
+    <Compile Include="FilterEffect.fs" />
     <Compile Include="Filter.fs" />
     <Compile Include="ViewBox.fs" />
     <Compile Include="Element.fs" />

@@ -99,7 +99,7 @@ type GaussianBlur =
         EdgeMode : EdgeMode
     }
 
-type FilterEffects =
+type FilterEffectType =
     | Blend of BlendMode
     | ColorMatrix of ColorMatrix
     // TODO: Implement ComponentTransfer
@@ -118,8 +118,8 @@ type FilterEffects =
     // TODO: Implement Tile
     // TODO: Implement Turbulence
 with
-    static member ToTag filterEffects =
-        match filterEffects with
+    static member ToTag filterEffect =
+        match filterEffect with
             | Blend (blend) -> Tag.create "feBlend" |> Tag.withAttribute (Attribute.createXML "mode" (blend.ToString()))
             | ColorMatrix (colorMatrix) -> ColorMatrix.ToTag colorMatrix
             | Composite (composite) -> Tag.create "feComposite" |> Tag.withAttribute (Attribute.createXML "operator" (composite.ToString()))
@@ -130,10 +130,22 @@ with
             | Offset (offset) -> Tag.create "feOffset" // TODO: Add attributes
 
     override this.ToString() =
-        this |> FilterEffects.ToTag |> Tag.toString
+        this |> FilterEffectType.ToTag |> Tag.toString
 
-module FilterEffects =
-    let empty : string =
-        invalidOp "Not Implemented"
+type FilterEffect =
+    {
+        Type : FilterEffectType
+        Input : string
+        Input2 : string
+        Result : string
+    }
 
-    let create = empty // TODO: Figure out what the most useful create function would be (which are likely inner tags)
+// TODO: make it easy to string things together so that if result or inputs aren't specified random ids are created and linked together.  
+
+module FilterEffect =
+
+    let create filterEffectType = 
+        { Type = filterEffectType; Input = ""; Input2 = ""; Result = "" }
+    
+    let toString filterEffect =
+        filterEffect.ToString()
