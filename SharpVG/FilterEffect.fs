@@ -1,4 +1,5 @@
 namespace SharpVG
+open System
 
 type BlendMode =
     | Normal
@@ -117,9 +118,25 @@ type FilterEffectType =
     // TODO: Implement SpecularLighting
     // TODO: Implement Tile
     // TODO: Implement Turbulence
+
+
+type FilterEffect =
+    {
+        Type : FilterEffectType
+        Input : string
+        Input2 : string
+        Result : string
+    }
 with
     static member ToTag filterEffect =
-        match filterEffect with
+        let attributes =
+            [
+                if String.IsNullOrEmpty(filterEffect.Input) then None else Some(Attribute.createXML "in" filterEffect.Input)
+                if String.IsNullOrEmpty(filterEffect.Input2) then None else Some(Attribute.createXML "in2" filterEffect.Input2)
+                if String.IsNullOrEmpty(filterEffect.Result) then None else Some(Attribute.createXML "result" filterEffect.Result)
+            ] |> List.choose id
+
+        match filterEffect.Type with
             | Blend (blend) -> Tag.create "feBlend" |> Tag.withAttribute (Attribute.createXML "mode" (blend.ToString()))
             | ColorMatrix (colorMatrix) -> ColorMatrix.ToTag colorMatrix
             | Composite (composite) -> Tag.create "feComposite" |> Tag.withAttribute (Attribute.createXML "operator" (composite.ToString()))
@@ -129,16 +146,11 @@ with
             | Image (image) -> Tag.create "feImage" // TODO: Add attributes
             | Offset (offset) -> Tag.create "feOffset" // TODO: Add attributes
 
-    override this.ToString() =
-        this |> FilterEffectType.ToTag |> Tag.toString
+        |> Tag.withAttributes attributes
 
-type FilterEffect =
-    {
-        Type : FilterEffectType
-        Input : string
-        Input2 : string
-        Result : string
-    }
+    override this.ToString() =
+        this |> FilterEffect.ToTag |> Tag.toString
+
 
 // TODO: make it easy to string things together so that if result or inputs aren't specified random ids are created and linked together.  
 
