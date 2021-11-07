@@ -81,24 +81,52 @@ type Composite =
             | Xor -> "Xor"
             | Lighter -> "Lighter"
             | Arithmetic -> "Arithmetic"
+            
 type DiffuseLighting =
     {
         SurfaceScale : float
         DiffuseConstant : float
         KernelUnitLength : float // TODO: Make optional
     }
+    with
+        static member ToTag diffuseLighting =
+            let attributes =
+                [
+                    Some(Attribute.createXML "surfaceScale" (string diffuseLighting.SurfaceScale))
+                    Some(Attribute.createXML "diffuseConstant" (string diffuseLighting.DiffuseConstant))
+                    Some(Attribute.createXML "kernelUnitLength" (string diffuseLighting.KernelUnitLength))
+                ] |> List.choose id
 
+            Tag.createWithAttributes "feDiffuseLighting" attributes
 type Flood =
     {
         Color : Color
-        Opacity : float // TODO: Make optional and onstrain to 0 to 1.0 or make type for percent
+        Opacity : float option// TODO: Make optional and onstrain to 0 to 1.0 or make type for percent
     }
+    with
+        static member ToTag flood =
+            let attributes =
+                [
+                    Some(Attribute.createXML "flood-color" (flood.Color.ToString()))
+                    flood.Opacity |> Option.map (string >> (Attribute.createXML "flood-opacity"))
+                ] |> List.choose id
+
+            Tag.createWithAttributes "feFlood" attributes
 
 type GaussianBlur =
     {
         StandardDeviation : float
-        EdgeMode : EdgeMode
+        EdgeMode : EdgeMode option
     }
+    with
+        static member ToTag gaussianBlur=
+            let attributes =
+                [
+                    Some(Attribute.createXML "stdDeviation" (string gaussianBlur.StandardDeviation))
+                    gaussianBlur.EdgeMode |> Option.map (fun edgeMode -> Attribute.createXML "edgeMode" (edgeMode.ToString())) 
+                ] |> List.choose id
+
+            Tag.createWithAttributes "feGaussianBlur" attributes
 
 type FilterEffectType =
     | Blend of BlendMode
@@ -140,13 +168,13 @@ with
             | Blend (blend) -> Tag.create "feBlend" |> Tag.withAttribute (Attribute.createXML "mode" (blend.ToString()))
             | ColorMatrix (colorMatrix) -> ColorMatrix.ToTag colorMatrix
             | Composite (composite) -> Tag.create "feComposite" |> Tag.withAttribute (Attribute.createXML "operator" (composite.ToString()))
-            | DiffuseLighting (diffuseLighting) -> Tag.create "feDiffuseLighting" // TODO: Add attributes
-            | Flood (flood) -> Tag.create "Flood" |> Tag.withAttributes [Attribute.createXML "flood-color" (flood.Color |> Color.toString); Attribute.createXML "flood-opacity" (string flood.Opacity)]
-            | GaussianBlur (gaussianBlur) -> Tag.create "feGaussianBlur" // TODO: Add attributes
-            | Image (image) -> Tag.create "feImage" // TODO: Add attributes
-            | Offset (offset) -> Tag.create "feOffset" // TODO: Add attributes
+            | DiffuseLighting (diffuseLighting) -> DiffuseLighting.ToTag diffuseLighting
+            | Flood (flood) -> Flood.ToTag flood
+            | GaussianBlur (gaussianBlur) -> GaussianBlur.ToTag gaussianBlur
+            | Image (image) -> Tag.createWithAttribute "feImage" (Attribute.createXML "xlink:href" image)
+            | Offset (offset) -> Tag.createWithAttributes "feOffset" (Point.toAttributesWithModifier "d" "" offset)
 
-        |> Tag.withAttributes attributes
+        |> Tag.addAttributes attributes
 
     override this.ToString() =
         this |> FilterEffect.ToTag |> Tag.toString
@@ -156,8 +184,41 @@ with
 
 module FilterEffect =
 
-    let create filterEffectType = 
-        { Type = filterEffectType; Input = ""; Input2 = ""; Result = "" }
-    
+    let createBlend blend = 
+        { Type = Blend blend; Input = ""; Input2 = ""; Result = "" }
+
+    let createColorMatrix colorMatrix = 
+        { Type = ColorMatrix colorMatrix; Input = ""; Input2 = ""; Result = "" }
+
+    let createComposite composite = 
+        { Type = Composite composite ; Input = ""; Input2 = ""; Result = "" }
+
+    let createDiffuseLighting surfaceScale diffuseConstant kernelUnitLength = 
+        { Type = DiffuseLighting { SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = kernelUnitLength }; Input = ""; Input2 = ""; Result = "" }
+
+    let createFlood color opacity = 
+        { Type = Flood { Color = color; Opacity = opacity }; Input = ""; Input2 = ""; Result = "" }
+
+    let createGaussianBlur standardDeviation = 
+        { Type = GaussianBlur { StandardDeviation = standardDeviation; EdgeMode = None }; Input = ""; Input2 = ""; Result = "" }
+
+    let createGaussianBlurWithEdgeMode standardDeviation edgeMode = 
+        { Type = GaussianBlur { StandardDeviation = standardDeviation; EdgeMode = Some(edgeMode) }; Input = ""; Input2 = ""; Result = "" }
+
+    let createImage image = 
+        { Type = Image image; Input = ""; Input2 = ""; Result = "" }
+
+    let createOffset offset =
+        { Type = Offset offset; Input = ""; Input2 = ""; Result = "" }
+
+    let withInput filterEffect input =
+        { filterEffect with Input = input }
+
+    let withInput2 filterEffect input =
+        { filterEffect with Input2 = input }
+
+    let withResult filterEffect result =
+        { filterEffect with Result = result }
+
     let toString filterEffect =
         filterEffect.ToString()

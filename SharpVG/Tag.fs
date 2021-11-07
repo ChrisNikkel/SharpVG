@@ -3,7 +3,7 @@ namespace SharpVG
 type Tag =
     {
         Name: string;
-        Attributes: List<Attribute>;
+        Attributes: Attribute list;
         Body: string option;
     }
 with
@@ -19,6 +19,15 @@ module Tag =
 
     let create name =
         { Name = name; Attributes = List.empty; Body = None }
+
+    let createWithAttribute name attribute =
+        { Name = name; Attributes = List.singleton attribute ; Body = None }
+
+    let createWithAttributes name attributes =
+        { Name = name; Attributes = attributes ; Body = None }
+
+    let createWithBody name body =
+        { Name = name; Attributes = List.empty; Body = body }
 
     let withAttribute attribute tag =
         { tag with Attributes = List.singleton attribute }
