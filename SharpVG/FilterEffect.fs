@@ -81,7 +81,7 @@ type Composite =
             | Xor -> "Xor"
             | Lighter -> "Lighter"
             | Arithmetic -> "Arithmetic"
-            
+
 type DiffuseLighting =
     {
         SurfaceScale : float
@@ -98,10 +98,11 @@ type DiffuseLighting =
                 ] |> List.choose id
 
             Tag.createWithAttributes "feDiffuseLighting" attributes
+
 type Flood =
     {
         Color : Color
-        Opacity : float option// TODO: Make optional and onstrain to 0 to 1.0 or make type for percent
+        Opacity : float option // TODO: Make constrain to 0 to 1.0 or make type for percent
     }
     with
         static member ToTag flood =
@@ -123,102 +124,146 @@ type GaussianBlur =
             let attributes =
                 [
                     Some(Attribute.createXML "stdDeviation" (string gaussianBlur.StandardDeviation))
-                    gaussianBlur.EdgeMode |> Option.map (fun edgeMode -> Attribute.createXML "edgeMode" (edgeMode.ToString())) 
+                    gaussianBlur.EdgeMode |> Option.map (fun edgeMode -> Attribute.createXML "edgeMode" (edgeMode.ToString()))
                 ] |> List.choose id
 
             Tag.createWithAttributes "feGaussianBlur" attributes
 
-type FilterEffectType =
-    | Blend of BlendMode
-    | ColorMatrix of ColorMatrix
+type FilterEffect =
+    | Blend of BlendMode * FilterEffectSource option * FilterEffectSource option
+    | ColorMatrix of ColorMatrix * FilterEffectSource option
     // TODO: Implement ComponentTransfer
-    | Composite of Composite
+    | Composite of Composite * FilterEffectSource option * FilterEffectSource option
     // TODO: Implement ConvolveMatrix
-    | DiffuseLighting of DiffuseLighting
+    | DiffuseLighting of DiffuseLighting * FilterEffectSource option
     // TODO: Implement DisplacementMap
     | Flood of Flood
-    | GaussianBlur of GaussianBlur
-    | Image of string  // TODO: Create type to use here that can reference an ElementId or contain an Href
+    | GaussianBlur of GaussianBlur * FilterEffectSource option
+    | Image of string // TODO: Create type to use here that can reference an ElementId or contain an Href
     // TODO: Implement Merge
     // TODO: Implement MergeNode
     // TODO: Implement Morphology
-    | Offset of Point
+    | Offset of Point * FilterEffectSource option
     // TODO: Implement SpecularLighting
     // TODO: Implement Tile
     // TODO: Implement Turbulence
 
-
-type FilterEffect =
-    {
-        Type : FilterEffectType
-        Input : string
-        Input2 : string
-        Result : string
-    }
 with
     static member ToTag filterEffect =
-        let attributes =
+
+        let inputsToAttributes input1 input2 =
             [
-                if String.IsNullOrEmpty(filterEffect.Input) then None else Some(Attribute.createXML "in" filterEffect.Input)
-                if String.IsNullOrEmpty(filterEffect.Input2) then None else Some(Attribute.createXML "in2" filterEffect.Input2)
-                if String.IsNullOrEmpty(filterEffect.Result) then None else Some(Attribute.createXML "result" filterEffect.Result)
+                input1 |> Option.map (fun x -> (x.ToString()) |> Attribute.createXML "in")
+                input2 |> Option.map (fun x -> (x.ToString()) |> Attribute.createXML "in2")
             ] |> List.choose id
 
-        match filterEffect.Type with
-            | Blend (blend) -> Tag.create "feBlend" |> Tag.withAttribute (Attribute.createXML "mode" (blend.ToString()))
-            | ColorMatrix (colorMatrix) -> ColorMatrix.ToTag colorMatrix
-            | Composite (composite) -> Tag.create "feComposite" |> Tag.withAttribute (Attribute.createXML "operator" (composite.ToString()))
-            | DiffuseLighting (diffuseLighting) -> DiffuseLighting.ToTag diffuseLighting
+        match filterEffect with
+            | Blend (blend, input1, input2) -> Tag.create "feBlend" |> Tag.addAttributes ((Attribute.createXML "mode" (blend.ToString())) :: inputsToAttributes input1 input2)
+            | ColorMatrix (colorMatrix, input) -> ColorMatrix.ToTag colorMatrix |> Tag.addAttributes (inputsToAttributes input None)
+            | Composite (composite, input1, input2) ->
+                Tag.create "feComposite" |> Tag.addAttributes ((Attribute.createXML "operator" (composite.ToString())) :: inputsToAttributes input1 input2)
+            | DiffuseLighting (diffuseLighting, input) -> DiffuseLighting.ToTag diffuseLighting |> Tag.addAttributes (inputsToAttributes input None)
             | Flood (flood) -> Flood.ToTag flood
-            | GaussianBlur (gaussianBlur) -> GaussianBlur.ToTag gaussianBlur
+            | GaussianBlur (gaussianBlur, input) -> GaussianBlur.ToTag gaussianBlur |> Tag.addAttributes (inputsToAttributes input None)
             | Image (image) -> Tag.createWithAttribute "feImage" (Attribute.createXML "xlink:href" image)
-            | Offset (offset) -> Tag.createWithAttributes "feOffset" (Point.toAttributesWithModifier "d" "" offset)
-
-        |> Tag.addAttributes attributes
+            | Offset (offset, input) -> Tag.createWithAttributes "feOffset" (Point.toAttributesWithModifier "d" "" offset) |> Tag.addAttributes (inputsToAttributes input None)
 
     override this.ToString() =
         this |> FilterEffect.ToTag |> Tag.toString
 
+and NamedFilterEffect =
+    {
+        FilterEffect : FilterEffect
+        Name : string
+    }
+with
+    static member ToTag namedFilterEffect =
+        FilterEffect.ToTag namedFilterEffect.FilterEffect |> Tag.addAttribute (Attribute.createXML "result" namedFilterEffect.Name)
 
-// TODO: make it easy to string things together so that if result or inputs aren't specified random ids are created and linked together.  
+    override this.ToString() =
+        this |> NamedFilterEffect.ToTag |> Tag.toString
+
+and FilterEffectSource =
+    | SourceGraphic
+    | SourceAlpha
+    | BackgroundImage
+    | BackgroundAlpha
+    | FillPaint
+    | StrokePaint
+    | NamedFilterEffect of NamedFilterEffect
+    override this.ToString() =
+        match this with
+            | SourceGraphic -> "SourceGraphic"
+            | SourceAlpha -> "SourceAlpha"
+            | BackgroundImage -> "BackgroundImage"
+            | BackgroundAlpha -> "BackgroundAlpha"
+            | FillPaint -> "FillPaint"
+            | StrokePaint -> "StrokePaint"
+            | NamedFilterEffect namedFilterEffect -> namedFilterEffect.Name
+
+// TODO: make it easy to string things together so that if result or inputs aren't specified random ids are created and linked together.
 
 module FilterEffect =
 
-    let createBlend blend = 
-        { Type = Blend blend; Input = ""; Input2 = ""; Result = "" }
+    let createBlend blend =
+        Blend (blend, None, None)
 
-    let createColorMatrix colorMatrix = 
-        { Type = ColorMatrix colorMatrix; Input = ""; Input2 = ""; Result = "" }
+    let createBlendWithInput blend input =
+        Blend (blend, Some(input), None)
 
-    let createComposite composite = 
-        { Type = Composite composite ; Input = ""; Input2 = ""; Result = "" }
+    let createBlendWithInputs blend input1 input2 =
+        Blend (blend, Some(input1), Some(input2))
 
-    let createDiffuseLighting surfaceScale diffuseConstant kernelUnitLength = 
-        { Type = DiffuseLighting { SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = kernelUnitLength }; Input = ""; Input2 = ""; Result = "" }
+    let createColorMatrix colorMatrix =
+        ColorMatrix (colorMatrix, None)
 
-    let createFlood color opacity = 
-        { Type = Flood { Color = color; Opacity = opacity }; Input = ""; Input2 = ""; Result = "" }
+    let createColorMatrixWithInput colorMatrix input =
+        ColorMatrix (colorMatrix, input)
 
-    let createGaussianBlur standardDeviation = 
-        { Type = GaussianBlur { StandardDeviation = standardDeviation; EdgeMode = None }; Input = ""; Input2 = ""; Result = "" }
+    let createComposite composite =
+        Composite (composite, None, None)
 
-    let createGaussianBlurWithEdgeMode standardDeviation edgeMode = 
-        { Type = GaussianBlur { StandardDeviation = standardDeviation; EdgeMode = Some(edgeMode) }; Input = ""; Input2 = ""; Result = "" }
+    let createCompositeWithInput composite input =
+        Composite (composite, Some input, None)
 
-    let createImage image = 
-        { Type = Image image; Input = ""; Input2 = ""; Result = "" }
+    let createCompositeWithInputs composite input1 input2 =
+        Composite (composite, Some input1, Some input2)
+
+    let createDiffuseLighting surfaceScale diffuseConstant kernelUnitLength =
+        DiffuseLighting ({ SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = kernelUnitLength }, None)
+
+    let createDiffuseLightingWithInput surfaceScale diffuseConstant kernelUnitLength input=
+        DiffuseLighting ({ SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = kernelUnitLength }, Some input)
+
+    let createFlood color =
+        Flood { Color = color; Opacity = None }
+
+    let createFloodWithOpacity color opacity =
+        Flood { Color = color; Opacity = Some opacity }
+
+    let createGaussianBlur standardDeviation =
+        GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = None }, None)
+
+    let createGaussianBlurWithEdgeMode standardDeviation edgeMode =
+        GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = Some(edgeMode) }, None)
+
+    let createGaussianBlurWithInput standardDeviation input =
+        GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = None }, Some input)
+
+    let createGaussianBlurWithEdgeModeAndInput standardDeviation edgeMode input =
+        GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = Some(edgeMode) }, Some input)
+
+    let createImage image =
+        Image image
 
     let createOffset offset =
-        { Type = Offset offset; Input = ""; Input2 = ""; Result = "" }
+        Offset (offset, None)
 
-    let withInput filterEffect input =
-        { filterEffect with Input = input }
+    let createOffsetWithInput offset input =
+        Offset (offset, Some input)
 
-    let withInput2 filterEffect input =
-        { filterEffect with Input2 = input }
-
-    let withResult filterEffect result =
-        { filterEffect with Result = result }
+    let withName filterEffect result =
+        { FilterEffect = filterEffect; Name = result }
 
     let toString filterEffect =
         filterEffect.ToString()
