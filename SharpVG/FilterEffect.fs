@@ -143,7 +143,7 @@ type FilterEffect =
     // TODO: Implement Merge
     // TODO: Implement MergeNode
     // TODO: Implement Morphology
-    | Offset of Point * FilterEffectSource option
+    | Offset of Point * FilterEffectSource option  // TODO: Make Point * Area something that can optionally exist for all filter effects using .withOffset and .withScale
     // TODO: Implement SpecularLighting
     // TODO: Implement Tile
     // TODO: Implement Turbulence
