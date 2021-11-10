@@ -13,7 +13,7 @@ module TestAnimation =
         let transform2 = Transform.createMatrix (lengthF, lengthE, lengthD, lengthC, lengthB, lengthA)
         let timing = Timing.create (TimeSpan(0, 0, 1))
         let animation = Animation.createTransform timing transform1 transform2
-        printf "%s" (Animation.toString animation)
+
         Assert.Equal("<animateTransform attributeName=\"transform\" attributeType=\"XML\" type=\"matrix\" from=\"3 1 -1 3 30 40\" to=\"40 30 3 -1 1 3\" begin=\"1s\"/>", animation |> Animation.toString)
 
 
@@ -28,17 +28,6 @@ module TestAnimation =
 
         Assert.Equal("<circle id=\"orange-circle\" fill=\"orange\" r=\"30\" cx=\"50\" cy=\"50\"/>", circleWithStyle |> Element.toString)
         Assert.Equal("<animate href=\"#orange-circle\" attributeName=\"cy\" attributeType=\"XML\" from=\"50\" to=\"250\" begin=\"1s\" dur=\"3s\"/>", circleAnimation |> Element.toString)
-
-    (*
-    <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="60" cy="10" r="10">
-            <animate attributeName="cx" dur="4s" repeatCount="indefinite"
-                values="60 ; 110 ; 60 ; 10 ; 60" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"/>
-            <animate attributeName="cy" dur="4s" repeatCount="indefinite"
-                values="10 ; 60 ; 110 ; 60 ; 10" keyTimes="0 ; 0.25 ; 0.5 ; 0.75 ; 1"/>
-        </circle>
-    </svg>
-    *)
 
     [<Fact>]
     let ``create animation with list of key times`` () =
