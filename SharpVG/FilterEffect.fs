@@ -129,7 +129,7 @@ type GaussianBlur =
 
             Tag.createWithAttributes "feGaussianBlur" attributes
 
-type FilterEffect =
+type FilterEffectType =
     | Blend of BlendMode * FilterEffectSource option * FilterEffectSource option
     | ColorMatrix of ColorMatrix * FilterEffectSource option
     // TODO: Implement ComponentTransfer
@@ -143,11 +143,16 @@ type FilterEffect =
     // TODO: Implement Merge
     // TODO: Implement MergeNode
     // TODO: Implement Morphology
-    | Offset of Point * FilterEffectSource option  // TODO: Make Point * Area something that can optionally exist for all filter effects using .withOffset and .withScale
+    | Offset of Point * FilterEffectSource option
     // TODO: Implement SpecularLighting
     // TODO: Implement Tile
     // TODO: Implement Turbulence
-
+and FilterEffect =
+    {
+        FilterEffectType : FilterEffectType
+        Offset : Point option
+        Scale : Area option
+    }
 with
     static member ToTag filterEffect =
 
@@ -157,7 +162,13 @@ with
                 input2 |> Option.map (fun x -> (x.ToString()) |> Attribute.createXML "in2")
             ] |> List.choose id
 
-        match filterEffect with
+        let additionalAttributes filterEffect =
+            [
+                filterEffect.Offset |> Option.map Point.toAttributes
+                filterEffect.Scale |> Option.map Area.toAttributes
+            ] |> List.choose id |> List.concat
+
+        match filterEffect.FilterEffectType with
             | Blend (blend, input1, input2) -> Tag.create "feBlend" |> Tag.addAttributes ((Attribute.createXML "mode" (blend.ToString())) :: inputsToAttributes input1 input2)
             | ColorMatrix (colorMatrix, input) -> ColorMatrix.ToTag colorMatrix |> Tag.addAttributes (inputsToAttributes input None)
             | Composite (composite, input1, input2) ->
@@ -167,6 +178,7 @@ with
             | GaussianBlur (gaussianBlur, input) -> GaussianBlur.ToTag gaussianBlur |> Tag.addAttributes (inputsToAttributes input None)
             | Image (image) -> Tag.createWithAttribute "feImage" (Attribute.createXML "xlink:href" image)
             | Offset (offset, input) -> Tag.createWithAttributes "feOffset" (Point.toAttributesWithModifier "d" "" offset) |> Tag.addAttributes (inputsToAttributes input None)
+        |> Tag.addAttributes (additionalAttributes filterEffect)
 
     override this.ToString() =
         this |> FilterEffect.ToTag |> Tag.toString
@@ -206,64 +218,70 @@ and FilterEffectSource =
 module FilterEffect =
 
     let createBlend blend =
-        Blend (blend, None, None)
+        { FilterEffectType = Blend (blend, None, None); Offset = None; Scale = None }
 
     let createBlendWithInput blend input =
-        Blend (blend, Some(input), None)
+        { FilterEffectType = Blend (blend, Some(input), None); Offset = None; Scale = None }
 
     let createBlendWithInputs blend input1 input2 =
-        Blend (blend, Some(input1), Some(input2))
+        { FilterEffectType = Blend (blend, Some(input1), Some(input2)); Offset = None; Scale = None }
 
     let createColorMatrix colorMatrix =
-        ColorMatrix (colorMatrix, None)
+        { FilterEffectType = ColorMatrix (colorMatrix, None); Offset = None; Scale = None }
 
     let createColorMatrixWithInput colorMatrix input =
-        ColorMatrix (colorMatrix, input)
+        { FilterEffectType = ColorMatrix (colorMatrix, input); Offset = None; Scale = None }
 
     let createComposite composite =
-        Composite (composite, None, None)
+        { FilterEffectType = Composite (composite, None, None); Offset = None; Scale = None }
 
     let createCompositeWithInput composite input =
-        Composite (composite, Some input, None)
+        { FilterEffectType = Composite (composite, Some input, None); Offset = None; Scale = None }
 
     let createCompositeWithInputs composite input1 input2 =
-        Composite (composite, Some input1, Some input2)
+        { FilterEffectType = Composite (composite, Some input1, Some input2); Offset = None; Scale = None }
 
     let createDiffuseLighting surfaceScale diffuseConstant kernelUnitLength =
-        DiffuseLighting ({ SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = kernelUnitLength }, None)
+        { FilterEffectType = DiffuseLighting ({ SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = kernelUnitLength }, None); Offset = None; Scale = None }
 
     let createDiffuseLightingWithInput surfaceScale diffuseConstant kernelUnitLength input=
-        DiffuseLighting ({ SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = kernelUnitLength }, Some input)
+        { FilterEffectType = DiffuseLighting ({ SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = kernelUnitLength }, Some input); Offset = None; Scale = None }
 
     let createFlood color =
-        Flood { Color = color; Opacity = None }
+        { FilterEffectType = Flood { Color = color; Opacity = None }; Offset = None; Scale = None }
 
     let createFloodWithOpacity color opacity =
-        Flood { Color = color; Opacity = Some opacity }
+        { FilterEffectType = Flood { Color = color; Opacity = Some opacity }; Offset = None; Scale = None }
 
     let createGaussianBlur standardDeviation =
-        GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = None }, None)
+        { FilterEffectType = GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = None }, None); Offset = None; Scale = None }
 
     let createGaussianBlurWithEdgeMode standardDeviation edgeMode =
-        GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = Some(edgeMode) }, None)
+        { FilterEffectType = GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = Some(edgeMode) }, None); Offset = None; Scale = None }
 
     let createGaussianBlurWithInput standardDeviation input =
-        GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = None }, Some input)
+        { FilterEffectType = GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = None }, Some input); Offset = None; Scale = None }
 
     let createGaussianBlurWithEdgeModeAndInput standardDeviation edgeMode input =
-        GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = Some(edgeMode) }, Some input)
+        { FilterEffectType = GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = Some(edgeMode) }, Some input); Offset = None; Scale = None }
 
     let createImage image =
-        Image image
+        { FilterEffectType = Image image; Offset = None; Scale = None }
 
     let createOffset offset =
-        Offset (offset, None)
+        { FilterEffectType = Offset (offset, None); Offset = None; Scale = None }
 
     let createOffsetWithInput offset input =
-        Offset (offset, Some input)
+        { FilterEffectType = Offset (offset, Some input); Offset = None; Scale = None }
 
     let withName filterEffect result =
         { FilterEffect = filterEffect; Name = result }
+
+    let withOffset filterEffect offset =
+        { filterEffect with Offset = offset }
+
+    let withScale filterEffect scale =
+        { filterEffect with Scale = scale }
 
     let toString filterEffect =
         filterEffect.ToString()
