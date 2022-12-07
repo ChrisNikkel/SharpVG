@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net472;net6.0</TargetFrameworks>
     <Version>0.0.15</Version>
     <VersionSuffix>alpha</VersionSuffix>
     <Authors>Chris Nikkel</Authors>
