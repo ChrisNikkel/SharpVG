@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net472;net6.0</TargetFrameworks>
-    <Version>0.0.15</Version>
+    <TargetFrameworks>net472;net6.0;net7.0;netcoreapp3.1;netstandard2.1</TargetFrameworks>
+    <Version>0.0.16</Version>
     <VersionSuffix>alpha</VersionSuffix>
     <Authors>Chris Nikkel</Authors>
     <Product>SharpVG</Product>
     <Description>Create SVG vector graphics in F#</Description>
-    <Copyright>Copyright © Chris Nikkel 2020</Copyright>
+    <Copyright>Copyright © Chris Nikkel 2022</Copyright>
     <Summary>A .NET Standard library for F# to generate vector graphics in SVG format</Summary>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Title>SharpVG</Title>
