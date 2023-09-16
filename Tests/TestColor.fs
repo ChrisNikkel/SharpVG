@@ -13,11 +13,11 @@ module TestColor =
 
     [<Fact>]
     let ``create with small hex`` () =
-        Assert.Equal("0x123", Color.ofSmallHex 0x123s |> Color.toString)
+        Assert.Equal("#123", Color.ofSmallHex 0x123s |> Color.toString)
 
     [<Fact>]
     let ``create with hex`` () =
-        Assert.Equal("0x112233", Color.ofHex 0x112233 |> Color.toString)
+        Assert.Equal("#112233", Color.ofHex 0x112233 |> Color.toString)
 
     [<Fact>]
     let ``create with percents`` () =

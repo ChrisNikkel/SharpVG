@@ -310,8 +310,8 @@ with
     override this.ToString() =
         match this with
             | Name n -> n.ToString().ToLower()
-            | SmallHex sh -> String.Format("0x{0:x}", sh)
-            | Hex h -> String.Format("0x{0:x}", h)
+            | SmallHex sh -> String.Format("#{0:x}", sh)
+            | Hex h -> String.Format("#{0:x}", h)
             | Values (r, g, b) -> "rgb(" + string r + "," + string g + "," + string b + ")"
             | Percents (r, g, b) -> "rgb(" + string r + "%," + string g + "%," + string b + "%)"
 
