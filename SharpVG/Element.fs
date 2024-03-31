@@ -120,7 +120,7 @@ module Element =
         { element with Classes = classes }
 
     let addClass className element =
-        element.Classes |> Seq.append (Seq.singleton className)
+        { element with Classes = (element.Classes |> Seq.append (Seq.singleton className)) }
 
     let tryGetName element =
         element.Name
