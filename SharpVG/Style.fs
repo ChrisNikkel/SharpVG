@@ -27,7 +27,12 @@ with
         Style.MapToString stylePartToString style  |> String.concat ";"
 
     static member ToCssString style =
-        (match style.Name with | Some name  -> "." + name + " " | None -> "") + "{" + (style |> Style.ToString) + "}"
+        let cssName =
+            match style.Name with
+            | Some name  when name.Contains(".") -> name
+            | Some name -> ("." + name) + " "
+            | None -> ""
+        cssName + "{" + (style |> Style.ToString) + "}"
     static member ToTag style =
         Tag.create "style"
         |> Tag.withAttribute (Attribute.createCSS "type" "text/css")
