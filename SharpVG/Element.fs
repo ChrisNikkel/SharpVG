@@ -67,6 +67,28 @@ module Element =
             Animations = Seq.empty
         }
 
+    let inline createWithClass< ^T when ^T: (static member ToTag: ^T -> Tag)> theClass taggable =
+        {
+            Name = None
+            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+            Classes = Seq.singleton theClass
+            Style = None
+            Href = None
+            Transforms = Seq.empty
+            Animations = Seq.empty
+        }
+
+    let inline createWithClasses< ^T when ^T: (static member ToTag: ^T -> Tag)> classes taggable =
+        {
+            Name = None
+            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+            Classes = classes
+            Style = None
+            Href = None
+            Transforms = Seq.empty
+            Animations = Seq.empty
+        }
+
     let inline createWithName< ^T when ^T: (static member ToTag: ^T -> Tag)> name taggable =
         {
             Name = Option.ofObj name
