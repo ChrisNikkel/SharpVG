@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFrameworks>net472;net5.0;net6.0;net7.0;net8.0;netcoreapp3.1;netstandard2.1</TargetFrameworks>
-    <Version>0.0.18</Version>
+    <Version>0.0.19</Version>
     <VersionSuffix>alpha</VersionSuffix>
     <Authors>Chris Nikkel</Authors>
     <Product>SharpVG</Product>
