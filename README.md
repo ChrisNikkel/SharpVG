@@ -6,11 +6,7 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
 
 [Source code on GitHub](https://github.com/ChrisNikkel/SharpVG)
 
-[![NuGet Info](https://buildstats.info/nuget/SharpVG?includePreReleases=true)](https://www.nuget.org/packages/SharpVG/)
-
 ![.NET Core](https://github.com/ChrisNikkel/SharpVG/workflows/.NET%20Core/badge.svg)
-
-[![Build history](https://buildstats.info/github/chart/ChrisNikkel/SharpVG?branch=master)](https://github.com/ChrisNikkel/SharpVG/actions)
 
 ## Why SharpVG?
 
