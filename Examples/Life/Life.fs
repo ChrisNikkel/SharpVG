@@ -103,7 +103,7 @@ let main argv =
 
     let addAnimation element times =
         let duration = TimeSpan.FromSeconds(delay)
-        let createAnimation t =
+        let createAnimation (t : float) =
             let start = TimeSpan.FromSeconds(t)
             let timing = Timing.create start |> (Timing.withDuration duration)
             Animation.createSet timing AttributeType.CSS "display" "inline"
