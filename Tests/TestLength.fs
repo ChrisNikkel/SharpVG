@@ -33,6 +33,26 @@ module TestLength =
     let ``create percent`` () =
         Assert.Equal("2%", 2.0 |> Length.ofPercent |> Length.toString)
         Assert.Equal("2.1%", 2.1 |> Length.ofPercent |> Length.toString)
+    
+    [<Fact>]
+    let ``create cm`` () =
+        Assert.Equal("2cm", 2.0 |> Length.ofCm |> Length.toString)
+        Assert.Equal("2.1cm", 2.1 |> Length.ofCm |> Length.toString)
+    
+    [<Fact>]
+    let ``create mm`` () =
+        Assert.Equal("2mm", 2.0 |> Length.ofMm |> Length.toString)
+        Assert.Equal("2.1mm", 2.1 |> Length.ofMm |> Length.toString)
+    
+    [<Fact>]
+    let ``create in`` () =
+        Assert.Equal("2in", 2.0 |> Length.ofIn |> Length.toString)
+        Assert.Equal("2.1in", 2.1 |> Length.ofIn |> Length.toString)
+    
+    [<Fact>]
+    let ``create pt`` () =
+        Assert.Equal("2pt", 2.0 |> Length.ofPt |> Length.toString)
+        Assert.Equal("2.1pt", 2.1 |> Length.ofPt |> Length.toString)
 
     [<SvgProperty>]
     let ``what goes in must come out (float)`` (x) =

@@ -6,6 +6,10 @@ type Length =
     | Pixels of int
     | Em of float
     | Percent of float
+    | Cm of float
+    | Mm of float
+    | In of float
+    | Pt of float
     override this.ToString() =
         let round (n:float) = Math.Round(n, 4)
         match this with
@@ -13,6 +17,10 @@ type Length =
             | Pixels p -> sprintf "%d" p + "px"
             | Em e -> sprintf "%g" (round e) + "em"
             | Percent p -> sprintf "%g" (round p) + "%"
+            | Cm p -> sprintf "%g" (round p) + "cm"
+            | Mm p -> sprintf "%g" (round p) + "mm"
+            | In p -> sprintf "%g" (round p) + "in"
+            | Pt p -> sprintf "%g" (round p) + "pt"
 
 module Length =
 
@@ -46,6 +54,18 @@ module Length =
     let ofPercent =
         Percent
 
+    let ofCm =
+        Cm
+    
+    let ofMm =
+        Mm
+
+    let ofIn =
+        In
+
+    let ofPt =
+        Pt
+
     let toString (length : Length) =
         length.ToString()
 
@@ -55,6 +75,10 @@ module Length =
             | Pixels p -> float p
             | Em e -> e
             | Percent p -> p
+            | Cm p -> p
+            | Mm p -> p
+            | In p -> p
+            | Pt p -> p
 
     let toInt length =
         match length with
@@ -62,3 +86,7 @@ module Length =
             | Pixels p -> p
             | Em e -> int e
             | Percent p -> int p
+            | Cm p -> int p
+            | Mm p -> int p
+            | In p -> int p
+            | Pt p -> int p
