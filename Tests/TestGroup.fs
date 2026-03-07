@@ -16,3 +16,47 @@ module TestGroup =
         let body = [ ]
         let styles = body |> Group.ofList |> fun grp -> grp.Body |> Body.toStyles
         Assert.Equal("<style type=\"text/css\"><![CDATA[]]></style>", styles |> Styles.toString)
+
+    // Documentation/Group.md "Creating groups" example (wiki proof - tuple API)
+    [<Fact>]
+    let ``Group wiki - Creating groups example uses tuple API`` () =
+        let center = Point.ofInts (50, 50)
+        let radius = Length.ofInt 20
+        let position = Point.ofInts (10, 10)
+        let area = Area.ofInts (40, 30)
+        let circle = Circle.create center radius |> Element.create
+        let rect = Rect.create position area |> Element.create
+        let group = Group.ofList [ circle; rect ]
+        let groupElement = group |> Element.create
+        let output = groupElement |> Element.toString
+        Assert.Contains("<g>", output)
+        Assert.Contains("<circle ", output)
+        Assert.Contains("r=\"20\"", output)
+        Assert.Contains("cx=\"50\"", output)
+        Assert.Contains("cy=\"50\"", output)
+        Assert.Contains("<rect ", output)
+        Assert.Contains("width=\"40\"", output)
+        Assert.Contains("height=\"30\"", output)
+
+    // Documentation/Group.md example (wiki proof)
+    [<Fact>]
+    let ``Group wiki - named group with transform example`` () =
+        let center = Point.ofInts (25, 25)
+        let radius = Length.ofInt 20
+        let position = Point.ofInts (0, 0)
+        let area = Area.ofInts (30, 30)
+        let circle = Circle.create center radius |> Element.create
+        let rect = Rect.create position area |> Element.create
+        let translateX = Length.ofInt 100
+        let translateY = Length.ofInt 50
+        let transform = Transform.createTranslate translateX |> Transform.withY translateY
+        let group = [ circle; rect ] |> Group.ofList |> Group.withName "myGroup" |> Group.withTransform transform
+        let groupElement = group |> Element.create
+        let output = groupElement |> Element.toString
+        Assert.Contains("myGroup", output)
+        Assert.Contains("transform=\"translate(100,50)\"", output)
+        Assert.Contains("<circle ", output)
+        Assert.Contains("r=\"20\"", output)
+        Assert.Contains("<rect ", output)
+        Assert.Contains("width=\"30\"", output)
+        Assert.Contains("height=\"30\"", output)

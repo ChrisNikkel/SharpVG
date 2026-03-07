@@ -38,3 +38,39 @@ module TestAnimation =
         let circleElementWithAnimation = circle |> Element.create |> (Element.withAnimation animation)
 
         Assert.Equal("<circle r=\"10\" cx=\"60\" cy=\"10\"><animate attributeName=\"cx\" attributeType=\"XML\" from=\"60\" to=\"110\" keyTimes=\"0;0.25;0.5;0.75;1\" repeatCount=\"indefinite\" begin=\"0s\" dur=\"4s\"/></circle>", circleElementWithAnimation |> Element.toString)
+
+    // Documentation/Animation.md examples (wiki proof)
+    [<Fact>]
+    let ``Animation wiki - transform animation example produces valid animateTransform`` () =
+        let fromTransform = Transform.createRotate 0.0 (Length.ofInt 20) (Length.ofInt 20)
+        let toTransform = Transform.createRotate 360.0 (Length.ofInt 20) (Length.ofInt 20)
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 2.0) |> Timing.withRepetition { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = None }
+        let animation = Animation.createTransform timing fromTransform toTransform
+        let rect = Rect.create (Point.ofInts (10, 10)) (Area.ofInts (40, 40)) |> Element.create |> Element.withAnimation animation
+        let output = rect |> Element.toString
+        Assert.Contains("animateTransform", output)
+        Assert.Contains("type=\"rotate\"", output)
+        Assert.Contains("from=\"0 20 20\"", output)
+        Assert.Contains("to=\"360 20 20\"", output)
+        Assert.Contains("repeatCount=\"indefinite\"", output)
+
+    [<Fact>]
+    let ``Animation wiki - set animation example produces valid set tag`` () =
+        let timing = Timing.create (TimeSpan.FromSeconds 1.0)
+        let animation = Animation.createSet timing AttributeType.XML "visibility" "hidden"
+        let output = animation |> Animation.toString
+        Assert.Contains("<set", output)
+        Assert.Contains("attributeName=\"visibility\"", output)
+        Assert.Contains("to=\"hidden\"", output)
+        Assert.Contains("begin=\"1s\"", output)
+
+    [<Fact>]
+    let ``Animation wiki - motion animation example produces valid animateMotion`` () =
+        let path = Path.empty |> Path.addMoveTo Absolute (Point.ofInts (50, 50)) |> Path.addLinesTo Absolute (seq { Point.ofInts (100, 100); Point.ofInts (200, 50) })
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 2.0) |> Timing.withRepetition { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = None }
+        let animation = Animation.createMotion timing path (Some CalculationMode.Paced)
+        let circle = Circle.create (Point.ofInts (50, 50)) (Length.ofInt 10) |> Element.create |> Element.withAnimation animation
+        let output = circle |> Element.toString
+        Assert.Contains("animateMotion", output)
+        Assert.Contains("path=", output)
+        Assert.Contains("calculationMode=\"paced\"", output)

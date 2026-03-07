@@ -28,7 +28,12 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
 ```F#
 let position = Point.ofInts (10, 10)
 let area = Area.ofInts (50, 50)
-let style = Style.create (Color.ofName Colors.Cyan) (Color.ofName Colors.Blue) (Length.ofInt 3) 1.0 1.0
+let strokeColor = Color.ofName Colors.Blue
+let fillColor = Color.ofName Colors.Cyan
+let penWidth = Length.ofInt 3
+let strokePen = Pen.createWithOpacityAndWidth strokeColor 1.0 penWidth
+let fillPen = Pen.create fillColor
+let style = Style.createWithPen strokePen |> Style.withFillPen fillPen
 
 Rect.create position area
   |> Element.createWithStyle style
@@ -42,7 +47,12 @@ Rect.create position area
 ```F#
 let center = Point.ofInts (60, 60)
 let radius = Length.ofInt 50
-let style = Style.create (Color.ofName Colors.Violet) (Color.ofName Colors.Indigo) (Length.ofInt 3) 1.0 1.0
+let strokeColor = Color.ofName Colors.Indigo
+let fillColor = Color.ofName Colors.Violet
+let penWidth = Length.ofInt 3
+let strokePen = Pen.createWithOpacityAndWidth strokeColor 1.0 penWidth
+let fillPen = Pen.create fillColor
+let style = Style.createWithPen strokePen |> Style.withFillPen fillPen
 
 Circle.create center radius
   |> Element.createWithStyle style
@@ -80,6 +90,12 @@ Run the tests:
 ```bash
 dotnet test Tests
 ```
+
+Run tests with code coverage (output in `TestResults/`):
+```bash
+dotnet test Tests --collect:"XPlat Code Coverage" --results-directory ./TestResults
+```
+Coverage is also collected in CI; download the `coverage-results` artifact from the workflow run to inspect it.
 
 Run the examples:
 ```bash

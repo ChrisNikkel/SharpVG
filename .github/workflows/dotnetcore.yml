@@ -15,5 +15,10 @@ jobs:
         dotnet-version: 8.x.x
     - name: Build with dotnet
       run: dotnet build --configuration Release
-    - name: Test with dotnet
-      run: dotnet test --collect:"XPlat Code Coverage"
+    - name: Test with coverage
+      run: dotnet test Tests/Tests.fsproj --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults
+    - name: Upload coverage
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-results
+        path: TestResults/

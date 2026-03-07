@@ -105,8 +105,8 @@ module Tests =
         }
 
         let point = Point.ofInts (24, 15)
-        let style1 = Style.create (Name Colors.Red) (Hex 0xff0000) (Length.ofFloat 3.0) 1.0 1.0
-        let style2 = Style.create (Name Colors.Blue) (SmallHex 0xf00s) (Length.ofFloat 6.0) 1.0 1.0
+        let style1 = Style.createWithPen (Pen.createWithOpacityAndWidth (Hex 0xff0000) 1.0 (Length.ofFloat 3.0)) |> Style.withFillPen (Pen.create (Name Colors.Red))
+        let style2 = Style.createWithPen (Pen.createWithOpacityAndWidth (SmallHex 0xf00s) 1.0 (Length.ofFloat 6.0)) |> Style.withFillPen (Pen.create (Name Colors.Blue))
         let length = Length.ofPixels 1
         let area = Area.create length length
 

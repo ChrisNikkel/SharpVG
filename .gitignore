@@ -244,3 +244,5 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 .ionide
+.DS_Store
+.vscode/settings.json
