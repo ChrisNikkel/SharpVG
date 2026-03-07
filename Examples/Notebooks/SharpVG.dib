@@ -9,7 +9,12 @@ open System
 
 let position = Point.ofInts (10, 10)
 let area = Area.ofInts (50, 50)
-let style = Style.create (Color.ofName Colors.LightBlue) (Color.ofName Colors.Blue) (Length.ofInt 3) 1.0 1.0
+let strokeColor = Color.ofName Colors.Blue
+let fillColor = Color.ofName Colors.LightBlue
+let penWidth = Length.ofInt 3
+let strokePen = Pen.createWithOpacityAndWidth strokeColor 1.0 penWidth
+let fillPen = Pen.create fillColor
+let style = Style.createWithPen strokePen |> Style.withFillPen fillPen
 let showSvg svg = display(HTML(Svg.toString svg))
 let t = Rect.create position area |> Element.createWithStyle style |> Svg.ofElement
 showSvg t
@@ -18,7 +23,10 @@ showSvg t
 
 let black, white = Color.ofName Black, Color.ofName White
 let opaque = 1.0
-let style = Style.create black white Length.one opaque opaque
+let penWidth = Length.one
+let strokePen = Pen.createWithOpacityAndWidth white opaque penWidth
+let fillPen = Pen.createWithOpacity black opaque
+let style = Style.createWithPen strokePen |> Style.withFillPen fillPen
 let location = Point.ofInts (10, 10)
 let size = Area.ofInts (5, 5)
 let rectangle = Rect.create location size |> Element.create
