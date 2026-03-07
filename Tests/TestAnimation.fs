@@ -39,7 +39,7 @@ module TestAnimation =
 
         Assert.Equal("<circle r=\"10\" cx=\"60\" cy=\"10\"><animate attributeName=\"cx\" attributeType=\"XML\" from=\"60\" to=\"110\" keyTimes=\"0;0.25;0.5;0.75;1\" repeatCount=\"indefinite\" begin=\"0s\" dur=\"4s\"/></circle>", circleElementWithAnimation |> Element.toString)
 
-    // Documentation/Animation.md examples (wiki proof)
+    // Wiki: Animation examples
     [<Fact>]
     let ``Animation wiki - transform animation example produces valid animateTransform`` () =
         let fromTransform = Transform.createRotate 0.0 (Length.ofInt 20) (Length.ofInt 20)

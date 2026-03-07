@@ -17,7 +17,7 @@ module TestGroup =
         let styles = body |> Group.ofList |> fun grp -> grp.Body |> Body.toStyles
         Assert.Equal("<style type=\"text/css\"><![CDATA[]]></style>", styles |> Styles.toString)
 
-    // Documentation/Group.md "Creating groups" example (wiki proof - tuple API)
+    // Wiki: Group — Creating groups example (tuple API)
     [<Fact>]
     let ``Group wiki - Creating groups example uses tuple API`` () =
         let center = Point.ofInts (50, 50)
@@ -38,7 +38,7 @@ module TestGroup =
         Assert.Contains("width=\"40\"", output)
         Assert.Contains("height=\"30\"", output)
 
-    // Documentation/Group.md example (wiki proof)
+    // Wiki: Group example
     [<Fact>]
     let ``Group wiki - named group with transform example`` () =
         let center = Point.ofInts (25, 25)

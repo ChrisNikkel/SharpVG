@@ -27,9 +27,11 @@ graph BT
 
 For contribution and example standards, see [standards.md](standards.md).
 
-- [Styling](Styling.md) — Pen and Style (stroke/fill)
-- [Element](Element.md) — Wrapping shapes and groups for output
-- [Svg](Svg.md) — Building the SVG document and HTML
-- [Group](Group.md) — Grouping elements
-- [Transform](Transform.md) — Transforms on elements and groups
-- [Animation](Animation.md) — SVG animation and timing
+User-facing API documentation lives in the [SharpVG wiki](https://github.com/ChrisNikkel/SharpVG/wiki):
+
+- [Style](https://github.com/ChrisNikkel/SharpVG/wiki/Style) — Pen and Style (stroke/fill)
+- [Element](https://github.com/ChrisNikkel/SharpVG/wiki/Element) — Wrapping shapes and groups for output
+- [Svg](https://github.com/ChrisNikkel/SharpVG/wiki/Svg) — Building the SVG document and HTML
+- [Group](https://github.com/ChrisNikkel/SharpVG/wiki/Group) — Grouping elements
+- [Transform](https://github.com/ChrisNikkel/SharpVG/wiki/Transform) — Transforms on elements and groups
+- [Animation](https://github.com/ChrisNikkel/SharpVG/wiki/Animation) — SVG animation and timing

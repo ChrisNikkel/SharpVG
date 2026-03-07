@@ -31,11 +31,11 @@ Every doc example must be runnable and produce valid SVG (no orphan animations o
 
 ### Doc-proof tests
 
-For each non-trivial code example in `Documentation/*.md`, there should be a test that runs the same logic (or the same example) and asserts on output (e.g. `Assert.Contains` for expected tags/attributes).
+For each non-trivial code example in the user documentation (the [SharpVG wiki](https://github.com/ChrisNikkel/SharpVG.wiki), typically checked out at `~/Code/SharpVG.wiki`), there should be a test that runs the same logic (or the same example) and asserts on output (e.g. `Assert.Contains` for expected tags/attributes).
 
 ### Naming
 
-Name facts that verify docs like `"Module wiki - short description"` or reference the doc and section (e.g. "Documentation/Group.md Creating groups example"). Keep a brief comment above the fact pointing to the doc path and section.
+Name facts that verify docs like `"Module wiki - short description"` or reference the wiki page and section (e.g. "Wiki: Group — Creating groups example"). Keep a brief comment above the fact pointing to the wiki page and section.
 
 ### Coverage
 

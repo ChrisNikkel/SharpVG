@@ -24,7 +24,7 @@ module TestTransform =
         let transformsString = transforms |> Transforms.toAttribute |> Attribute.toString
         Assert.Equal("transform=\"matrix(3,1,-1,3,30,40) translate(3) scale(30)\"", transformsString)
 
-    // Documentation/Transform.md example (wiki proof)
+    // Wiki: Transform example
     [<Fact>]
     let ``Transform wiki - group with transform example`` () =
         let center = Point.ofInts (25, 25)

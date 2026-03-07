@@ -59,7 +59,7 @@ module TestTiming =
         Assert.Contains("dur=\"3s\"", s)
         Assert.Contains("repeatCount=\"indefinite\"", s)
 
-    // Documentation/Animation.md (Timing section) examples (wiki proof)
+    // Wiki: Animation (Timing section) examples
     [<Fact>]
     let ``Timing wiki - duration and repeat example`` () =
         let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 3.0) |> Timing.withRepetition { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = None }
