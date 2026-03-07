@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -33,6 +33,7 @@
     <Compile Include="TestPen.fs" />
     <Compile Include="TestGraphic.fs" />
     <Compile Include="TestFilter.fs" />
+    <Compile Include="TestSvgDefinitions.fs" />
     <Compile Include="TestSvg.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />

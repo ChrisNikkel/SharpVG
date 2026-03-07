@@ -31,6 +31,8 @@ let svgString = svg |> Svg.toString
 - **Svg.ofElement** — build an Svg from a single element.
 - **Svg.ofSeq** / **Svg.ofList** / **Svg.ofArray** — build an Svg from a sequence of elements.
 - **Svg.ofGroup** — build an Svg from a single group (with default size).
+- **Svg.ofElementsWithDefinitions** definitions elements — build an Svg with a definitions block and a sequence of elements as the body.
+- **Svg.withDefinitions** definitions — attach a SvgDefinitions block to an Svg (rendered as `<defs>...</defs>` before the body).
 - **Svg.toString** — serialize the Svg to an `<svg>...</svg>` string.
 - **Svg.toHtml** title — wrap that string in a minimal HTML document with the given title.
 
@@ -50,6 +52,28 @@ let svg =
     |> Svg.withSize size
     |> Svg.withViewBox (ViewBox.create viewBoxMin viewBoxSize)
 ```
+
+## Definitions (defs)
+
+Reusable content (symbols, filters, gradients, etc.) can be placed in a **definitions** block so it is not rendered directly; reference it by id (e.g. with `<use href="#id">`). Build a **SvgDefinitions** and attach it to the Svg.
+
+- **SvgDefinitions.create** — start an empty definitions block.
+- **SvgDefinitions.addElement** / **SvgDefinitions.addGroup** — add elements or groups to the block (each referenced item must have an id, e.g. via `Element.withName`).
+
+Example: symbol in definitions, `<use>` in body:
+
+```fsharp
+let viewBox = ViewBox.create Point.origin Area.full
+let symbolContent = [ Circle.create Point.origin (Length.ofInt 10) |> Element.create ]
+let circleIconSymbol = Symbol.create viewBox |> Symbol.withBody symbolContent |> Element.createWithName "icon"
+let useEl = Use.create circleIconSymbol Point.origin |> Element.create
+
+let definitions = SvgDefinitions.create |> SvgDefinitions.addElement circleIconSymbol
+let svg = [ useEl ] |> Svg.ofElementsWithDefinitions definitions
+// Or: let svg = [ useEl ] |> Svg.ofSeq |> Svg.withDefinitions definitions
+```
+
+The output will contain `<defs><symbol id="icon">...</symbol></defs>` followed by `<use href="#icon" .../>`.
 
 ## Pipeline
 

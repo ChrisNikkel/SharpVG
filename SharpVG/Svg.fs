@@ -2,6 +2,7 @@ namespace SharpVG
 
 type Svg = {
     Body: Body
+    Definitions: SvgDefinitions option
     Size: Area option
     ViewBox: ViewBox option
 }
@@ -13,23 +14,28 @@ with
             @ match this.ViewBox with | Some viewBox -> ViewBox.toAttributes viewBox | None -> []
 
         let styles =
-            let namedStyles = this.Body |> Body.toStyles |> Styles.named
+            let bodyStyles = this.Body |> Body.toStyles
+            let definitionsStyles = this.Definitions |> Option.map SvgDefinitions.toStyles |> Option.defaultValue Seq.empty
+            let namedStyles = Seq.append bodyStyles definitionsStyles |> Styles.named
             if Seq.isEmpty namedStyles then
                 ""
             else
                 Styles.toString namedStyles
+
+        let definitionsBlock =
+            this.Definitions |> Option.map SvgDefinitions.toString |> Option.defaultValue ""
 
         let body =
             if Seq.isEmpty this.Body then
                 ""
             else
                 this.Body
-                |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> Group.toString)
+                |> Seq.map (function | GroupElement.Element e -> e |> Element.toString | GroupElement.Group g -> g |> Group.toString)
                 |> String.concat ""
 
         Tag.create "svg"
         |> Tag.withAttributes attributes
-        |> Tag.withBody (styles + body)
+        |> Tag.withBody (styles + definitionsBlock + body)
         |> Tag.toString
 
 module Svg =
@@ -46,7 +52,8 @@ module Svg =
     /// <returns>The svg object containing the elements.</returns>
     let ofSeq seq =
         {
-            Body = seq |> Seq.map (fun e -> Element(e))
+            Body = seq |> Seq.map (fun e -> GroupElement.Element(e))
+            Definitions = None
             Size = None
             ViewBox = None
         }
@@ -62,10 +69,17 @@ module Svg =
 
     let ofGroup group =
         {
-            Body = seq { yield Group(group) }
+            Body = seq { yield GroupElement.Group(group) }
+            Definitions = None
             Size = Some(Area.full);
             ViewBox = None
         }
+
+    let withDefinitions definitions (svg: Svg) =
+        { svg with Definitions = Some definitions }
+
+    let ofElementsWithDefinitions definitions elements =
+        elements |> ofSeq |> withDefinitions definitions
 
     let toString (svg : Svg) =
         svg.ToString()
