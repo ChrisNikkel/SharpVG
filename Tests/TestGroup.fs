@@ -38,7 +38,45 @@ module TestGroup =
         Assert.Contains("width=\"40\"", output)
         Assert.Contains("height=\"30\"", output)
 
-    // Wiki: Group example
+    [<Fact>]
+    let ``group ofSeq`` () =
+        let elements = seq { yield Circle.create Point.origin (Length.ofInt 5) |> Element.create }
+        let result = elements |> Group.ofSeq |> Element.create |> Element.toString
+        Assert.Contains("<g>", result)
+        Assert.Contains("<circle", result)
+
+    [<Fact>]
+    let ``group ofArray`` () =
+        let elements = [| Rect.create Point.origin Area.full |> Element.create |]
+        let result = elements |> Group.ofArray |> Element.create |> Element.toString
+        Assert.Contains("<g>", result)
+        Assert.Contains("<rect", result)
+
+    [<Fact>]
+    let ``group addElement`` () =
+        let circle = Circle.create Point.origin (Length.ofInt 10) |> Element.create
+        let rect = Rect.create Point.origin Area.full |> Element.create
+        let result = Group.ofList [circle] |> Group.addElement rect |> Element.create |> Element.toString
+        Assert.Contains("<circle", result)
+        Assert.Contains("<rect", result)
+
+    [<Fact>]
+    let ``group addTransform`` () =
+        let translateX = Length.ofInt 20
+        let translateY = Length.ofInt 30
+        let transform = Transform.createTranslate translateX |> Transform.withY translateY
+        let result = Group.empty |> Group.addTransform transform |> Element.create |> Element.toString
+        Assert.Contains("translate(20,30)", result)
+
+    [<Fact>]
+    let ``group asCartesian flips y axis`` () =
+        let offsetX = Length.ofInt 0
+        let offsetY = Length.ofInt 100
+        let result = Group.empty |> Group.asCartesian offsetX offsetY |> Element.create |> Element.toString
+        Assert.Contains("scale", result)
+        Assert.Contains("translate", result)
+
+    // Wiki: Group — named group with transform example
     [<Fact>]
     let ``Group wiki - named group with transform example`` () =
         let center = Point.ofInts (25, 25)

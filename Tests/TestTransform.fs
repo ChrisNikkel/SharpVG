@@ -24,6 +24,47 @@ module TestTransform =
         let transformsString = transforms |> Transforms.toAttribute |> Attribute.toString
         Assert.Equal("transform=\"matrix(3,1,-1,3,30,40) translate(3) scale(30)\"", transformsString)
 
+    [<Fact>]
+    let ``create scale with y`` () =
+        let scaleX = Length.ofInt 2
+        let scaleY = Length.ofInt 3
+        let result = Transform.createScale scaleX |> Transform.withY scaleY |> Transform.toString
+        Assert.Equal("scale(2,3)", result)
+
+    [<Fact>]
+    let ``create rotate`` () =
+        let pivot = Length.ofInt 50
+        let result = Transform.createRotate 45.0 pivot pivot |> Transform.toString
+        Assert.Equal("rotate(45,50,50)", result)
+
+    [<Fact>]
+    let ``create skewX`` () =
+        let result = Transform.createSkewX 30.0 |> Transform.toString
+        Assert.Equal("skewX(30)", result)
+
+    [<Fact>]
+    let ``create skewY`` () =
+        let result = Transform.createSkewY 15.0 |> Transform.toString
+        Assert.Equal("skewY(15)", result)
+
+    [<Fact>]
+    let ``rotate withX`` () =
+        let pivot = Length.ofInt 10
+        let result = Transform.createRotate 90.0 Length.empty Length.empty |> Transform.withX pivot |> Transform.toString
+        Assert.Equal("rotate(90,10,0)", result)
+
+    [<Fact>]
+    let ``rotate withY`` () =
+        let pivot = Length.ofInt 20
+        let result = Transform.createRotate 90.0 Length.empty Length.empty |> Transform.withY pivot |> Transform.toString
+        Assert.Equal("rotate(90,0,20)", result)
+
+    [<Fact>]
+    let ``translate single axis`` () =
+        let translateX = Length.ofInt 100
+        let result = Transform.createTranslate translateX |> Transform.toString
+        Assert.Equal("translate(100)", result)
+
     // Wiki: Transform example
     [<Fact>]
     let ``Transform wiki - group with transform example`` () =

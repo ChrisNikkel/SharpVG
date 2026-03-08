@@ -19,6 +19,8 @@
     <Compile Include="TestPath.fs" />
     <Compile Include="TestPoint.fs" />
     <Compile Include="TestPolygon.fs" />
+    <Compile Include="TestPolyline.fs" />
+    <Compile Include="TestElement.fs" />
     <Compile Include="TestRect.fs" />
     <Compile Include="TestStyle.fs" />
     <Compile Include="TestTag.fs" />
