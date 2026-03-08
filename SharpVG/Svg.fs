@@ -5,6 +5,8 @@ type Svg = {
     Definitions: SvgDefinitions option
     Size: Area option
     ViewBox: ViewBox option
+    Title: string option
+    Description: string option
 }
 with
     override this.ToString() =
@@ -22,6 +24,12 @@ with
             else
                 Styles.toString namedStyles
 
+        let titleBlock =
+            this.Title |> Option.map (fun t -> "<title>" + t + "</title>") |> Option.defaultValue ""
+
+        let descBlock =
+            this.Description |> Option.map (fun d -> "<desc>" + d + "</desc>") |> Option.defaultValue ""
+
         let definitionsBlock =
             this.Definitions |> Option.map SvgDefinitions.toString |> Option.defaultValue ""
 
@@ -35,7 +43,7 @@ with
 
         Tag.create "svg"
         |> Tag.withAttributes attributes
-        |> Tag.withBody (styles + definitionsBlock + body)
+        |> Tag.withBody (titleBlock + descBlock + styles + definitionsBlock + body)
         |> Tag.toString
 
 module Svg =
@@ -44,6 +52,12 @@ module Svg =
 
     let withViewBox viewBox (svg:Svg) =
         { svg with ViewBox = Some(viewBox) }
+
+    let withTitle title (svg:Svg) =
+        { svg with Title = Some title }
+
+    let withDescription description (svg:Svg) =
+        { svg with Description = Some description }
 
     /// <summary>
     /// This function takes seqence of elements and creates a simple svg object.
@@ -56,6 +70,8 @@ module Svg =
             Definitions = None
             Size = None
             ViewBox = None
+            Title = None
+            Description = None
         }
 
     let ofList list =
@@ -71,8 +87,10 @@ module Svg =
         {
             Body = seq { yield GroupElement.Group(group) }
             Definitions = None
-            Size = Some(Area.full);
+            Size = Some(Area.full)
             ViewBox = None
+            Title = None
+            Description = None
         }
 
     let withDefinitions definitions (svg: Svg) =

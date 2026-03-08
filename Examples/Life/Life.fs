@@ -93,7 +93,7 @@ let main argv =
         |> List.concat
         |> removeDups
 
-    let style = { Stroke = Some(Name Colors.Black); StrokeWidth = Some(Length.ofInt 1); Fill = Some(Name Colors.White); Opacity = None; Name = Some("std"); FillOpacity = None }
+    let style = Style.createNamed (Name Colors.White) (Name Colors.Black) (Length.ofInt 1) 1.0 1.0 "std"
 
     // Execute
 

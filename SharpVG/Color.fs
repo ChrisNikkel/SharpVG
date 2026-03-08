@@ -306,6 +306,7 @@ type Color =
     | Hex of int  // #rrggbb
     | Values of byte * byte * byte // 0 - 255
     | Percents of float * float * float // 0.0% - 100.0%
+    | Url of string  // url(#id) reference to a gradient or paint server
 with
     override this.ToString() =
         match this with
@@ -314,6 +315,7 @@ with
             | Hex h -> String.Format("#{0:x}", h)
             | Values (r, g, b) -> "rgb(" + string r + "," + string g + "," + string b + ")"
             | Percents (r, g, b) -> "rgb(" + string r + "%," + string g + "%," + string b + "%)"
+            | Url id -> "url(#" + id + ")"
 
 module Color =
 
@@ -331,6 +333,9 @@ module Color =
 
     let ofPercents =
         Percents
+
+    let ofUrl =
+        Url
 
     let toString (color :Color) =
         color.ToString()

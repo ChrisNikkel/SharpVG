@@ -50,12 +50,15 @@
     <Compile Include="Animation.fs" />
     <Compile Include="FilterEffect.fs" />
     <Compile Include="Filter.fs" />
+    <Compile Include="Gradient.fs" />
     <Compile Include="ViewBox.fs" />
     <Compile Include="Element.fs" />
     <Compile Include="Anchor.fs" />
     <Compile Include="Symbol.fs" />
     <Compile Include="Use.fs" />
     <Compile Include="Group.fs" />
+    <Compile Include="ClipPath.fs" />
+    <Compile Include="Marker.fs" />
     <Compile Include="SvgDefinitions.fs" />
     <Compile Include="Graphic.fs" />
     <Compile Include="Svg.fs" />

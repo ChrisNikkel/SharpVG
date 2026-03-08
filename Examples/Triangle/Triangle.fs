@@ -41,14 +41,7 @@ let offset x y =  Transform.createTranslate (Length.ofFloat x) |> Transform.with
 let main argv =
     let fileName = getProgramPath + "Triangle.html"
     let style =
-        {
-            Stroke = Some(Name Colors.Black);
-            StrokeWidth = Some(Length.ofInt 1);
-            Fill = Some(Name Colors.LightGray);
-            Opacity = None;
-            FillOpacity = None;
-            Name = Some("std")
-        }
+        Style.createNamed (Name Colors.LightGray) (Name Colors.Black) (Length.ofInt 1) 1.0 1.0 "std"
 
     let iterations, triangleLength = 7, 500.0
     let offsetY = triangleLength - Math.Sqrt 3.0 * triangleLength / 2.0

@@ -13,6 +13,7 @@ with
 
 type Filter =
     {
+        Id : ElementId option
         Location : Point option
         Area : Area option
         FilterUnits : FilterUnits option
@@ -21,12 +22,13 @@ type Filter =
     }
 with
     static member ToTag filter =
-        
+
         let body = filter.FilterEffects |> List.map FilterEffect.toString |> List.toSeq |> (String.concat "")
 
         Tag.create "filter"
             |> Tag.withAttributes (
                 [
+                    filter.Id |> Option.map (fun id -> [ Attribute.createXML "id" id ])
                     filter.Location |> Option.map Point.toAttributes
                     filter.Area |> Option.map Area.toAttributes
                     filter.FilterUnits |> Option.map (fun filterUnits -> [ Attribute.createXML "filterUnits" (filterUnits.ToString()) ])
@@ -40,19 +42,22 @@ with
 
 module Filter =
     let empty =
-        { Location = None; Area = None; FilterUnits = None; PrimitiveUnits = None; FilterEffects = list.Empty }
+        { Id = None; Location = None; Area = None; FilterUnits = None; PrimitiveUnits = None; FilterEffects = list.Empty }
 
     let create filterEffect =
-        { Location = None; Area = None; FilterUnits = None; PrimitiveUnits = None; FilterEffects = List.singleton filterEffect }
+        { Id = None; Location = None; Area = None; FilterUnits = None; PrimitiveUnits = None; FilterEffects = List.singleton filterEffect }
 
     let createWithLocation filterEffect location =
-        { Location = location; Area = None; FilterUnits = None; PrimitiveUnits = None; FilterEffects = List.singleton filterEffect }
+        { Id = None; Location = location; Area = None; FilterUnits = None; PrimitiveUnits = None; FilterEffects = List.singleton filterEffect }
 
     let createWithFilterUnits filterEffect filterUnits =
-        { Location = None; Area = None; FilterUnits = filterUnits; PrimitiveUnits = None; FilterEffects = List.singleton filterEffect }
+        { Id = None; Location = None; Area = None; FilterUnits = filterUnits; PrimitiveUnits = None; FilterEffects = List.singleton filterEffect }
 
     let createWithPrimitiveUnits filterEffect filterUnits =
-        { Location = None; Area = None; FilterUnits = None; PrimitiveUnits = filterUnits; FilterEffects = List.singleton filterEffect }
+        { Id = None; Location = None; Area = None; FilterUnits = None; PrimitiveUnits = filterUnits; FilterEffects = List.singleton filterEffect }
+
+    let withId id filter =
+        { filter with Id = Some id }
 
     let withLocation filter location =
         { filter with Location = location }

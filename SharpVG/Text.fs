@@ -1,5 +1,31 @@
 namespace SharpVG
 
+type FontWeight =
+    | NormalWeight
+    | BoldWeight
+    | BolderWeight
+    | LighterWeight
+    | NumericWeight of int
+with
+    override this.ToString() =
+        match this with
+        | NormalWeight -> "normal"
+        | BoldWeight -> "bold"
+        | BolderWeight -> "bolder"
+        | LighterWeight -> "lighter"
+        | NumericWeight n -> string n
+
+type FontStyle =
+    | NormalStyle
+    | ItalicStyle
+    | ObliqueStyle
+with
+    override this.ToString() =
+        match this with
+        | NormalStyle -> "normal"
+        | ItalicStyle -> "italic"
+        | ObliqueStyle -> "oblique"
+
 type TextAnchor =
     | Start
     | Middle
@@ -25,6 +51,8 @@ type Text =
         LetterSpacing: float option
         Decoration: TextDecoration option
         WritingMode: WritingMode option
+        FontWeight: FontWeight option
+        FontStyle: FontStyle option
     }
 with
     static member ToTag text =
@@ -72,6 +100,18 @@ with
                         | Some(VerticalLeftToRight) -> [Attribute.createXML "writing-mode" "vertical-left"]
                         | None -> []
             )
+        |> Tag.addAttributes
+            (
+                    match text.FontWeight with
+                        | Some(fw) -> [Attribute.createXML "font-weight" (fw.ToString())]
+                        | None -> []
+            )
+        |> Tag.addAttributes
+            (
+                    match text.FontStyle with
+                        | Some(fs) -> [Attribute.createXML "font-style" (fs.ToString())]
+                        | None -> []
+            )
         |> Tag.addBody text.Body
 
     override this.ToString() =
@@ -79,7 +119,7 @@ with
 
 module Text =
     let create position body =
-        { Position = position; Body = body; FontFamily = None; FontSize = None; Anchor = None; LetterSpacing = None; Decoration = None; WritingMode = None}
+        { Position = position; Body = body; FontFamily = None; FontSize = None; Anchor = None; LetterSpacing = None; Decoration = None; WritingMode = None; FontWeight = None; FontStyle = None }
 
     let withFont family size text =
         { text with FontFamily = Option.ofObj family; FontSize = Some(size) }
@@ -101,6 +141,12 @@ module Text =
 
     let withDecoration decoration text =
         { text with Decoration = Some(decoration) }
+
+    let withFontWeight fontWeight text =
+        { text with FontWeight = Some(fontWeight) }
+
+    let withFontStyle fontStyle text =
+        { text with FontStyle = Some(fontStyle) }
 
     let toTag =
         Text.ToTag
