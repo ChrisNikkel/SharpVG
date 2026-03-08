@@ -17,6 +17,7 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
   - Cross platform support on Windows, Linux, and OSX
   - Limited support for SVG animations
   - Reusable styles
+  - Works in the browser via [Fable](https://fable.io) — SharpVG is pure F# with no platform-specific APIs
 
 ## SharpVG Goals
   - To enable easy cross platform graphics in F#
@@ -102,6 +103,12 @@ Run the examples:
 dotnet run -p Examples/Triangle/Triangle.fsproj
 dotnet run -p Examples/Life/Life.fsproj
 ```
+
+Run the Fable (browser) example — a live SVG clock:
+```bash
+cd Examples/FableClock && npm install && npm start
+```
+See [Documentation/FableTutorial.md](Documentation/FableTutorial.md) for a full walkthrough.
 
 Explore interactively:
 ```bash
