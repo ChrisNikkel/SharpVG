@@ -246,3 +246,12 @@ ModelManifest.xml
 .ionide
 .DS_Store
 .vscode/settings.json
+
+# Fable
+.fable/
+*.fs.js
+*.fs.js.map
+dist/
+
+# Local dotnet tools
+.tools/
