@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "start": "dotnet fable watch src --run vite",
-    "build": "dotnet fable src --run vite build"
+    "start": "fable watch src --run vite",
+    "build": "fable src --run vite build"
   },
   "devDependencies": {
     "vite": "^5.0.0"
