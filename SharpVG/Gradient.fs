@@ -1,5 +1,16 @@
 namespace SharpVG
 
+type SpreadMethod =
+    | Pad
+    | Reflect
+    | Repeat
+with
+    override this.ToString() =
+        match this with
+        | Pad -> "pad"
+        | Reflect -> "reflect"
+        | Repeat -> "repeat"
+
 type GradientStop =
     {
         Offset: float
@@ -27,6 +38,9 @@ type LinearGradient =
         Point1: Point
         Point2: Point
         GradientUnits: FilterUnits option
+        SpreadMethod: SpreadMethod option
+        GradientTransform: Transform option
+        Href: string option
         Stops: GradientStop list
     }
 with
@@ -39,6 +53,9 @@ with
                 Point.toAttributesWithModifier "" "1" gradient.Point1
                 Point.toAttributesWithModifier "" "2" gradient.Point2
                 gradient.GradientUnits |> Option.map (fun u -> [ Attribute.createXML "gradientUnits" (u.ToString()) ]) |> Option.defaultValue []
+                gradient.SpreadMethod |> Option.map (fun sm -> [ Attribute.createXML "spreadMethod" (sm.ToString()) ]) |> Option.defaultValue []
+                gradient.GradientTransform |> Option.map (fun t -> [ Transforms.toAttribute (Seq.singleton t) ]) |> Option.defaultValue []
+                gradient.Href |> Option.map (fun h -> [ Attribute.createXML "href" ("#" + h) ]) |> Option.defaultValue []
             ] |> List.concat)
         |> Tag.withBody body
 
@@ -52,6 +69,9 @@ type RadialGradient =
         Focal: Point option
         Radius: Length
         GradientUnits: FilterUnits option
+        SpreadMethod: SpreadMethod option
+        GradientTransform: Transform option
+        Href: string option
         Stops: GradientStop list
     }
 with
@@ -65,6 +85,9 @@ with
                 gradient.Focal |> Option.map (Point.toAttributesWithModifier "f" "") |> Option.defaultValue []
                 [ Attribute.createXML "r" (Length.toString gradient.Radius) ]
                 gradient.GradientUnits |> Option.map (fun u -> [ Attribute.createXML "gradientUnits" (u.ToString()) ]) |> Option.defaultValue []
+                gradient.SpreadMethod |> Option.map (fun sm -> [ Attribute.createXML "spreadMethod" (sm.ToString()) ]) |> Option.defaultValue []
+                gradient.GradientTransform |> Option.map (fun t -> [ Transforms.toAttribute (Seq.singleton t) ]) |> Option.defaultValue []
+                gradient.Href |> Option.map (fun h -> [ Attribute.createXML "href" ("#" + h) ]) |> Option.defaultValue []
             ] |> List.concat)
         |> Tag.withBody body
 
@@ -96,10 +119,19 @@ module GradientStop =
 
 module LinearGradient =
     let create id point1 point2 stops =
-        { Id = id; Point1 = point1; Point2 = point2; GradientUnits = None; Stops = stops }
+        { Id = id; Point1 = point1; Point2 = point2; GradientUnits = None; SpreadMethod = None; GradientTransform = None; Href = None; Stops = stops }
 
     let withGradientUnits units (gradient: LinearGradient) =
         { gradient with GradientUnits = Some units }
+
+    let withSpreadMethod method (gradient: LinearGradient) =
+        { gradient with SpreadMethod = Some method }
+
+    let withGradientTransform transform (gradient: LinearGradient) =
+        { gradient with GradientTransform = Some transform }
+
+    let withHref id (gradient: LinearGradient) =
+        { gradient with Href = Some id }
 
     let toTag = LinearGradient.ToTag
 
@@ -107,13 +139,22 @@ module LinearGradient =
 
 module RadialGradient =
     let create id center radius stops =
-        { Id = id; Center = center; Focal = None; Radius = radius; GradientUnits = None; Stops = stops }
+        { Id = id; Center = center; Focal = None; Radius = radius; GradientUnits = None; SpreadMethod = None; GradientTransform = None; Href = None; Stops = stops }
 
     let withFocal focal (gradient: RadialGradient) =
         { gradient with Focal = Some focal }
 
     let withGradientUnits units (gradient: RadialGradient) =
         { gradient with GradientUnits = Some units }
+
+    let withSpreadMethod method (gradient: RadialGradient) =
+        { gradient with SpreadMethod = Some method }
+
+    let withGradientTransform transform (gradient: RadialGradient) =
+        { gradient with GradientTransform = Some transform }
+
+    let withHref id (gradient: RadialGradient) =
+        { gradient with Href = Some id }
 
     let toTag = RadialGradient.ToTag
 

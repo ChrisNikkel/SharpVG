@@ -26,6 +26,45 @@ with
         | ItalicStyle -> "italic"
         | ObliqueStyle -> "oblique"
 
+type TextBaseline =
+    | AutoBaseline
+    | HangingBaseline
+    | MiddleBaseline
+    | CentralBaseline
+    | AlphabeticBaseline
+    | IdeographicBaseline
+    | TextBottomBaseline
+    | TextTopBaseline
+with
+    override this.ToString() =
+        match this with
+        | AutoBaseline -> "auto"
+        | HangingBaseline -> "hanging"
+        | MiddleBaseline -> "middle"
+        | CentralBaseline -> "central"
+        | AlphabeticBaseline -> "alphabetic"
+        | IdeographicBaseline -> "ideographic"
+        | TextBottomBaseline -> "text-bottom"
+        | TextTopBaseline -> "text-top"
+
+type FontVariant =
+    | NormalVariant
+    | SmallCaps
+with
+    override this.ToString() =
+        match this with
+        | NormalVariant -> "normal"
+        | SmallCaps -> "small-caps"
+
+type LengthAdjust =
+    | Spacing
+    | SpacingAndGlyphs
+with
+    override this.ToString() =
+        match this with
+        | Spacing -> "spacing"
+        | SpacingAndGlyphs -> "spacingAndGlyphs"
+
 type TextAnchor =
     | Start
     | Middle
@@ -41,6 +80,32 @@ type WritingMode =
     | VerticalRightToLeft
     | VerticalLeftToRight
 
+type TSpan =
+    {
+        Body: string
+        Position: Point option
+        Offset: Point option
+        FontFamily: string option
+        FontSize: float option
+        FontWeight: FontWeight option
+        FontStyle: FontStyle option
+        FontVariant: FontVariant option
+        Baseline: TextBaseline option
+    }
+with
+    static member ToTag span =
+        Tag.create "tspan"
+        |> (match span.Position with Some p -> Tag.addAttributes (Point.toAttributes p) | None -> id)
+        |> (match span.Offset with Some p -> Tag.addAttributes (Point.toAttributesWithModifier "d" "" p) | None -> id)
+        |> (match span.FontFamily with Some f -> Tag.addAttributes [Attribute.createXML "font-family" f] | None -> id)
+        |> (match span.FontSize with Some s -> Tag.addAttributes [Attribute.createXML "font-size" (string s)] | None -> id)
+        |> (match span.FontWeight with Some fw -> Tag.addAttributes [Attribute.createXML "font-weight" (fw.ToString())] | None -> id)
+        |> (match span.FontStyle with Some fs -> Tag.addAttributes [Attribute.createXML "font-style" (fs.ToString())] | None -> id)
+        |> (match span.FontVariant with Some fv -> Tag.addAttributes [Attribute.createXML "font-variant" (fv.ToString())] | None -> id)
+        |> (match span.Baseline with Some b -> Tag.addAttributes [Attribute.createXML "dominant-baseline" (b.ToString())] | None -> id)
+        |> Tag.addBody span.Body
+    override this.ToString() = this |> TSpan.ToTag |> Tag.toString
+
 type Text =
     {
         Position: Point
@@ -53,6 +118,13 @@ type Text =
         WritingMode: WritingMode option
         FontWeight: FontWeight option
         FontStyle: FontStyle option
+        FontVariant: FontVariant option
+        Baseline: TextBaseline option
+        AlignmentBaseline: TextBaseline option
+        WordSpacing: float option
+        TextLength: Length option
+        LengthAdjust: LengthAdjust option
+        Spans: TSpan list
     }
 with
     static member ToTag text =
@@ -112,14 +184,52 @@ with
                         | Some(fs) -> [Attribute.createXML "font-style" (fs.ToString())]
                         | None -> []
             )
+        |> Tag.addAttributes
+            (
+                    match text.FontVariant with
+                        | Some(fv) -> [Attribute.createXML "font-variant" (fv.ToString())]
+                        | None -> []
+            )
+        |> Tag.addAttributes
+            (
+                    match text.Baseline with
+                        | Some(b) -> [Attribute.createXML "dominant-baseline" (b.ToString())]
+                        | None -> []
+            )
+        |> Tag.addAttributes
+            (
+                    match text.AlignmentBaseline with
+                        | Some(b) -> [Attribute.createXML "alignment-baseline" (b.ToString())]
+                        | None -> []
+            )
+        |> Tag.addAttributes
+            (
+                    match text.WordSpacing with
+                        | Some(ws) -> [Attribute.createXML "word-spacing" (string ws)]
+                        | None -> []
+            )
+        |> Tag.addAttributes
+            (
+                    match text.TextLength with
+                        | Some(tl) -> [Attribute.createXML "textLength" (Length.toString tl)]
+                        | None -> []
+            )
+        |> Tag.addAttributes
+            (
+                    match text.LengthAdjust with
+                        | Some(la) -> [Attribute.createXML "lengthAdjust" (la.ToString())]
+                        | None -> []
+            )
         |> Tag.addBody text.Body
+        |> (if text.Spans |> List.isEmpty then id
+            else Tag.addBody (text.Spans |> List.map (fun s -> s.ToString()) |> String.concat ""))
 
     override this.ToString() =
         this |> Text.ToTag |> Tag.toString
 
 module Text =
     let create position body =
-        { Position = position; Body = body; FontFamily = None; FontSize = None; Anchor = None; LetterSpacing = None; Decoration = None; WritingMode = None; FontWeight = None; FontStyle = None }
+        { Position = position; Body = body; FontFamily = None; FontSize = None; Anchor = None; LetterSpacing = None; Decoration = None; WritingMode = None; FontWeight = None; FontStyle = None; FontVariant = None; Baseline = None; AlignmentBaseline = None; WordSpacing = None; TextLength = None; LengthAdjust = None; Spans = [] }
 
     let withFont family size text =
         { text with FontFamily = Option.ofObj family; FontSize = Some(size) }
@@ -148,8 +258,47 @@ module Text =
     let withFontStyle fontStyle text =
         { text with FontStyle = Some(fontStyle) }
 
+    let withFontVariant fontVariant text =
+        { text with FontVariant = Some(fontVariant) }
+
+    let withBaseline baseline text =
+        { text with Baseline = Some(baseline) }
+
+    let withAlignmentBaseline baseline text =
+        { text with AlignmentBaseline = Some(baseline) }
+
+    let withWordSpacing spacing text =
+        { text with WordSpacing = Some(spacing) }
+
+    let withTextLength length text =
+        { text with TextLength = Some(length) }
+
+    let withLengthAdjust adjust text =
+        { text with LengthAdjust = Some(adjust) }
+
+    let addSpan span text =
+        { text with Spans = text.Spans @ [span] }
+
+    let withSpans spans text =
+        { text with Spans = spans }
+
     let toTag =
         Text.ToTag
 
     let toString (text : Text) =
         text.ToString()
+
+module TSpan =
+    let create body =
+        { Body = body; Position = None; Offset = None; FontFamily = None; FontSize = None; FontWeight = None; FontStyle = None; FontVariant = None; Baseline = None }
+
+    let withPosition position (span: TSpan) = { span with Position = Some position }
+    let withOffset offset (span: TSpan) = { span with Offset = Some offset }
+    let withFontFamily family (span: TSpan) = { span with FontFamily = Some family }
+    let withFontSize size (span: TSpan) = { span with FontSize = Some size }
+    let withFontWeight weight (span: TSpan) = { span with FontWeight = Some weight }
+    let withFontStyle style (span: TSpan) = { span with FontStyle = Some style }
+    let withFontVariant variant (span: TSpan) = { span with FontVariant = Some variant }
+    let withBaseline baseline (span: TSpan) = { span with Baseline = Some baseline }
+    let toTag = TSpan.ToTag
+    let toString (span: TSpan) = span.ToString()

@@ -1,5 +1,25 @@
 namespace SharpVG
 
+type Visibility =
+    | Visible
+    | Hidden
+    | Collapse
+with
+    override this.ToString() =
+        match this with
+        | Visible -> "visible"
+        | Hidden -> "hidden"
+        | Collapse -> "collapse"
+
+type Display =
+    | Inline
+    | DisplayNone
+with
+    override this.ToString() =
+        match this with
+        | Inline -> "inline"
+        | DisplayNone -> "none"
+
 type StrokeLinecap =
     | ButtLinecap
     | RoundLinecap
@@ -49,6 +69,10 @@ type Style =
         MarkerStart: string option;
         MarkerMid: string option;
         MarkerEnd: string option;
+        StrokeMiterLimit: float option;
+        Mask: string option;
+        Visibility: Visibility option;
+        Display: Display option;
     }
 with
     static member private MapToString f style =
@@ -68,6 +92,10 @@ with
             style.MarkerStart |> Option.map (fun id -> f "marker-start" ("url(#" + id + ")"));
             style.MarkerMid |> Option.map (fun id -> f "marker-mid" ("url(#" + id + ")"));
             style.MarkerEnd |> Option.map (fun id -> f "marker-end" ("url(#" + id + ")"));
+            style.StrokeMiterLimit |> Option.map (string >> (f "stroke-miterlimit"));
+            style.Mask |> Option.map (fun id -> f "mask" ("url(#" + id + ")"));
+            style.Visibility |> Option.map (fun v -> f "visibility" (v.ToString()));
+            style.Display |> Option.map (fun d -> f "display" (d.ToString()));
         ] |> List.choose id
 
     static member ToAttributes style =
@@ -106,7 +134,8 @@ module Style =
     let empty =
         { Fill = None; Stroke = None; StrokeWidth = None; Opacity = None; FillOpacity = None; Name = None;
           StrokeLinecap = None; StrokeLinejoin = None; StrokeDashArray = None; StrokeDashOffset = None;
-          FillRule = None; ClipPath = None; Filter = None; MarkerStart = None; MarkerMid = None; MarkerEnd = None }
+          FillRule = None; ClipPath = None; Filter = None; MarkerStart = None; MarkerMid = None; MarkerEnd = None;
+          StrokeMiterLimit = None; Mask = None; Visibility = None; Display = None }
 
     let withName name (style : Style) =
         { style with Name = Option.ofObj name }
@@ -185,6 +214,18 @@ module Style =
 
     let withMarkerEnd id style =
         { style with MarkerEnd = Some id }
+
+    let withStrokeMiterLimit limit style =
+        { style with StrokeMiterLimit = Some limit }
+
+    let withMask id style =
+        { style with Mask = Some id }
+
+    let withVisibility visibility style =
+        { style with Visibility = Some visibility }
+
+    let withDisplay display style =
+        { style with Display = Some display }
 
     let createWithName name =
         empty |> withName name

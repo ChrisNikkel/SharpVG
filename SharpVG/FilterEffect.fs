@@ -129,24 +129,78 @@ type GaussianBlur =
 
             Tag.createWithAttributes "feGaussianBlur" attributes
 
+type TurbulenceType =
+    | FractalNoise
+    | TurbulenceNoise
+with
+    override this.ToString() =
+        match this with FractalNoise -> "fractalNoise" | TurbulenceNoise -> "turbulence"
+
+type MorphologyOperator =
+    | Erode
+    | Dilate
+with
+    override this.ToString() =
+        match this with Erode -> "erode" | Dilate -> "dilate"
+
+type ChannelSelector =
+    | RedChannel
+    | GreenChannel
+    | BlueChannel
+    | AlphaChannel
+with
+    override this.ToString() =
+        match this with RedChannel -> "R" | GreenChannel -> "G" | BlueChannel -> "B" | AlphaChannel -> "A"
+
+type TransferFuncType =
+    | IdentityTransfer
+    | TableValues of float list
+    | DiscreteValues of float list
+    | LinearTransfer of slope: float * intercept: float
+    | GammaTransfer of amplitude: float * exponent: float * offset: float
+with
+    static member ToAttributes func =
+        match func with
+        | IdentityTransfer -> [Attribute.createXML "type" "identity"]
+        | TableValues values -> [Attribute.createXML "type" "table"; Attribute.createXML "tableValues" (values |> List.map string |> String.concat " ")]
+        | DiscreteValues values -> [Attribute.createXML "type" "discrete"; Attribute.createXML "tableValues" (values |> List.map string |> String.concat " ")]
+        | LinearTransfer (slope, intercept) -> [Attribute.createXML "type" "linear"; Attribute.createXML "slope" (string slope); Attribute.createXML "intercept" (string intercept)]
+        | GammaTransfer (amplitude, exponent, offset) -> [Attribute.createXML "type" "gamma"; Attribute.createXML "amplitude" (string amplitude); Attribute.createXML "exponent" (string exponent); Attribute.createXML "offset" (string offset)]
+
+type LightSource =
+    | DistantLight of azimuth: float * elevation: float
+    | PointLight of x: float * y: float * z: float
+    | SpotLight of x: float * y: float * z: float * pointsAtX: float * pointsAtY: float * pointsAtZ: float * specularExponent: float option
+with
+    override this.ToString() =
+        match this with
+        | DistantLight (az, el) ->
+            Tag.createWithAttributes "feDistantLight" [Attribute.createXML "azimuth" (string az); Attribute.createXML "elevation" (string el)] |> Tag.toString
+        | PointLight (x, y, z) ->
+            Tag.createWithAttributes "fePointLight" [Attribute.createXML "x" (string x); Attribute.createXML "y" (string y); Attribute.createXML "z" (string z)] |> Tag.toString
+        | SpotLight (x, y, z, pax, pay, paz, specExp) ->
+            Tag.createWithAttributes "feSpotLight"
+                ([Attribute.createXML "x" (string x); Attribute.createXML "y" (string y); Attribute.createXML "z" (string z)
+                  Attribute.createXML "pointsAtX" (string pax); Attribute.createXML "pointsAtY" (string pay); Attribute.createXML "pointsAtZ" (string paz)]
+                 @ (specExp |> Option.map (fun e -> [Attribute.createXML "specularExponent" (string e)]) |> Option.defaultValue []))
+            |> Tag.toString
+
 type FilterEffectType =
     | Blend of BlendMode * FilterEffectSource option * FilterEffectSource option
     | ColorMatrix of ColorMatrix * FilterEffectSource option
-    // TODO: Implement ComponentTransfer
+    | ComponentTransfer of rFunc: TransferFuncType * gFunc: TransferFuncType * bFunc: TransferFuncType * aFunc: TransferFuncType * FilterEffectSource option
     | Composite of Composite * FilterEffectSource option * FilterEffectSource option
-    // TODO: Implement ConvolveMatrix
+    | ConvolveMatrix of order: int * kernelMatrix: float list * divisor: float option * bias: float option * preserveAlpha: bool * FilterEffectSource option
     | DiffuseLighting of DiffuseLighting * FilterEffectSource option
-    // TODO: Implement DisplacementMap
+    | DisplacementMap of scale: float * xSelector: ChannelSelector * ySelector: ChannelSelector * FilterEffectSource option * FilterEffectSource option
     | Flood of Flood
     | GaussianBlur of GaussianBlur * FilterEffectSource option
-    | Image of string // TODO: Create type to use here that can reference an ElementId or contain an Href
-    // TODO: Implement Merge
-    // TODO: Implement MergeNode
-    // TODO: Implement Morphology
+    | Image of string
+    | Merge of FilterEffectSource list
+    | Morphology of MorphologyOperator * radius: float * FilterEffectSource option
     | Offset of Point * FilterEffectSource option
-    // TODO: Implement SpecularLighting
-    // TODO: Implement Tile
-    // TODO: Implement Turbulence
+    | SpecularLighting of surfaceScale: float * specularConstant: float * specularExponent: float * LightSource * FilterEffectSource option
+    | Turbulence of TurbulenceType * baseFrequency: float * numOctaves: int * seed: int option
 and FilterEffect =
     {
         FilterEffectType : FilterEffectType
@@ -171,13 +225,58 @@ with
         match filterEffect.FilterEffectType with
             | Blend (blend, input1, input2) -> Tag.create "feBlend" |> Tag.addAttributes ((Attribute.createXML "mode" (blend.ToString())) :: inputsToAttributes input1 input2)
             | ColorMatrix (colorMatrix, input) -> ColorMatrix.ToTag colorMatrix |> Tag.addAttributes (inputsToAttributes input None)
+            | ComponentTransfer (rFunc, gFunc, bFunc, aFunc, input) ->
+                let funcToTag name func =
+                    Tag.createWithAttributes ("feFunc" + name) (TransferFuncType.ToAttributes func) |> Tag.toString
+                let body = funcToTag "R" rFunc + funcToTag "G" gFunc + funcToTag "B" bFunc + funcToTag "A" aFunc
+                Tag.create "feComponentTransfer"
+                |> Tag.addAttributes (inputsToAttributes input None)
+                |> Tag.withBody body
             | Composite (composite, input1, input2) ->
                 Tag.create "feComposite" |> Tag.addAttributes ((Attribute.createXML "operator" (composite.ToString())) :: inputsToAttributes input1 input2)
+            | ConvolveMatrix (order, kernelMatrix, divisor, bias, preserveAlpha, input) ->
+                Tag.create "feConvolveMatrix"
+                |> Tag.addAttributes
+                    ([Attribute.createXML "order" (string order)
+                      Attribute.createXML "kernelMatrix" (kernelMatrix |> List.map string |> String.concat " ")]
+                     @ (divisor |> Option.map (fun d -> [Attribute.createXML "divisor" (string d)]) |> Option.defaultValue [])
+                     @ (bias |> Option.map (fun b -> [Attribute.createXML "bias" (string b)]) |> Option.defaultValue [])
+                     @ [Attribute.createXML "preserveAlpha" (if preserveAlpha then "true" else "false")])
+                |> Tag.addAttributes (inputsToAttributes input None)
             | DiffuseLighting (diffuseLighting, input) -> DiffuseLighting.ToTag diffuseLighting |> Tag.addAttributes (inputsToAttributes input None)
+            | DisplacementMap (scale, xSel, ySel, input1, input2) ->
+                Tag.create "feDisplacementMap"
+                |> Tag.addAttributes
+                    [Attribute.createXML "scale" (string scale)
+                     Attribute.createXML "xChannelSelector" (xSel.ToString())
+                     Attribute.createXML "yChannelSelector" (ySel.ToString())]
+                |> Tag.addAttributes (inputsToAttributes input1 input2)
             | Flood (flood) -> Flood.ToTag flood
             | GaussianBlur (gaussianBlur, input) -> GaussianBlur.ToTag gaussianBlur |> Tag.addAttributes (inputsToAttributes input None)
             | Image (image) -> Tag.createWithAttribute "feImage" (Attribute.createXML "xlink:href" image)
+            | Merge inputs ->
+                let body = inputs |> List.map (fun src -> Tag.createWithAttribute "feMergeNode" (Attribute.createXML "in" (src.ToString())) |> Tag.toString) |> String.concat ""
+                Tag.create "feMerge" |> Tag.withBody body
+            | Morphology (op, radius, input) ->
+                Tag.create "feMorphology"
+                |> Tag.addAttributes [Attribute.createXML "operator" (op.ToString()); Attribute.createXML "radius" (string radius)]
+                |> Tag.addAttributes (inputsToAttributes input None)
             | Offset (offset, input) -> Tag.createWithAttributes "feOffset" (Point.toAttributesWithModifier "d" "" offset) |> Tag.addAttributes (inputsToAttributes input None)
+            | SpecularLighting (surfaceScale, specConst, specExp, lightSource, input) ->
+                Tag.create "feSpecularLighting"
+                |> Tag.addAttributes
+                    [Attribute.createXML "surfaceScale" (string surfaceScale)
+                     Attribute.createXML "specularConstant" (string specConst)
+                     Attribute.createXML "specularExponent" (string specExp)]
+                |> Tag.addAttributes (inputsToAttributes input None)
+                |> Tag.withBody (lightSource.ToString())
+            | Turbulence (turbType, baseFreq, numOctaves, seed) ->
+                Tag.create "feTurbulence"
+                |> Tag.addAttributes
+                    ([Attribute.createXML "type" (turbType.ToString())
+                      Attribute.createXML "baseFrequency" (string baseFreq)
+                      Attribute.createXML "numOctaves" (string numOctaves)]
+                     @ (seed |> Option.map (fun s -> [Attribute.createXML "seed" (string s)]) |> Option.defaultValue []))
         |> Tag.addAttributes (additionalAttributes filterEffect)
 
     override this.ToString() =
@@ -273,6 +372,45 @@ module FilterEffect =
 
     let createOffsetWithInput offset input =
         { FilterEffectType = Offset (offset, Some input); Offset = None; Scale = None }
+
+    let createComponentTransfer rFunc gFunc bFunc aFunc =
+        { FilterEffectType = ComponentTransfer (rFunc, gFunc, bFunc, aFunc, None); Offset = None; Scale = None }
+
+    let createComponentTransferWithInput rFunc gFunc bFunc aFunc input =
+        { FilterEffectType = ComponentTransfer (rFunc, gFunc, bFunc, aFunc, Some input); Offset = None; Scale = None }
+
+    let createConvolveMatrix order kernelMatrix =
+        { FilterEffectType = ConvolveMatrix (order, kernelMatrix, None, None, false, None); Offset = None; Scale = None }
+
+    let createConvolveMatrixFull order kernelMatrix divisor bias preserveAlpha =
+        { FilterEffectType = ConvolveMatrix (order, kernelMatrix, divisor, bias, preserveAlpha, None); Offset = None; Scale = None }
+
+    let createDisplacementMap scale xSelector ySelector =
+        { FilterEffectType = DisplacementMap (scale, xSelector, ySelector, None, None); Offset = None; Scale = None }
+
+    let createDisplacementMapWithInputs scale xSelector ySelector input1 input2 =
+        { FilterEffectType = DisplacementMap (scale, xSelector, ySelector, Some input1, Some input2); Offset = None; Scale = None }
+
+    let createMerge inputs =
+        { FilterEffectType = Merge inputs; Offset = None; Scale = None }
+
+    let createMorphology op radius =
+        { FilterEffectType = Morphology (op, radius, None); Offset = None; Scale = None }
+
+    let createMorphologyWithInput op radius input =
+        { FilterEffectType = Morphology (op, radius, Some input); Offset = None; Scale = None }
+
+    let createSpecularLighting surfaceScale specularConstant specularExponent lightSource =
+        { FilterEffectType = SpecularLighting (surfaceScale, specularConstant, specularExponent, lightSource, None); Offset = None; Scale = None }
+
+    let createSpecularLightingWithInput surfaceScale specularConstant specularExponent lightSource input =
+        { FilterEffectType = SpecularLighting (surfaceScale, specularConstant, specularExponent, lightSource, Some input); Offset = None; Scale = None }
+
+    let createTurbulence turbType baseFrequency numOctaves =
+        { FilterEffectType = Turbulence (turbType, baseFrequency, numOctaves, None); Offset = None; Scale = None }
+
+    let createTurbulenceWithSeed turbType baseFrequency numOctaves seed =
+        { FilterEffectType = Turbulence (turbType, baseFrequency, numOctaves, Some seed); Offset = None; Scale = None }
 
     let withName filterEffect result =
         { FilterEffect = filterEffect; Name = result }

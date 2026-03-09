@@ -7,6 +7,8 @@ type SvgDefinitionsContent =
     | ClipPathDef of ClipPath
     | MarkerDef of Marker
     | FilterDef of Filter
+    | MaskDef of Mask
+    | PatternDef of Pattern
 
 type SvgDefinitions = {
     Contents: seq<SvgDefinitionsContent>
@@ -21,7 +23,9 @@ with
                 | GradientDef g -> g |> Gradient.toString
                 | ClipPathDef cp -> cp |> ClipPath.toString
                 | MarkerDef m -> m |> Marker.toString
-                | FilterDef f -> f |> Filter.toString)
+                | FilterDef f -> f |> Filter.toString
+                | MaskDef m -> m |> Mask.toString
+                | PatternDef p -> p |> Pattern.toString)
             |> String.concat ""
         Tag.create "defs"
         |> Tag.withBody body
@@ -54,6 +58,12 @@ module SvgDefinitions =
 
     let addFilter filter (definitions: SvgDefinitions) =
         { definitions with Contents = Seq.append definitions.Contents (Seq.singleton (FilterDef filter)) }
+
+    let addMask mask (definitions: SvgDefinitions) =
+        { definitions with Contents = Seq.append definitions.Contents (Seq.singleton (MaskDef mask)) }
+
+    let addPattern pattern (definitions: SvgDefinitions) =
+        { definitions with Contents = Seq.append definitions.Contents (Seq.singleton (PatternDef pattern)) }
 
     let addElements elements (definitions: SvgDefinitions) =
         elements

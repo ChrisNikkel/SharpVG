@@ -58,6 +58,8 @@
     <Compile Include="Use.fs" />
     <Compile Include="Group.fs" />
     <Compile Include="ClipPath.fs" />
+    <Compile Include="Mask.fs" />
+    <Compile Include="Pattern.fs" />
     <Compile Include="Marker.fs" />
     <Compile Include="SvgDefinitions.fs" />
     <Compile Include="Graphic.fs" />

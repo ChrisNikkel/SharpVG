@@ -307,6 +307,7 @@ type Color =
     | Values of byte * byte * byte // 0 - 255
     | Percents of float * float * float // 0.0% - 100.0%
     | Url of string  // url(#id) reference to a gradient or paint server
+    | CurrentColor   // CSS currentColor — inherits the element's color property
 with
     override this.ToString() =
         match this with
@@ -316,6 +317,7 @@ with
             | Values (r, g, b) -> "rgb(" + string r + "," + string g + "," + string b + ")"
             | Percents (r, g, b) -> "rgb(" + string r + "%," + string g + "%," + string b + "%)"
             | Url id -> "url(#" + id + ")"
+            | CurrentColor -> "currentColor"
 
 module Color =
 
@@ -336,6 +338,8 @@ module Color =
 
     let ofUrl =
         Url
+
+    let currentColor = CurrentColor
 
     let toString (color :Color) =
         color.ToString()
