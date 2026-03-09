@@ -15,7 +15,7 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
   - No understanding of SVG is required and its as easy as using seq, list, or array
   - No external dependencies other than SharpVG are required
   - Cross platform support on Windows, Linux, and OSX
-  - Limited support for SVG animations
+  - Full support for SVG animations: attribute animation, transform animation, motion paths, and timing control
   - Reusable styles
   - Works in the browser via [Fable](https://fable.io) — SharpVG is pure F# with no platform-specific APIs
 
