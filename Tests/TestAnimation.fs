@@ -74,3 +74,50 @@ module TestAnimation =
         Assert.Contains("animateMotion", output)
         Assert.Contains("path=", output)
         Assert.Contains("calculationMode=\"paced\"", output)
+
+    [<Fact>]
+    let ``createAnimationWithValues produces animate tag with values attribute`` () =
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 2.0)
+        let animation = Animation.createAnimationWithValues timing AttributeType.XML "cx" ["10"; "50"; "90"]
+        let output = animation |> Animation.toString
+        Assert.Contains("<animate", output)
+        Assert.Contains("attributeName=\"cx\"", output)
+        Assert.Contains("values=\"10;50;90\"", output)
+        Assert.DoesNotContain("from=", output)
+        Assert.DoesNotContain("to=", output)
+
+    [<Fact>]
+    let ``createTransformWithValues produces animateTransform with values`` () =
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 2.0)
+        let t1 = Transform.createRotate 0.0 (Length.ofInt 20) (Length.ofInt 20)
+        let t2 = Transform.createRotate 180.0 (Length.ofInt 20) (Length.ofInt 20)
+        let t3 = Transform.createRotate 360.0 (Length.ofInt 20) (Length.ofInt 20)
+        let animation = Animation.createTransformWithValues timing [t1; t2; t3]
+        let output = animation |> Animation.toString
+        Assert.Contains("animateTransform", output)
+        Assert.Contains("type=\"rotate\"", output)
+        Assert.Contains("values=", output)
+
+    [<Fact>]
+    let ``Animation withKeySplines adds keySplines attribute`` () =
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 2.0)
+        let animation = Animation.createAnimation timing AttributeType.XML "cx" "0" "100"
+                        |> Animation.withKeySplines ["0.5 0 0.5 1"]
+        let output = animation |> Animation.toString
+        Assert.Contains("keySplines=\"0.5 0 0.5 1\"", output)
+
+    [<Fact>]
+    let ``Animation withAdditive sum`` () =
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let animation = Animation.createAnimation timing AttributeType.XML "cy" "0" "100"
+                        |> Animation.withAdditive Sum
+        let output = animation |> Animation.toString
+        Assert.Contains("additive=\"sum\"", output)
+
+    [<Fact>]
+    let ``Animation withAdditive replace`` () =
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let animation = Animation.createAnimation timing AttributeType.XML "cy" "0" "100"
+                        |> Animation.withAdditive Replace
+        let output = animation |> Animation.toString
+        Assert.Contains("additive=\"replace\"", output)

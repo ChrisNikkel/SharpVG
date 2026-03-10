@@ -27,7 +27,7 @@ with
                 pattern.Size |> Option.map Area.toAttributes |> Option.defaultValue []
                 pattern.PatternUnits |> Option.map (fun u -> [ Attribute.createXML "patternUnits" (u.ToString()) ]) |> Option.defaultValue []
                 pattern.PatternContentUnits |> Option.map (fun u -> [ Attribute.createXML "patternContentUnits" (u.ToString()) ]) |> Option.defaultValue []
-                pattern.PatternTransform |> Option.map (fun t -> [ Transforms.toAttribute (Seq.singleton t) ]) |> Option.defaultValue []
+                pattern.PatternTransform |> Option.map (fun t -> [ Attribute.createXML "patternTransform" (Transform.toString t) ]) |> Option.defaultValue []
                 pattern.ViewBox |> Option.map ViewBox.toAttributes |> Option.defaultValue []
             ] |> List.concat)
         |> Tag.withBody body

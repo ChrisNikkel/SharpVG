@@ -26,3 +26,11 @@ module TestColor =
     [<Property>]
     let ``create with values`` (r, g, b) =
         Assert.Equal(sprintf "rgb(%d,%d,%d)" r g b, Color.ofValues (r, g, b) |> Color.toString)
+
+    [<Fact>]
+    let ``create with url reference`` () =
+        Assert.Equal("url(#myGradient)", Color.ofUrl "myGradient" |> Color.toString)
+
+    [<Fact>]
+    let ``currentColor`` () =
+        Assert.Equal("currentColor", Color.currentColor |> Color.toString)

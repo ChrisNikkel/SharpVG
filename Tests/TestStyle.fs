@@ -69,3 +69,113 @@ module TestStyle =
         Assert.Contains("class=\"outlined\"", result)
         Assert.DoesNotContain("stroke=", result)
 
+    [<Fact>]
+    let ``style withStrokeLinecap butt`` () =
+        let result = Style.empty |> Style.withStrokeLinecap ButtLinecap |> Style.toString
+        Assert.Contains("stroke-linecap:butt", result)
+
+    [<Fact>]
+    let ``style withStrokeLinecap round`` () =
+        let result = Style.empty |> Style.withStrokeLinecap RoundLinecap |> Style.toString
+        Assert.Contains("stroke-linecap:round", result)
+
+    [<Fact>]
+    let ``style withStrokeLinecap square`` () =
+        let result = Style.empty |> Style.withStrokeLinecap SquareLinecap |> Style.toString
+        Assert.Contains("stroke-linecap:square", result)
+
+    [<Fact>]
+    let ``style withStrokeLinejoin miter`` () =
+        let result = Style.empty |> Style.withStrokeLinejoin MiterLinejoin |> Style.toString
+        Assert.Contains("stroke-linejoin:miter", result)
+
+    [<Fact>]
+    let ``style withStrokeLinejoin round`` () =
+        let result = Style.empty |> Style.withStrokeLinejoin RoundLinejoin |> Style.toString
+        Assert.Contains("stroke-linejoin:round", result)
+
+    [<Fact>]
+    let ``style withStrokeLinejoin bevel`` () =
+        let result = Style.empty |> Style.withStrokeLinejoin BevelLinejoin |> Style.toString
+        Assert.Contains("stroke-linejoin:bevel", result)
+
+    [<Fact>]
+    let ``style withStrokeDashArray`` () =
+        let result = Style.empty |> Style.withStrokeDashArray [5.0; 3.0] |> Style.toString
+        Assert.Contains("stroke-dasharray:5,3", result)
+
+    [<Fact>]
+    let ``style withStrokeDashOffset`` () =
+        let result = Style.empty |> Style.withStrokeDashOffset 2.0 |> Style.toString
+        Assert.Contains("stroke-dashoffset:2", result)
+
+    [<Fact>]
+    let ``style withFillRule nonzero`` () =
+        let result = Style.empty |> Style.withFillRule NonZero |> Style.toString
+        Assert.Contains("fill-rule:nonzero", result)
+
+    [<Fact>]
+    let ``style withFillRule evenodd`` () =
+        let result = Style.empty |> Style.withFillRule EvenOdd |> Style.toString
+        Assert.Contains("fill-rule:evenodd", result)
+
+    [<Fact>]
+    let ``style withClipPath`` () =
+        let result = Style.empty |> Style.withClipPath "myClip" |> Style.toString
+        Assert.Contains("clip-path:url(#myClip)", result)
+
+    [<Fact>]
+    let ``style withFilter`` () =
+        let result = Style.empty |> Style.withFilter "myFilter" |> Style.toString
+        Assert.Contains("filter:url(#myFilter)", result)
+
+    [<Fact>]
+    let ``style withMarkerStart`` () =
+        let result = Style.empty |> Style.withMarkerStart "arrow" |> Style.toString
+        Assert.Contains("marker-start:url(#arrow)", result)
+
+    [<Fact>]
+    let ``style withMarkerMid`` () =
+        let result = Style.empty |> Style.withMarkerMid "dot" |> Style.toString
+        Assert.Contains("marker-mid:url(#dot)", result)
+
+    [<Fact>]
+    let ``style withMarkerEnd`` () =
+        let result = Style.empty |> Style.withMarkerEnd "tip" |> Style.toString
+        Assert.Contains("marker-end:url(#tip)", result)
+
+    [<Fact>]
+    let ``style withStrokeMiterLimit`` () =
+        let result = Style.empty |> Style.withStrokeMiterLimit 4.0 |> Style.toString
+        Assert.Contains("stroke-miterlimit:4", result)
+
+    [<Fact>]
+    let ``style withMask`` () =
+        let result = Style.empty |> Style.withMask "myMask" |> Style.toString
+        Assert.Contains("mask:url(#myMask)", result)
+
+    [<Fact>]
+    let ``style withVisibility visible`` () =
+        let result = Style.empty |> Style.withVisibility Visible |> Style.toString
+        Assert.Contains("visibility:visible", result)
+
+    [<Fact>]
+    let ``style withVisibility hidden`` () =
+        let result = Style.empty |> Style.withVisibility Hidden |> Style.toString
+        Assert.Contains("visibility:hidden", result)
+
+    [<Fact>]
+    let ``style withVisibility collapse`` () =
+        let result = Style.empty |> Style.withVisibility Collapse |> Style.toString
+        Assert.Contains("visibility:collapse", result)
+
+    [<Fact>]
+    let ``style withDisplay inline`` () =
+        let result = Style.empty |> Style.withDisplay Inline |> Style.toString
+        Assert.Contains("display:inline", result)
+
+    [<Fact>]
+    let ``style withDisplay none`` () =
+        let result = Style.empty |> Style.withDisplay DisplayNone |> Style.toString
+        Assert.Contains("display:none", result)
+

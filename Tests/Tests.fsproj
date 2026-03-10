@@ -34,6 +34,11 @@
     <Compile Include="TestAnimation.fs" />
     <Compile Include="TestPen.fs" />
     <Compile Include="TestGraphic.fs" />
+    <Compile Include="TestGradient.fs" />
+    <Compile Include="TestClipPath.fs" />
+    <Compile Include="TestMask.fs" />
+    <Compile Include="TestPattern.fs" />
+    <Compile Include="TestMarker.fs" />
     <Compile Include="TestFilter.fs" />
     <Compile Include="TestSvgDefinitions.fs" />
     <Compile Include="TestSvg.fs" />
