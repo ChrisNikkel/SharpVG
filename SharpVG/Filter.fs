@@ -74,8 +74,8 @@ module Filter =
     let withFilterEffects filter filterEffects =
         { filter with FilterEffects = filterEffects }
 
-    let addFilterEffect filter filterEffect =
-        { filter with FilterEffects = filter.FilterEffects |> List.append filterEffect }
+    let addFilterEffect filterEffect filter =
+        { filter with FilterEffects = filter.FilterEffects @ [filterEffect] }
 
     let toTag =
         Filter.ToTag

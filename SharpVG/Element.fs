@@ -127,7 +127,7 @@ module Element =
         { element with Animations = animations }
 
     let addAnimation animation element =
-        element.Animations |> Seq.append (Seq.singleton animation)
+        { element with Animations = element.Animations |> Seq.append (Seq.singleton animation) }
 
     let withName name (element : Element) =
         { element with Name = Some name }

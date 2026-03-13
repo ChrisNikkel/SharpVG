@@ -20,22 +20,22 @@ type BlendMode =
     | Luminosity
     override this.ToString() =
         match this with
-            | Normal -> "Normal"
-            | Multiply -> "Multiply"
-            | Screen -> "Screen"
-            | Overlay -> "Overlay"
-            | Darken -> "Darken"
-            | Lighten -> "Lighten"
-            | ColorDodge -> "ColorDodge"
-            | ColorBurn -> "ColorBurn"
-            | HardLight -> "HardLight"
-            | SoftLight -> "SoftLight"
-            | Difference -> "Difference"
-            | Exclusion -> "Exclusion"
-            | Hue -> "Hue"
-            | Saturation -> "Saturation"
-            | Color -> "Color"
-            | Luminosity -> "Luminosity"
+            | Normal -> "normal"
+            | Multiply -> "multiply"
+            | Screen -> "screen"
+            | Overlay -> "overlay"
+            | Darken -> "darken"
+            | Lighten -> "lighten"
+            | ColorDodge -> "color-dodge"
+            | ColorBurn -> "color-burn"
+            | HardLight -> "hard-light"
+            | SoftLight -> "soft-light"
+            | Difference -> "difference"
+            | Exclusion -> "exclusion"
+            | Hue -> "hue"
+            | Saturation -> "saturation"
+            | Color -> "color"
+            | Luminosity -> "luminosity"
 
 type EdgeMode =
     | Duplicate
@@ -43,9 +43,9 @@ type EdgeMode =
     | NoEdge
     override this.ToString() =
         match this with
-            | Duplicate -> "Duplicate"
-            | Wrap -> "Wrap"
-            | NoEdge -> "NoEdge"
+            | Duplicate -> "duplicate"
+            | Wrap -> "wrap"
+            | NoEdge -> "none"
 
 type ColorMatrix =
     | Matrix of int list // TODO: Convert top a 5x4 matrix object of some sort
@@ -59,7 +59,7 @@ type ColorMatrix =
                 | Matrix(matrix) -> Tag.withAttributes [(Attribute.createXML "type" "matrix"); Attribute.createXML "values" (matrix |> List.map string |> String.concat " ")]
                 | Saturate(saturate) -> Tag.withAttributes [(Attribute.createXML "type" "saturate"); Attribute.createXML "values" (string saturate)]
                 | HueRotate(hueRotate) -> Tag.withAttributes [(Attribute.createXML "type" "hueRotate"); Attribute.createXML "values" (string hueRotate)]
-                | LuminanceToAlpha -> id
+                | LuminanceToAlpha -> Tag.withAttributes [Attribute.createXML "type" "luminanceToAlpha"]
 
         override this.ToString() =
             this |> ColorMatrix.ToTag |> Tag.toString
@@ -74,13 +74,13 @@ type Composite =
     | Arithmetic
     override this.ToString() =
         match this with
-            | Over -> "Over"
-            | In -> "In"
-            | Out -> "Out"
-            | Atop -> "Atop"
-            | Xor -> "Xor"
-            | Lighter -> "Lighter"
-            | Arithmetic -> "Arithmetic"
+            | Over -> "over"
+            | In -> "in"
+            | Out -> "out"
+            | Atop -> "atop"
+            | Xor -> "xor"
+            | Lighter -> "lighter"
+            | Arithmetic -> "arithmetic"
 
 type DiffuseLighting =
     {

@@ -115,6 +115,20 @@ module TestAnimation =
         Assert.Contains("additive=\"sum\"", output)
 
     [<Fact>]
+    let ``Element addAnimation accumulates multiple animations`` () =
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let a1 = Animation.createAnimation timing AttributeType.XML "cx" "0" "100"
+        let a2 = Animation.createAnimation timing AttributeType.XML "cy" "0" "50"
+        let result =
+            Circle.create Point.origin (Length.ofInt 10)
+            |> Element.create
+            |> Element.withAnimation a1
+            |> Element.addAnimation a2
+            |> Element.toString
+        Assert.Contains("attributeName=\"cx\"", result)
+        Assert.Contains("attributeName=\"cy\"", result)
+
+    [<Fact>]
     let ``Animation withAdditive replace`` () =
         let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
         let animation = Animation.createAnimation timing AttributeType.XML "cy" "0" "100"

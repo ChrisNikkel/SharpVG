@@ -9,7 +9,7 @@ module TestFilter =
     let ``create blend filter`` () =
         let filter = Filter.create (FilterEffect.createBlend BlendMode.Lighten)
         let element = filter |> Element.createWithName "blendFilter"
-        Assert.Equal("<filter id=\"blendFilter\"><feBlend mode=\"Lighten\"/></filter>", element |> Element.toString)
+        Assert.Equal("<filter id=\"blendFilter\"><feBlend mode=\"lighten\"/></filter>", element |> Element.toString)
 
     [<Fact>]
     let ``create gaussian blur filter`` () =
@@ -50,7 +50,7 @@ module TestFilter =
         let fe = FilterEffect.createComposite Over
         let result = fe |> FilterEffect.toString
         Assert.Contains("feComposite", result)
-        Assert.Contains("operator=\"Over\"", result)
+        Assert.Contains("operator=\"over\"", result)
 
     [<Fact>]
     let ``create turbulence fractalNoise filter`` () =
@@ -152,6 +152,39 @@ module TestFilter =
         let result = Filter.withLocation f (Some (Point.ofInts (-10, -10))) |> Filter.toString
         Assert.Contains("x=\"-10\"", result)
         Assert.Contains("y=\"-10\"", result)
+
+    [<Fact>]
+    let ``Filter addFilterEffect appends a single effect`` () =
+        let fe1 = FilterEffect.createGaussianBlur 3.0
+        let fe2 = FilterEffect.createColorMatrix (Saturate 0.5)
+        let result = Filter.create fe1 |> Filter.addFilterEffect fe2 |> Filter.toString
+        Assert.Contains("feGaussianBlur", result)
+        Assert.Contains("feColorMatrix", result)
+
+    [<Fact>]
+    let ``ColorMatrix luminanceToAlpha has correct type attribute`` () =
+        let result = FilterEffect.createColorMatrix LuminanceToAlpha |> FilterEffect.toString
+        Assert.Contains("type=\"luminanceToAlpha\"", result)
+
+    [<Fact>]
+    let ``BlendMode values are lowercase per SVG spec`` () =
+        let modes = [Normal; Multiply; Screen; Overlay; Darken; Lighten; ColorDodge; ColorBurn; HardLight; SoftLight; Difference; Exclusion; Hue; Saturation; Color; Luminosity]
+        for mode in modes do
+            let s = mode.ToString()
+            Assert.Equal(s, s.ToLowerInvariant())
+
+    [<Fact>]
+    let ``Composite operator values are lowercase per SVG spec`` () =
+        let ops = [Composite.Over; Composite.In; Composite.Out; Composite.Atop; Composite.Xor; Composite.Lighter; Composite.Arithmetic]
+        for op in ops do
+            let s = op.ToString()
+            Assert.Equal(s, s.ToLowerInvariant())
+
+    [<Fact>]
+    let ``EdgeMode none value is correct per SVG spec`` () =
+        Assert.Equal("none", NoEdge.ToString())
+        Assert.Equal("duplicate", Duplicate.ToString())
+        Assert.Equal("wrap", Wrap.ToString())
 
     [<Fact>]
     let ``Filter withFilterEffects multiple effects`` () =
