@@ -37,16 +37,14 @@ module TestElement =
         Assert.Contains("class=\"highlight\"", result)
 
     [<Fact>]
-    let ``element withClasses renders first class`` () =
-        // SVG attributes are deduplicated by name; only the first class in the sequence is rendered
+    let ``element withClasses renders all classes space-separated`` () =
         let result = Rect.create Point.origin Area.full |> Element.create |> Element.withClasses ["a"; "b"] |> Element.toString
-        Assert.Contains("class=\"a\"", result)
+        Assert.Contains("class=\"a b\"", result)
 
     [<Fact>]
-    let ``element addClass prepends new class`` () =
-        // addClass prepends, so the newest class wins after attribute deduplication
+    let ``element addClass prepends class to existing`` () =
         let result = Rect.create Point.origin Area.full |> Element.createWithClass "base" |> Element.addClass "extra" |> Element.toString
-        Assert.Contains("class=\"extra\"", result)
+        Assert.Contains("class=\"extra base\"", result)
 
     [<Fact>]
     let ``element withStyle via pipeline`` () =
@@ -81,6 +79,6 @@ module TestElement =
         Assert.Contains("href=\"#anchor\"", result)
 
     [<Fact>]
-    let ``element createWithClasses renders first class`` () =
+    let ``element createWithClasses renders all classes space-separated`` () =
         let result = Circle.create Point.origin (Length.ofInt 5) |> Element.createWithClasses ["foo"; "bar"] |> Element.toString
-        Assert.Contains("class=\"foo\"", result)
+        Assert.Contains("class=\"foo bar\"", result)

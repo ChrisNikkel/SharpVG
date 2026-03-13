@@ -166,7 +166,7 @@ type Colors =
         | Brown -> "Brown"
         | BurlyWood -> "BurlyWood"
         | CadetBlue -> "CadetBlue"
-        | Chartreuse -> "Chartreus"
+        | Chartreuse -> "Chartreuse"
         | Chocolate -> "Chocolate"
         | Coral -> "Coral"
         | CornflowerBlue -> "CornflowerBlue"

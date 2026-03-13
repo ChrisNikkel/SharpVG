@@ -36,7 +36,7 @@ module TestTiming =
 
     [<Fact>]
     let ``create timing with restart when not active`` () =
-        Assert.Equal("begin=\"4s\" restart=\"whennotactive\"", Timing.create (TimeSpan.FromSeconds(4.0)) |> Timing.withResart WhenNotActive |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " ")
+        Assert.Equal("begin=\"4s\" restart=\"whenNotActive\"", Timing.create (TimeSpan.FromSeconds(4.0)) |> Timing.withResart WhenNotActive |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " ")
 
     [<Fact>]
     let ``create timing with never restart`` () =

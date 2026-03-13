@@ -27,7 +27,7 @@ with
         let attributes =
             [
                     element.Name |> Option.map (Attribute.createCSS "id" >> List.singleton)
-                    classes |> Seq.map (Attribute.createCSS "class") |> Seq.toList |> Option.Some
+                    (let joined = classes |> String.concat " " in if joined = "" then None else Some [Attribute.createCSS "class" joined])
                     element.Style |> Option.filter (not << Style.isNamed) |> Option.map Style.toAttributes
                     element.Href |> Option.map (Attribute.createCSS "href" >> List.singleton)
                     if Seq.isEmpty element.Transforms then None else Some [ element.Transforms |> Transforms.toAttribute ]

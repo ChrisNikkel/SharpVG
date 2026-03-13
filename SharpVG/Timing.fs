@@ -117,7 +117,7 @@ module Timing =
         let restartToString restart =
             match restart with
                 | Always -> "always"
-                | WhenNotActive -> "whennotactive"
+                | WhenNotActive -> "whenNotActive"
                 | Never -> "never"
 
         [

@@ -16,7 +16,7 @@ with
 
             let attributes =
                 [
-                    group.Name |> Option.map (Attribute.createXML "Id")
+                    group.Name |> Option.map (Attribute.createXML "id")
                     (if group.Transforms |> Seq.isEmpty then None else Some (group.Transforms |> Transforms.toAttribute))
                 ]
                 |> List.choose id

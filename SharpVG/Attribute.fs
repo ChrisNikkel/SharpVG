@@ -12,7 +12,8 @@ type Attribute =
     }
 with
     override this.ToString() =
-        this.Name + "=" + "\"" + this.Value + "\""
+        let escaped = this.Value.Replace("&", "&amp;").Replace("\"", "&quot;").Replace("<", "&lt;").Replace(">", "&gt;")
+        this.Name + "=" + "\"" + escaped + "\""
 
 module Attribute =
 
