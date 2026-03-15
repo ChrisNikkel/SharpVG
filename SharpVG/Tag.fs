@@ -55,11 +55,12 @@ module Tag =
         |> insertAttributes (List.singleton attribute)
 
     let addBody body tag =
+        let safeBody = body |> Option.ofObj |> Option.defaultValue ""
         tag
         |> withBody (
             match tag.Body with
-                | Some(b) -> b + body
-                | None -> body
+                | Some(b) -> b + safeBody
+                | None -> safeBody
         )
 
     let toString (tag : Tag) =

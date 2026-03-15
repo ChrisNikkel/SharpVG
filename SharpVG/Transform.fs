@@ -37,12 +37,14 @@ module Transform =
             | SkewX _ -> "skewX"
             | SkewY _ -> "skewY"
 
+    /// <summary>Sets the x component for transforms that support it (Rotate). Throws for other transform types (Translate, Scale, Matrix, SkewX, SkewY).</summary>
     let withX x transform =
         match transform with
             | Rotate (a, None) -> Rotate (a, Some (x, Length.empty))
             | Rotate (a, Some (_, y)) -> Rotate (a, Some (x, y))
             | _ -> failwith ("Not able to set x with transform of type: " + getTypeName transform)
 
+    /// <summary>Sets the y component for transforms that support it (Translate, Scale, Rotate). Throws for other transform types (Matrix, SkewX, SkewY).</summary>
     let withY y transform =
         match transform with
             | Translate (x, _) -> Translate (x, Some y)

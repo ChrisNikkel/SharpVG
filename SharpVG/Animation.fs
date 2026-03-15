@@ -1,4 +1,4 @@
-﻿namespace SharpVG
+namespace SharpVG
 
 open System
 
@@ -107,6 +107,7 @@ module Animation =
             KeySplines = List.empty
         }
 
+    /// <summary>Creates a transform animation with the given timing and values. Throws if values is empty.</summary>
     let createTransformWithValues timing values =
         match values with
         | [] -> failwith "createTransformWithValues: values list must not be empty"

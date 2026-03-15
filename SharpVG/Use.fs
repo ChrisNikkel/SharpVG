@@ -19,6 +19,7 @@ with
 
 module Use =
 
+    /// <summary>Creates a Use that references the given element at the given position. Throws if the element has no id (use Element.withName or tryCreate for safe handling).</summary>
     let create element position : Use =
         match Element.tryGetName element with
             | Some name -> { Name = name; Position = position; Size = None }

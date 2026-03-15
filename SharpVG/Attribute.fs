@@ -1,4 +1,4 @@
-﻿namespace SharpVG
+namespace SharpVG
 
 type AttributeType =
     | CSS = 1
@@ -34,4 +34,4 @@ module AttributeType =
         match attributeType with
         | AttributeType.CSS -> "CSS"
         | AttributeType.XML -> "XML"
-        | _ -> failwith "Unknown AttributeType"
+        | _ -> "XML"

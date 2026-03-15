@@ -415,10 +415,10 @@ module FilterEffect =
     let withName filterEffect result =
         { FilterEffect = filterEffect; Name = result }
 
-    let withOffset filterEffect offset =
+    let withOffset (filterEffect: FilterEffect) offset =
         { filterEffect with Offset = offset }
 
-    let withScale filterEffect scale =
+    let withScale (filterEffect: FilterEffect) scale =
         { filterEffect with Scale = scale }
 
     let toString filterEffect =

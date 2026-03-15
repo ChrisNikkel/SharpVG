@@ -2,13 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>netstandard2.1;net7.0;net8.0;net9.0</TargetFrameworks>
-    <Version>0.0.20</Version>
-    <VersionSuffix>alpha</VersionSuffix>
+    <TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
+    <Version>0.1.0</Version>
     <Authors>Chris Nikkel</Authors>
     <Product>SharpVG</Product>
     <Description>Create SVG vector graphics in F#</Description>
-    <Copyright>Copyright © Chris Nikkel 2025</Copyright>
+    <Copyright>Copyright © Chris Nikkel 2024-2026</Copyright>
     <Summary>A .NET Standard library for F# to generate vector graphics in SVG format</Summary>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Title>SharpVG</Title>
@@ -21,9 +20,15 @@
     <RootNamespace>SharpVG</RootNamespace>
     <AssemblyName>SharpVG</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>See CHANGELOG.md at https://github.com/ChrisNikkel/SharpVG/blob/master/CHANGELOG.md</PackageReleaseNotes>
     <LangVersion>latest</LangVersion>
     <EnablePreviewFeatures>true</EnablePreviewFeatures>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="Attribute.fs" />

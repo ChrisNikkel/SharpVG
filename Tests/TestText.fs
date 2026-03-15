@@ -1,4 +1,4 @@
-﻿namespace SharpVG.Tests
+namespace SharpVG.Tests
 
 open SharpVG
 open Xunit
@@ -87,7 +87,7 @@ module TestText =
     let ``text writing mode vertical left to right`` () =
         let position = Point.ofInts (10, 10)
         let result = Text.create position "V" |> Text.withWritingMode VerticalLeftToRight |> Text.toString
-        Assert.Contains("writing-mode=\"vertical-left\"", result)
+        Assert.Contains("writing-mode=\"vertical-lr\"", result)
 
     [<Fact>]
     let ``text withFontWeight normal`` () =

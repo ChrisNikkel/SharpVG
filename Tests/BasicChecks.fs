@@ -20,7 +20,7 @@ type SvgProperty() =
 
 let isTagEnclosed (tag:string) =
     let trimmedTag = tag.Trim()
-    trimmedTag.[0..0] = "<" && trimmedTag.[(trimmedTag.Length - 2)..(trimmedTag.Length - 1)] = "/>"
+    trimmedTag.Length >= 2 && trimmedTag.[0..0] = "<" && trimmedTag.[(trimmedTag.Length - 2)..(trimmedTag.Length - 1)] = "/>"
 
 let happensEvenly chr (str:string) =
     str.ToCharArray()

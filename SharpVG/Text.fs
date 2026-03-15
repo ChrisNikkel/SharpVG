@@ -169,7 +169,7 @@ with
                     match text.WritingMode with
                         | Some(HorizontalTopToBottom) -> [Attribute.createXML "writing-mode" "horizontal-tb"]
                         | Some(VerticalRightToLeft) -> [Attribute.createXML "writing-mode" "vertical-rl"]
-                        | Some(VerticalLeftToRight) -> [Attribute.createXML "writing-mode" "vertical-left"]
+                        | Some(VerticalLeftToRight) -> [Attribute.createXML "writing-mode" "vertical-lr"]
                         | None -> []
             )
         |> Tag.addAttributes
@@ -231,13 +231,13 @@ module Text =
     let create position body =
         { Position = position; Body = body; FontFamily = None; FontSize = None; Anchor = None; LetterSpacing = None; Decoration = None; WritingMode = None; FontWeight = None; FontStyle = None; FontVariant = None; Baseline = None; AlignmentBaseline = None; WordSpacing = None; TextLength = None; LengthAdjust = None; Spans = [] }
 
-    let withFont family size text =
+    let withFont family size (text: Text) =
         { text with FontFamily = Option.ofObj family; FontSize = Some(size) }
 
-    let withFontFamily family text =
-        { text with FontFamily = Some(family) }
+    let withFontFamily family (text: Text) =
+        { text with FontFamily = Option.ofObj family }
 
-    let withFontSize size text =
+    let withFontSize size (text: Text) =
         { text with FontSize = Some(size) }
 
     let withAnchor anchor text =
@@ -252,16 +252,16 @@ module Text =
     let withDecoration decoration text =
         { text with Decoration = Some(decoration) }
 
-    let withFontWeight fontWeight text =
+    let withFontWeight fontWeight (text: Text) =
         { text with FontWeight = Some(fontWeight) }
 
-    let withFontStyle fontStyle text =
+    let withFontStyle fontStyle (text: Text) =
         { text with FontStyle = Some(fontStyle) }
 
-    let withFontVariant fontVariant text =
+    let withFontVariant fontVariant (text: Text) =
         { text with FontVariant = Some(fontVariant) }
 
-    let withBaseline baseline text =
+    let withBaseline baseline (text: Text) =
         { text with Baseline = Some(baseline) }
 
     let withAlignmentBaseline baseline text =

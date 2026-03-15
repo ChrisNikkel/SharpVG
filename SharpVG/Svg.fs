@@ -102,5 +102,9 @@ module Svg =
     let toString (svg : Svg) =
         svg.ToString()
 
+    let private escapeHtmlTitle (s: string) =
+        let s = Option.ofObj s |> Option.defaultValue ""
+        s.Replace("&", "&amp;").Replace("\"", "&quot;").Replace("<", "&lt;").Replace(">", "&gt;")
+
     let toHtml title svg =
-        "<!DOCTYPE html>\n<html>\n<head>\n<title>" + title + "</title>\n</head>\n<body>\n" + (toString svg) + "\n</body>\n</html>\n"
+        "<!DOCTYPE html>\n<html>\n<head>\n<title>" + escapeHtmlTitle title + "</title>\n</head>\n<body>\n" + (toString svg) + "\n</body>\n</html>\n"
