@@ -24,6 +24,8 @@
     <Compile Include="TestRect.fs" />
     <Compile Include="TestStyle.fs" />
     <Compile Include="TestTag.fs" />
+    <Compile Include="TestScript.fs" />
+    <Compile Include="TestViewBox.fs" />
     <Compile Include="TestText.fs" />
     <Compile Include="TestGroup.fs" />
     <Compile Include="TestAnchor.fs" />
