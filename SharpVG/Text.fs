@@ -70,15 +70,33 @@ type TextAnchor =
     | Middle
     | End
     | Inherit
+with
+    override this.ToString() =
+        match this with
+        | Start -> "start"
+        | Middle -> "middle"
+        | End -> "end"
+        | Inherit -> "inherit"
 
 type TextDecoration =
     | Underline
     | StrikeThrough
+with
+    override this.ToString() =
+        match this with
+        | Underline -> "underline"
+        | StrikeThrough -> "line-through"
 
 type WritingMode =
     | HorizontalTopToBottom
     | VerticalRightToLeft
     | VerticalLeftToRight
+with
+    override this.ToString() =
+        match this with
+        | HorizontalTopToBottom -> "horizontal-tb"
+        | VerticalRightToLeft -> "vertical-rl"
+        | VerticalLeftToRight -> "vertical-lr"
 
 type TSpan =
     {
@@ -171,96 +189,20 @@ with
     static member ToTag text =
         Tag.create "text"
         |> Tag.withAttributes (Point.toAttributes text.Position)
-        |> Tag.addAttributes
-            (
-                    match text.FontFamily with
-                        | Some(family) -> [Attribute.createXML "font-family" family]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.FontSize with
-                        | Some(size) -> [Attribute.createXML "font-size" (string size)]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.Anchor with
-                        | Some(Start) -> [Attribute.createXML "text-anchor" "start"]
-                        | Some(Middle) -> [Attribute.createXML "text-anchor" "middle"]
-                        | Some(End) -> [Attribute.createXML "text-anchor" "end"]
-                        | Some(Inherit) -> [Attribute.createXML "text-anchor" "inherit"]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.Decoration with
-                        | Some(Underline) -> [Attribute.createXML "text-decoration" "underline"]
-                        | Some(StrikeThrough) -> [Attribute.createXML "text-decoration" "line-through"]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.LetterSpacing with
-                        | Some(letterSpacing) -> [Attribute.createXML "letter-spacing" (string letterSpacing)]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.WritingMode with
-                        | Some(HorizontalTopToBottom) -> [Attribute.createXML "writing-mode" "horizontal-tb"]
-                        | Some(VerticalRightToLeft) -> [Attribute.createXML "writing-mode" "vertical-rl"]
-                        | Some(VerticalLeftToRight) -> [Attribute.createXML "writing-mode" "vertical-lr"]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.FontWeight with
-                        | Some(fw) -> [Attribute.createXML "font-weight" (fw.ToString())]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.FontStyle with
-                        | Some(fs) -> [Attribute.createXML "font-style" (fs.ToString())]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.FontVariant with
-                        | Some(fv) -> [Attribute.createXML "font-variant" (fv.ToString())]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.Baseline with
-                        | Some(b) -> [Attribute.createXML "dominant-baseline" (b.ToString())]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.AlignmentBaseline with
-                        | Some(b) -> [Attribute.createXML "alignment-baseline" (b.ToString())]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.WordSpacing with
-                        | Some(ws) -> [Attribute.createXML "word-spacing" (string ws)]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.TextLength with
-                        | Some(tl) -> [Attribute.createXML "textLength" (Length.toString tl)]
-                        | None -> []
-            )
-        |> Tag.addAttributes
-            (
-                    match text.LengthAdjust with
-                        | Some(la) -> [Attribute.createXML "lengthAdjust" (la.ToString())]
-                        | None -> []
-            )
+        |> (match text.FontFamily with Some family -> Tag.addAttributes [Attribute.createXML "font-family" family] | None -> id)
+        |> (match text.FontSize with Some size -> Tag.addAttributes [Attribute.createXML "font-size" (string size)] | None -> id)
+        |> (match text.Anchor with Some a -> Tag.addAttributes [Attribute.createXML "text-anchor" (a.ToString())] | None -> id)
+        |> (match text.Decoration with Some d -> Tag.addAttributes [Attribute.createXML "text-decoration" (d.ToString())] | None -> id)
+        |> (match text.LetterSpacing with Some ls -> Tag.addAttributes [Attribute.createXML "letter-spacing" (string ls)] | None -> id)
+        |> (match text.WritingMode with Some wm -> Tag.addAttributes [Attribute.createXML "writing-mode" (wm.ToString())] | None -> id)
+        |> (match text.FontWeight with Some fw -> Tag.addAttributes [Attribute.createXML "font-weight" (fw.ToString())] | None -> id)
+        |> (match text.FontStyle with Some fs -> Tag.addAttributes [Attribute.createXML "font-style" (fs.ToString())] | None -> id)
+        |> (match text.FontVariant with Some fv -> Tag.addAttributes [Attribute.createXML "font-variant" (fv.ToString())] | None -> id)
+        |> (match text.Baseline with Some b -> Tag.addAttributes [Attribute.createXML "dominant-baseline" (b.ToString())] | None -> id)
+        |> (match text.AlignmentBaseline with Some b -> Tag.addAttributes [Attribute.createXML "alignment-baseline" (b.ToString())] | None -> id)
+        |> (match text.WordSpacing with Some ws -> Tag.addAttributes [Attribute.createXML "word-spacing" (string ws)] | None -> id)
+        |> (match text.TextLength with Some tl -> Tag.addAttributes [Attribute.createXML "textLength" (Length.toString tl)] | None -> id)
+        |> (match text.LengthAdjust with Some la -> Tag.addAttributes [Attribute.createXML "lengthAdjust" (la.ToString())] | None -> id)
         |> Tag.addBody text.Body
         |> (if text.Spans |> List.isEmpty then id
             else Tag.addBody (text.Spans |> List.map (fun s -> s.ToString()) |> String.concat ""))
