@@ -106,6 +106,46 @@ with
         |> Tag.addBody span.Body
     override this.ToString() = this |> TSpan.ToTag |> Tag.toString
 
+type TextPathMethod =
+    | AlignMethod
+    | StretchMethod
+with
+    override this.ToString() =
+        match this with
+        | AlignMethod -> "align"
+        | StretchMethod -> "stretch"
+
+type TextPathSpacing =
+    | AutoSpacing
+    | ExactSpacing
+with
+    override this.ToString() =
+        match this with
+        | AutoSpacing -> "auto"
+        | ExactSpacing -> "exact"
+
+type TextPath =
+    {
+        Href: ElementId
+        Body: string
+        StartOffset: Length option
+        Method: TextPathMethod option
+        Spacing: TextPathSpacing option
+        TextLength: Length option
+        LengthAdjust: LengthAdjust option
+    }
+with
+    static member ToTag textPath =
+        Tag.create "textPath"
+        |> Tag.withAttribute (Attribute.createXML "href" ("#" + textPath.Href))
+        |> (match textPath.StartOffset with Some o -> Tag.addAttributes [Attribute.createXML "startOffset" (Length.toString o)] | None -> id)
+        |> (match textPath.Method with Some m -> Tag.addAttributes [Attribute.createXML "method" (m.ToString())] | None -> id)
+        |> (match textPath.Spacing with Some s -> Tag.addAttributes [Attribute.createXML "spacing" (s.ToString())] | None -> id)
+        |> (match textPath.TextLength with Some tl -> Tag.addAttributes [Attribute.createXML "textLength" (Length.toString tl)] | None -> id)
+        |> (match textPath.LengthAdjust with Some la -> Tag.addAttributes [Attribute.createXML "lengthAdjust" (la.ToString())] | None -> id)
+        |> Tag.addBody textPath.Body
+    override this.ToString() = this |> TextPath.ToTag |> Tag.toString
+
 type Text =
     {
         Position: Point
@@ -125,6 +165,7 @@ type Text =
         TextLength: Length option
         LengthAdjust: LengthAdjust option
         Spans: TSpan list
+        TextPaths: TextPath list
     }
 with
     static member ToTag text =
@@ -223,13 +264,15 @@ with
         |> Tag.addBody text.Body
         |> (if text.Spans |> List.isEmpty then id
             else Tag.addBody (text.Spans |> List.map (fun s -> s.ToString()) |> String.concat ""))
+        |> (if text.TextPaths |> List.isEmpty then id
+            else Tag.addBody (text.TextPaths |> List.map (fun tp -> tp.ToString()) |> String.concat ""))
 
     override this.ToString() =
         this |> Text.ToTag |> Tag.toString
 
 module Text =
     let create position body =
-        { Position = position; Body = body; FontFamily = None; FontSize = None; Anchor = None; LetterSpacing = None; Decoration = None; WritingMode = None; FontWeight = None; FontStyle = None; FontVariant = None; Baseline = None; AlignmentBaseline = None; WordSpacing = None; TextLength = None; LengthAdjust = None; Spans = [] }
+        { Position = position; Body = body; FontFamily = None; FontSize = None; Anchor = None; LetterSpacing = None; Decoration = None; WritingMode = None; FontWeight = None; FontStyle = None; FontVariant = None; Baseline = None; AlignmentBaseline = None; WordSpacing = None; TextLength = None; LengthAdjust = None; Spans = []; TextPaths = [] }
 
     let withFont family size (text: Text) =
         { text with FontFamily = Option.ofObj family; FontSize = Some(size) }
@@ -270,10 +313,10 @@ module Text =
     let withWordSpacing spacing text =
         { text with WordSpacing = Some(spacing) }
 
-    let withTextLength length text =
+    let withTextLength length (text: Text) =
         { text with TextLength = Some(length) }
 
-    let withLengthAdjust adjust text =
+    let withLengthAdjust adjust (text: Text) =
         { text with LengthAdjust = Some(adjust) }
 
     let addSpan span text =
@@ -281,6 +324,12 @@ module Text =
 
     let withSpans spans text =
         { text with Spans = spans }
+
+    let addTextPath textPath (text: Text) =
+        { text with TextPaths = text.TextPaths @ [textPath] }
+
+    let withTextPaths textPaths (text: Text) =
+        { text with TextPaths = textPaths }
 
     let toTag =
         Text.ToTag
@@ -302,3 +351,26 @@ module TSpan =
     let withBaseline baseline (span: TSpan) = { span with Baseline = Some baseline }
     let toTag = TSpan.ToTag
     let toString (span: TSpan) = span.ToString()
+
+module TextPath =
+    let create href body : TextPath =
+        { Href = href; Body = body; StartOffset = None; Method = None; Spacing = None; TextLength = None; LengthAdjust = None }
+
+    let withStartOffset offset (textPath: TextPath) =
+        { textPath with StartOffset = Some offset }
+
+    let withMethod method (textPath: TextPath) =
+        { textPath with Method = Some method }
+
+    let withSpacing spacing (textPath: TextPath) =
+        { textPath with Spacing = Some spacing }
+
+    let withTextLength length (textPath: TextPath) =
+        { textPath with TextLength = Some length }
+
+    let withLengthAdjust adjust (textPath: TextPath) =
+        { textPath with LengthAdjust = Some adjust }
+
+    let toTag = TextPath.ToTag
+
+    let toString (textPath: TextPath) = textPath.ToString()

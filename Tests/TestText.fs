@@ -235,3 +235,62 @@ module TestText =
         let result = Text.create Point.origin "" |> Text.withSpans [span1; span2] |> Text.toString
         Assert.Contains("<tspan>first</tspan>", result)
         Assert.Contains("<tspan>second</tspan>", result)
+
+    [<Fact>]
+    let ``create textPath basic`` () =
+        let result = TextPath.create "myPath" "Hello" |> TextPath.toString
+        Assert.Equal("<textPath href=\"#myPath\">Hello</textPath>", result)
+
+    [<Fact>]
+    let ``textPath withStartOffset percentage`` () =
+        let startOffset = Length.ofPercent 50.0
+        let result = TextPath.create "myPath" "Hello" |> TextPath.withStartOffset startOffset |> TextPath.toString
+        Assert.Contains("startOffset=\"50%\"", result)
+
+    [<Fact>]
+    let ``textPath withStartOffset length`` () =
+        let startOffset = Length.ofInt 20
+        let result = TextPath.create "myPath" "Hello" |> TextPath.withStartOffset startOffset |> TextPath.toString
+        Assert.Contains("startOffset=\"20\"", result)
+
+    [<Fact>]
+    let ``textPath withMethod align`` () =
+        let result = TextPath.create "myPath" "Hello" |> TextPath.withMethod AlignMethod |> TextPath.toString
+        Assert.Contains("method=\"align\"", result)
+
+    [<Fact>]
+    let ``textPath withMethod stretch`` () =
+        let result = TextPath.create "myPath" "Hello" |> TextPath.withMethod StretchMethod |> TextPath.toString
+        Assert.Contains("method=\"stretch\"", result)
+
+    [<Fact>]
+    let ``textPath withSpacing auto`` () =
+        let result = TextPath.create "myPath" "Hello" |> TextPath.withSpacing AutoSpacing |> TextPath.toString
+        Assert.Contains("spacing=\"auto\"", result)
+
+    [<Fact>]
+    let ``textPath withSpacing exact`` () =
+        let result = TextPath.create "myPath" "Hello" |> TextPath.withSpacing ExactSpacing |> TextPath.toString
+        Assert.Contains("spacing=\"exact\"", result)
+
+    [<Fact>]
+    let ``textPath withTextLength`` () =
+        let result = TextPath.create "myPath" "Hello" |> TextPath.withTextLength (Length.ofInt 200) |> TextPath.toString
+        Assert.Contains("textLength=\"200\"", result)
+
+    [<Fact>]
+    let ``textPath withLengthAdjust spacing`` () =
+        let result = TextPath.create "myPath" "Hello" |> TextPath.withLengthAdjust Spacing |> TextPath.toString
+        Assert.Contains("lengthAdjust=\"spacing\"", result)
+
+    [<Fact>]
+    let ``Text addTextPath`` () =
+        let textPath = TextPath.create "curvePath" "Curved text"
+        let result = Text.create Point.origin "" |> Text.addTextPath textPath |> Text.toString
+        Assert.Contains("<textPath href=\"#curvePath\">Curved text</textPath>", result)
+
+    [<Fact>]
+    let ``Text withTextPaths`` () =
+        let textPath = TextPath.create "myPath" "Along a path"
+        let result = Text.create Point.origin "" |> Text.withTextPaths [textPath] |> Text.toString
+        Assert.Contains("<textPath href=\"#myPath\">Along a path</textPath>", result)
