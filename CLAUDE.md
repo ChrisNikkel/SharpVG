@@ -55,3 +55,9 @@ Tests live in `Tests/` and use xUnit + FsCheck (property-based testing). `BasicC
 ## Code standards
 
 See [`Documentation/standards.md`](Documentation/standards.md) for coding conventions, example style, and test standards.
+
+When editing or adding documentation in `Documentation/`, follow **Documentation/standards.md**: use named `let` bindings for all points, areas, lengths, times, colors, and pens; use the standard names (center, radius, position, area, strokeColor, fillColor, penWidth, strokePen, fillPen, beginTime, duration, etc.); ensure examples produce valid SVG.
+
+When adding or changing tests, follow **Documentation/standards.md**: add or update doc-proof tests for doc examples; use the same naming as the doc so examples and tests stay in sync.
+
+When writing F# code examples (README, notebooks, docs), apply the same binding and naming rules from **Documentation/standards.md**.
