@@ -201,6 +201,7 @@ type FilterEffectType =
     | Offset of Point * FilterEffectSource option
     | SpecularLighting of surfaceScale: float * specularConstant: float * specularExponent: float * LightSource * FilterEffectSource option
     | Turbulence of TurbulenceType * baseFrequency: float * numOctaves: int * seed: int option
+    | DropShadow of dx: float * dy: float * stdDeviation: float * color: Color option * opacity: float option * FilterEffectSource option
 and FilterEffect =
     {
         FilterEffectType : FilterEffectType
@@ -277,6 +278,12 @@ with
                       Attribute.createXML "baseFrequency" (string baseFreq)
                       Attribute.createXML "numOctaves" (string numOctaves)]
                      @ (seed |> Option.map (fun s -> [Attribute.createXML "seed" (string s)]) |> Option.defaultValue []))
+            | DropShadow (dx, dy, stdDev, color, opacity, input) ->
+                Tag.create "feDropShadow"
+                |> Tag.addAttributes [Attribute.createXML "dx" (string dx); Attribute.createXML "dy" (string dy); Attribute.createXML "stdDeviation" (string stdDev)]
+                |> (match color with Some c -> Tag.addAttributes [Attribute.createXML "flood-color" (c.ToString())] | None -> id)
+                |> (match opacity with Some o -> Tag.addAttributes [Attribute.createXML "flood-opacity" (string o)] | None -> id)
+                |> Tag.addAttributes (inputsToAttributes input None)
         |> Tag.addAttributes (additionalAttributes filterEffect)
 
     override this.ToString() =
@@ -411,6 +418,15 @@ module FilterEffect =
 
     let createTurbulenceWithSeed turbType baseFrequency numOctaves seed =
         { FilterEffectType = Turbulence (turbType, baseFrequency, numOctaves, Some seed); Offset = None; Scale = None }
+
+    let createDropShadow dx dy stdDeviation =
+        { FilterEffectType = DropShadow (dx, dy, stdDeviation, None, None, None); Offset = None; Scale = None }
+
+    let createDropShadowWithColor dx dy stdDeviation color =
+        { FilterEffectType = DropShadow (dx, dy, stdDeviation, Some color, None, None); Offset = None; Scale = None }
+
+    let createDropShadowFull dx dy stdDeviation color opacity =
+        { FilterEffectType = DropShadow (dx, dy, stdDeviation, Some color, Some opacity, None); Offset = None; Scale = None }
 
     let withName filterEffect result =
         { FilterEffect = filterEffect; Name = result }

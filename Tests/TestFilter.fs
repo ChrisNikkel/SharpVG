@@ -194,3 +194,22 @@ module TestFilter =
         let result = Filter.withFilterEffects f [fe1; fe2] |> Filter.toString
         Assert.Contains("feGaussianBlur", result)
         Assert.Contains("feColorMatrix", result)
+
+    [<Fact>]
+    let ``create drop shadow basic`` () =
+        let result = FilterEffect.createDropShadow 2.0 2.0 3.0 |> FilterEffect.toString
+        Assert.Contains("feDropShadow", result)
+        Assert.Contains("dx=\"2\"", result)
+        Assert.Contains("dy=\"2\"", result)
+        Assert.Contains("stdDeviation=\"3\"", result)
+
+    [<Fact>]
+    let ``create drop shadow with color`` () =
+        let result = FilterEffect.createDropShadowWithColor 4.0 4.0 2.0 (Color.ofName Colors.Black) |> FilterEffect.toString
+        Assert.Contains("flood-color=\"black\"", result)
+
+    [<Fact>]
+    let ``create drop shadow full`` () =
+        let result = FilterEffect.createDropShadowFull 2.0 2.0 3.0 (Color.ofName Colors.Black) 0.5 |> FilterEffect.toString
+        Assert.Contains("flood-color=\"black\"", result)
+        Assert.Contains("flood-opacity=\"0.5\"", result)
