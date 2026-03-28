@@ -90,6 +90,13 @@ module Group =
         group.ToString()
 
 module Body =
+    let toString body =
+        body
+        |> Seq.map (function
+            | Group g -> Group.toString g
+            | Element e -> Element.toString e)
+        |> String.concat ""
+
     let toStyles body =
         body
         |> Seq.map (fun b ->

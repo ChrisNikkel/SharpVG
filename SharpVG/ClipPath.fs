@@ -8,12 +8,7 @@ type ClipPath =
     }
 with
     static member ToTag clipPath =
-        let body =
-            clipPath.Body
-            |> Seq.map (function
-                | GroupElement.Element e -> e |> Element.toString
-                | GroupElement.Group g -> g |> Group.toString)
-            |> String.concat ""
+        let body = Body.toString clipPath.Body
         Tag.create "clipPath"
         |> Tag.withAttributes
             ([
@@ -33,10 +28,10 @@ module ClipPath =
         { clipPath with ClipPathUnits = Some units }
 
     let addElement element (clipPath: ClipPath) =
-        { clipPath with Body = Seq.append clipPath.Body (Seq.singleton (GroupElement.Element element)) }
+        { clipPath with Body = Seq.append clipPath.Body (Seq.singleton (Element element)) }
 
     let addElements elements (clipPath: ClipPath) =
-        { clipPath with Body = Seq.append clipPath.Body (elements |> Seq.map GroupElement.Element) }
+        { clipPath with Body = Seq.append clipPath.Body (elements |> Seq.map Element) }
 
     let ofElement id element =
         create id |> addElement element

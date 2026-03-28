@@ -55,7 +55,7 @@ with
                 gradient.GradientUnits |> Option.map (fun u -> [ Attribute.createXML "gradientUnits" (u.ToString()) ]) |> Option.defaultValue []
                 gradient.SpreadMethod |> Option.map (fun sm -> [ Attribute.createXML "spreadMethod" (sm.ToString()) ]) |> Option.defaultValue []
                 gradient.GradientTransform |> Option.map (fun t -> [ Attribute.createXML "gradientTransform" (Transform.toString t) ]) |> Option.defaultValue []
-                gradient.Href |> Option.map (fun h -> [ Attribute.createXML "href" ("#" + h) ]) |> Option.defaultValue []
+                gradient.Href |> Option.map (fun h -> [ Attribute.createHref h ]) |> Option.defaultValue []
             ] |> List.concat)
         |> Tag.withBody body
 
@@ -87,7 +87,7 @@ with
                 gradient.GradientUnits |> Option.map (fun u -> [ Attribute.createXML "gradientUnits" (u.ToString()) ]) |> Option.defaultValue []
                 gradient.SpreadMethod |> Option.map (fun sm -> [ Attribute.createXML "spreadMethod" (sm.ToString()) ]) |> Option.defaultValue []
                 gradient.GradientTransform |> Option.map (fun t -> [ Attribute.createXML "gradientTransform" (Transform.toString t) ]) |> Option.defaultValue []
-                gradient.Href |> Option.map (fun h -> [ Attribute.createXML "href" ("#" + h) ]) |> Option.defaultValue []
+                gradient.Href |> Option.map (fun h -> [ Attribute.createHref h ]) |> Option.defaultValue []
             ] |> List.concat)
         |> Tag.withBody body
 

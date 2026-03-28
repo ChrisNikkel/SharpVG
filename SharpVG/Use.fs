@@ -9,7 +9,7 @@ type Use =
 with
     static member ToTag useObj =
         Tag.create "use"
-        |> Tag.withAttribute (Attribute.createXML "href" ("#" + useObj.Name))
+        |> Tag.withAttribute (Attribute.createHref useObj.Name)
         |> Tag.addAttributes (Point.toAttributes useObj.Position)
         |> Tag.addAttributes (match useObj.Size with Some(s) -> Area.toAttributes s | _ -> [])
 

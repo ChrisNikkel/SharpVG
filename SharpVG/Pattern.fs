@@ -13,12 +13,7 @@ type Pattern =
     }
 with
     static member ToTag pattern =
-        let body =
-            pattern.Body
-            |> Seq.map (function
-                | GroupElement.Element e -> e |> Element.toString
-                | GroupElement.Group g -> g |> Group.toString)
-            |> String.concat ""
+        let body = Body.toString pattern.Body
         Tag.create "pattern"
         |> Tag.withAttributes
             ([
@@ -58,10 +53,10 @@ module Pattern =
         { pattern with ViewBox = Some viewBox }
 
     let addElement element (pattern: Pattern) =
-        { pattern with Body = Seq.append pattern.Body (Seq.singleton (GroupElement.Element element)) }
+        { pattern with Body = Seq.append pattern.Body (Seq.singleton (Element element)) }
 
     let addElements elements (pattern: Pattern) =
-        { pattern with Body = Seq.append pattern.Body (elements |> Seq.map GroupElement.Element) }
+        { pattern with Body = Seq.append pattern.Body (elements |> Seq.map Element) }
 
     let ofElement id size element =
         create id |> withSize size |> addElement element

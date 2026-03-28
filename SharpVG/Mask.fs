@@ -11,12 +11,7 @@ type Mask =
     }
 with
     static member ToTag mask =
-        let body =
-            mask.Body
-            |> Seq.map (function
-                | GroupElement.Element e -> e |> Element.toString
-                | GroupElement.Group g -> g |> Group.toString)
-            |> String.concat ""
+        let body = Body.toString mask.Body
         Tag.create "mask"
         |> Tag.withAttributes
             ([
@@ -48,10 +43,10 @@ module Mask =
         { mask with Size = Some size }
 
     let addElement element (mask: Mask) =
-        { mask with Body = Seq.append mask.Body (Seq.singleton (GroupElement.Element element)) }
+        { mask with Body = Seq.append mask.Body (Seq.singleton (Element element)) }
 
     let addElements elements (mask: Mask) =
-        { mask with Body = Seq.append mask.Body (elements |> Seq.map GroupElement.Element) }
+        { mask with Body = Seq.append mask.Body (elements |> Seq.map Element) }
 
     let ofElement id element =
         create id |> addElement element

@@ -30,12 +30,7 @@ type Marker =
     }
 with
     static member ToTag marker =
-        let body =
-            marker.Body
-            |> Seq.map (function
-                | GroupElement.Element e -> e |> Element.toString
-                | GroupElement.Group g -> g |> Group.toString)
-            |> String.concat ""
+        let body = Body.toString marker.Body
         Tag.create "marker"
         |> Tag.withAttributes
             ([
@@ -73,10 +68,10 @@ module Marker =
         { marker with Orient = Some orient }
 
     let addElement element (marker: Marker) =
-        { marker with Body = Seq.append marker.Body (Seq.singleton (GroupElement.Element element)) }
+        { marker with Body = Seq.append marker.Body (Seq.singleton (Element element)) }
 
     let addElements elements (marker: Marker) =
-        { marker with Body = Seq.append marker.Body (elements |> Seq.map GroupElement.Element) }
+        { marker with Body = Seq.append marker.Body (elements |> Seq.map Element) }
 
     let toTag = Marker.ToTag
 

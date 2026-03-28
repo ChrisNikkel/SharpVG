@@ -155,7 +155,7 @@ type TextPath =
 with
     static member ToTag textPath =
         Tag.create "textPath"
-        |> Tag.withAttribute (Attribute.createXML "href" ("#" + textPath.Href))
+        |> Tag.withAttribute (Attribute.createHref textPath.Href)
         |> (match textPath.StartOffset with Some o -> Tag.addAttributes [Attribute.createXML "startOffset" (Length.toString o)] | None -> id)
         |> (match textPath.Method with Some m -> Tag.addAttributes [Attribute.createXML "method" (m.ToString())] | None -> id)
         |> (match textPath.Spacing with Some s -> Tag.addAttributes [Attribute.createXML "spacing" (s.ToString())] | None -> id)
