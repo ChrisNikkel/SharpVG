@@ -54,10 +54,32 @@ Tests live in `Tests/` and use xUnit + FsCheck (property-based testing). `BasicC
 
 ## Code standards
 
-See [`Documentation/standards.md`](Documentation/standards.md) for coding conventions, example style, and test standards.
+### Documentation (code examples)
 
-When editing or adding documentation in `Documentation/`, follow **Documentation/standards.md**: use named `let` bindings for all points, areas, lengths, times, colors, and pens; use the standard names (center, radius, position, area, strokeColor, fillColor, penWidth, strokePen, fillPen, beginTime, duration, etc.); ensure examples produce valid SVG.
+**Named bindings:** Do not use inline construction inside API calls in examples (e.g. no `Point.ofInts (x, y)` or `Length.ofInt n` inside the call). Define values with `let` first, then use the variable. Tuples of named bindings are fine when appropriate (e.g. `(startPoint, endPoint)` for a line).
 
-When adding or changing tests, follow **Documentation/standards.md**: add or update doc-proof tests for doc examples; use the same naming as the doc so examples and tests stay in sync.
+**Standard names** (use consistently):
 
-When writing F# code examples (README, notebooks, docs), apply the same binding and naming rules from **Documentation/standards.md**.
+- **Points**: `center` (circle/ellipse center), `position` (rect/shape position), `pathPoint1`, `pathPoint2`, `startingPoint` for path motion. For lines: `startPoint`, `endPoint` (or `fromPoint`, `toPoint`).
+- **Areas/sizes**: `area` (rect size), `size` when referring to dimensions.
+- **Lengths**: `radius` (circle), `penWidth` (stroke), `pivot` (rotate center when a single length is reused for x/y).
+- **Time**: `beginTime`, `duration`, `repeatDuration`.
+- **Style**: `strokeColor`, `fillColor`, `strokePen`, `fillPen`, `style`.
+- **Transform**: `translateX`, `translateY` (or `offsetX`, `offsetY`); `transform` for the composed value.
+
+**API:** Use tuple form for `Point.ofInts` and `Area.ofInts`: `(x, y)` and `(w, h)`.
+
+**Valid SVG:** Every doc example must be runnable and produce valid SVG (no orphan animations or incomplete snippets).
+
+### Testing
+
+**Doc-proof tests:** For each non-trivial code example in the user documentation (the [SharpVG wiki](https://github.com/ChrisNikkel/SharpVG.wiki), typically checked out at `~/Code/SharpVG.wiki`), there should be a test that runs the same logic and asserts on output (e.g. `Assert.Contains` for expected tags/attributes).
+
+**Naming:** Name facts like `"Module wiki - short description"` or `"Wiki: Group — Creating groups example"`. Keep a brief comment above the fact pointing to the wiki page and section.
+
+**Coverage:** Use the same variable names (`center`, `radius`, `position`, `area`, etc.) as the docs so examples and tests stay in sync.
+
+### Coding (library / tests)
+
+- **F# style**: Match existing style (modules, `let` bindings, pipelines).
+- **SharpVG API**: Use `Point.ofInts (x, y)` and `Area.ofInts (w, h)` (tuple form), not the curried form.
