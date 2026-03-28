@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFrameworks>netstandard2.1;net8.0;net9.0</TargetFrameworks>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>Chris Nikkel</Authors>
     <Product>SharpVG</Product>
     <Description>Create SVG vector graphics in F#</Description>
