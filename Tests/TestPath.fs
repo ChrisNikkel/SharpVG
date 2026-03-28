@@ -76,3 +76,47 @@ module TestPath =
                 |> Path.addVerticalLineTo Relative (Length.ofFloat -80.0)
                 |> Path.addHorizontalLineTo Relative (Length.ofFloat -40.0)
         Assert.Equal("<path d=\"M110,10 l80,80 v-80 h-40\"/>", paritalTriangle |> Path.toString)
+
+    [<Fact>]
+    let ``addMovesTo multiple points`` () =
+        let result = Path.empty |> Path.addMovesTo Absolute (seq { Point.ofInts (0, 0); Point.ofInts (10, 20) }) |> Path.toString
+        Assert.Equal("<path d=\"M0,0 10,20\"/>", result)
+
+    [<Fact>]
+    let ``addHorizontalLinesTo multiple lengths`` () =
+        let result = Path.empty |> Path.addHorizontalLinesTo Absolute (seq { Length.ofInt 10; Length.ofInt 20 }) |> Path.toString
+        Assert.Equal("<path d=\"H10 20\"/>", result)
+
+    [<Fact>]
+    let ``addVerticalLinesTo multiple lengths`` () =
+        let result = Path.empty |> Path.addVerticalLinesTo Relative (seq { Length.ofInt 5; Length.ofInt 15 }) |> Path.toString
+        Assert.Equal("<path d=\"v5 15\"/>", result)
+
+    [<Fact>]
+    let ``addCubicBezierCurvesTo multiple triplets`` () =
+        let p = Point.origin
+        let result = Path.empty |> Path.addCubicBezierCurvesTo Absolute (seq { p, p, p; p, p, p }) |> Path.toString
+        Assert.Equal("<path d=\"C0,0 0,0 0,0 0,0 0,0 0,0\"/>", result)
+
+    [<Fact>]
+    let ``addSmoothCubicBezierCurvesTo multiple pairs`` () =
+        let p = Point.origin
+        let result = Path.empty |> Path.addSmoothCubicBezierCurvesTo Absolute (seq { p, p; p, p }) |> Path.toString
+        Assert.Equal("<path d=\"S0,0 0,0 0,0 0,0\"/>", result)
+
+    [<Fact>]
+    let ``addQuadraticBezierCurvesTo multiple pairs`` () =
+        let p = Point.origin
+        let result = Path.empty |> Path.addQuadraticBezierCurvesTo Absolute (seq { p, p; p, p }) |> Path.toString
+        Assert.Equal("<path d=\"Q0,0 0,0 0,0 0,0\"/>", result)
+
+    [<Fact>]
+    let ``addSmoothQuadraticBezierCurvesTo multiple points`` () =
+        let result = Path.empty |> Path.addSmoothQuadraticBezierCurvesTo Absolute (seq { Point.ofInts (10, 20); Point.ofInts (30, 40) }) |> Path.toString
+        Assert.Equal("<path d=\"T10,20 30,40\"/>", result)
+
+    [<Fact>]
+    let ``addEllipticalArcCurvesTo multiple params`` () =
+        let arc = { Radius = Point.origin; RotationXAxis = 0.0; LargeArc = false; Sweep = false; Point = Point.origin }
+        let result = Path.empty |> Path.addEllipticalArcCurvesTo Absolute (seq { arc; arc }) |> Path.toString
+        Assert.Equal("<path d=\"A0,0 0 0,0 0,0 0,0 0 0,0 0,0\"/>", result)

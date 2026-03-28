@@ -135,3 +135,31 @@ module TestAnimation =
                         |> Animation.withAdditive Replace
         let output = animation |> Animation.toString
         Assert.Contains("additive=\"replace\"", output)
+
+    [<Fact>]
+    let ``CalculationMode discrete`` () =
+        let path = Path.empty |> Path.addMoveTo Absolute Point.origin
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let output = Animation.createMotion timing path (Some Discrete) |> Animation.toString
+        Assert.Contains("calculationMode=\"discrete\"", output)
+
+    [<Fact>]
+    let ``CalculationMode linear`` () =
+        let path = Path.empty |> Path.addMoveTo Absolute Point.origin
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let output = Animation.createMotion timing path (Some Linear) |> Animation.toString
+        Assert.Contains("calculationMode=\"linear\"", output)
+
+    [<Fact>]
+    let ``CalculationMode spline`` () =
+        let path = Path.empty |> Path.addMoveTo Absolute Point.origin
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let output = Animation.createMotion timing path (Some Spline) |> Animation.toString
+        Assert.Contains("calculationMode=\"spline\"", output)
+
+    [<Fact>]
+    let ``CalculationMode none omits attribute`` () =
+        let path = Path.empty |> Path.addMoveTo Absolute Point.origin
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let output = Animation.createMotion timing path None |> Animation.toString
+        Assert.DoesNotContain("calculationMode", output)

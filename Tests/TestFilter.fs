@@ -26,6 +26,19 @@ module TestFilter =
         Assert.Contains("values=\"0.5\"", result)
 
     [<Fact>]
+    let ``create color matrix matrix filter`` () =
+        let identity = [1;0;0;0;0; 0;1;0;0;0; 0;0;1;0;0; 0;0;0;1;0]
+        let result = FilterEffect.createColorMatrix (ColorMatrix.Matrix identity) |> FilterEffect.toString
+        Assert.Contains("type=\"matrix\"", result)
+        Assert.Contains("values=\"1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0\"", result)
+
+    [<Fact>]
+    let ``create color matrix hueRotate filter`` () =
+        let result = FilterEffect.createColorMatrix (HueRotate 90.0) |> FilterEffect.toString
+        Assert.Contains("type=\"hueRotate\"", result)
+        Assert.Contains("values=\"90\"", result)
+
+    [<Fact>]
     let ``create flood filter`` () =
         let fe = FilterEffect.createFlood (Color.ofName Colors.Red)
         let result = fe |> FilterEffect.toString
