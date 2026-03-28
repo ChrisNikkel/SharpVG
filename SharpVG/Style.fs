@@ -51,6 +51,45 @@ with
         | NonZero -> "nonzero"
         | EvenOdd -> "evenodd"
 
+type PaintLayer =
+    | FillLayer
+    | StrokeLayer
+    | MarkersLayer
+with
+    override this.ToString() =
+        match this with
+        | FillLayer -> "fill"
+        | StrokeLayer -> "stroke"
+        | MarkersLayer -> "markers"
+
+type VectorEffect =
+    | VectorEffectNone
+    | NonScalingStroke
+    | NonScalingSize
+    | NonRotation
+    | FixedPosition
+with
+    override this.ToString() =
+        match this with
+        | VectorEffectNone -> "none"
+        | NonScalingStroke -> "non-scaling-stroke"
+        | NonScalingSize -> "non-scaling-size"
+        | NonRotation -> "non-rotation"
+        | FixedPosition -> "fixed-position"
+
+type ShapeRendering =
+    | ShapeRenderingAuto
+    | OptimizeSpeed
+    | CrispEdges
+    | GeometricPrecision
+with
+    override this.ToString() =
+        match this with
+        | ShapeRenderingAuto -> "auto"
+        | OptimizeSpeed -> "optimizeSpeed"
+        | CrispEdges -> "crispEdges"
+        | GeometricPrecision -> "geometricPrecision"
+
 type Style =
     {
         Fill : Color option;
@@ -73,6 +112,9 @@ type Style =
         Mask: string option;
         Visibility: Visibility option;
         Display: Display option;
+        PaintOrder: PaintLayer list option;
+        VectorEffect: VectorEffect option;
+        ShapeRendering: ShapeRendering option;
     }
 with
     static member private MapToString f style =
@@ -96,6 +138,9 @@ with
             style.Mask |> Option.map (fun id -> f "mask" ("url(#" + id + ")"));
             style.Visibility |> Option.map (fun v -> f "visibility" (v.ToString()));
             style.Display |> Option.map (fun d -> f "display" (d.ToString()));
+            style.PaintOrder |> Option.map (fun layers -> f "paint-order" (if List.isEmpty layers then "normal" else layers |> List.map (fun l -> l.ToString()) |> String.concat " "));
+            style.VectorEffect |> Option.map (fun ve -> f "vector-effect" (ve.ToString()));
+            style.ShapeRendering |> Option.map (fun sr -> f "shape-rendering" (sr.ToString()));
         ] |> List.choose id
 
     static member ToAttributes style =
@@ -135,7 +180,8 @@ module Style =
         { Fill = None; Stroke = None; StrokeWidth = None; Opacity = None; FillOpacity = None; Name = None;
           StrokeLinecap = None; StrokeLinejoin = None; StrokeDashArray = None; StrokeDashOffset = None;
           FillRule = None; ClipPath = None; Filter = None; MarkerStart = None; MarkerMid = None; MarkerEnd = None;
-          StrokeMiterLimit = None; Mask = None; Visibility = None; Display = None }
+          StrokeMiterLimit = None; Mask = None; Visibility = None; Display = None;
+          PaintOrder = None; VectorEffect = None; ShapeRendering = None }
 
     let withName name (style : Style) =
         { style with Name = Option.ofObj name }
@@ -226,6 +272,15 @@ module Style =
 
     let withDisplay display style =
         { style with Display = Some display }
+
+    let withPaintOrder paintOrder style =
+        { style with PaintOrder = Some paintOrder }
+
+    let withVectorEffect vectorEffect style =
+        { style with VectorEffect = Some vectorEffect }
+
+    let withShapeRendering shapeRendering style =
+        { style with ShapeRendering = Some shapeRendering }
 
     let createWithName name =
         empty |> withName name
