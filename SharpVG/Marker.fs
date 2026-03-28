@@ -26,6 +26,7 @@ type Marker =
         Size: Area option
         Units: MarkerUnits option
         Orient: MarkerOrient option
+        PreserveAspectRatio: PreserveAspectRatio option
         Body: Body
     }
 with
@@ -38,6 +39,7 @@ with
         |> (match marker.Size with Some s -> Tag.addAttributes (Area.toAttributes s) | None -> id)
         |> (match marker.Units with Some u -> Tag.addAttributes [Attribute.createXML "markerUnits" (u.ToString())] | None -> id)
         |> (match marker.Orient with Some o -> Tag.addAttributes [Attribute.createXML "orient" (o.ToString())] | None -> id)
+        |> (match marker.PreserveAspectRatio with Some par -> Tag.addAttributes [PreserveAspectRatio.toAttribute par] | None -> id)
         |> Tag.withBody body
 
     override this.ToString() =
@@ -45,7 +47,7 @@ with
 
 module Marker =
     let create id =
-        { Id = id; ViewBox = None; RefPoint = None; Size = None; Units = None; Orient = None; Body = Seq.empty }
+        { Id = id; ViewBox = None; RefPoint = None; Size = None; Units = None; Orient = None; PreserveAspectRatio = None; Body = Seq.empty }
 
     let withViewBox viewBox (marker: Marker) =
         { marker with ViewBox = Some viewBox }
@@ -61,6 +63,9 @@ module Marker =
 
     let withOrient orient (marker: Marker) =
         { marker with Orient = Some orient }
+
+    let withPreserveAspectRatio par (marker: Marker) =
+        { marker with PreserveAspectRatio = Some par }
 
     let addElement element (marker: Marker) =
         { marker with Body = Seq.append marker.Body (Seq.singleton (Element element)) }

@@ -5,6 +5,7 @@ type Svg = {
     Definitions: SvgDefinitions option
     Size: Area option
     ViewBox: ViewBox option
+    PreserveAspectRatio: PreserveAspectRatio option
     Title: string option
     Description: string option
 }
@@ -14,6 +15,7 @@ with
             Attribute.create AttributeType.XML "xmlns" "http://www.w3.org/2000/svg"
             :: match this.Size with | Some size -> Area.toAttributes size | None -> []
             @ match this.ViewBox with | Some viewBox -> ViewBox.toAttributes viewBox | None -> []
+            @ match this.PreserveAspectRatio with | Some par -> [PreserveAspectRatio.toAttribute par] | None -> []
 
         let styles =
             let bodyStyles = this.Body |> Body.toStyles
@@ -47,6 +49,9 @@ module Svg =
     let withViewBox viewBox (svg:Svg) =
         { svg with ViewBox = Some(viewBox) }
 
+    let withPreserveAspectRatio par (svg: Svg) =
+        { svg with PreserveAspectRatio = Some par }
+
     let withTitle title (svg:Svg) =
         { svg with Title = Some title }
 
@@ -64,6 +69,7 @@ module Svg =
             Definitions = None
             Size = None
             ViewBox = None
+            PreserveAspectRatio = None
             Title = None
             Description = None
         }
@@ -83,6 +89,7 @@ module Svg =
             Definitions = None
             Size = Some(Area.full)
             ViewBox = None
+            PreserveAspectRatio = None
             Title = None
             Description = None
         }

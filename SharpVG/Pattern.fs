@@ -9,6 +9,7 @@ type Pattern =
         PatternContentUnits: FilterUnits option
         PatternTransform: Transform option
         ViewBox: ViewBox option
+        PreserveAspectRatio: PreserveAspectRatio option
         Body: Body
     }
 with
@@ -22,6 +23,7 @@ with
         |> (match pattern.PatternContentUnits with Some u -> Tag.addAttributes [Attribute.createXML "patternContentUnits" (u.ToString())] | None -> id)
         |> (match pattern.PatternTransform with Some t -> Tag.addAttributes [Attribute.createXML "patternTransform" (Transform.toString t)] | None -> id)
         |> (match pattern.ViewBox with Some v -> Tag.addAttributes (ViewBox.toAttributes v) | None -> id)
+        |> (match pattern.PreserveAspectRatio with Some par -> Tag.addAttributes [PreserveAspectRatio.toAttribute par] | None -> id)
         |> Tag.withBody body
 
     override this.ToString() =
@@ -29,7 +31,7 @@ with
 
 module Pattern =
     let create id =
-        { Id = id; Position = None; Size = None; PatternUnits = None; PatternContentUnits = None; PatternTransform = None; ViewBox = None; Body = Seq.empty }
+        { Id = id; Position = None; Size = None; PatternUnits = None; PatternContentUnits = None; PatternTransform = None; ViewBox = None; PreserveAspectRatio = None; Body = Seq.empty }
 
     let withPosition position (pattern: Pattern) =
         { pattern with Position = Some position }
@@ -48,6 +50,9 @@ module Pattern =
 
     let withViewBox viewBox (pattern: Pattern) =
         { pattern with ViewBox = Some viewBox }
+
+    let withPreserveAspectRatio par (pattern: Pattern) =
+        { pattern with PreserveAspectRatio = Some par }
 
     let addElement element (pattern: Pattern) =
         { pattern with Body = Seq.append pattern.Body (Seq.singleton (Element element)) }

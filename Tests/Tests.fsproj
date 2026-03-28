@@ -39,6 +39,7 @@
     <Compile Include="TestMask.fs" />
     <Compile Include="TestPattern.fs" />
     <Compile Include="TestMarker.fs" />
+    <Compile Include="TestPreserveAspectRatio.fs" />
     <Compile Include="TestFilter.fs" />
     <Compile Include="TestSvgDefinitions.fs" />
     <Compile Include="TestSvg.fs" />

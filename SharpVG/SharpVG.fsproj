@@ -38,6 +38,7 @@
     <Compile Include="Point.fs" />
     <Compile Include="Area.fs" />
     <Compile Include="Color.fs" />
+    <Compile Include="PreserveAspectRatio.fs" />
     <Compile Include="Path.fs" />
     <Compile Include="Polygon.fs" />
     <Compile Include="Polyline.fs" />
