@@ -15,16 +15,13 @@ with
     static member ToTag pattern =
         let body = Body.toString pattern.Body
         Tag.create "pattern"
-        |> Tag.withAttributes
-            ([
-                [ Attribute.createXML "id" pattern.Id ]
-                pattern.Position |> Option.map Point.toAttributes |> Option.defaultValue []
-                pattern.Size |> Option.map Area.toAttributes |> Option.defaultValue []
-                pattern.PatternUnits |> Option.map (fun u -> [ Attribute.createXML "patternUnits" (u.ToString()) ]) |> Option.defaultValue []
-                pattern.PatternContentUnits |> Option.map (fun u -> [ Attribute.createXML "patternContentUnits" (u.ToString()) ]) |> Option.defaultValue []
-                pattern.PatternTransform |> Option.map (fun t -> [ Attribute.createXML "patternTransform" (Transform.toString t) ]) |> Option.defaultValue []
-                pattern.ViewBox |> Option.map ViewBox.toAttributes |> Option.defaultValue []
-            ] |> List.concat)
+        |> Tag.withAttribute (Attribute.createXML "id" pattern.Id)
+        |> (match pattern.Position with Some p -> Tag.addAttributes (Point.toAttributes p) | None -> id)
+        |> (match pattern.Size with Some s -> Tag.addAttributes (Area.toAttributes s) | None -> id)
+        |> (match pattern.PatternUnits with Some u -> Tag.addAttributes [Attribute.createXML "patternUnits" (u.ToString())] | None -> id)
+        |> (match pattern.PatternContentUnits with Some u -> Tag.addAttributes [Attribute.createXML "patternContentUnits" (u.ToString())] | None -> id)
+        |> (match pattern.PatternTransform with Some t -> Tag.addAttributes [Attribute.createXML "patternTransform" (Transform.toString t)] | None -> id)
+        |> (match pattern.ViewBox with Some v -> Tag.addAttributes (ViewBox.toAttributes v) | None -> id)
         |> Tag.withBody body
 
     override this.ToString() =

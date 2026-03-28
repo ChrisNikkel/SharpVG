@@ -47,16 +47,13 @@ with
     static member ToTag gradient =
         let body = gradient.Stops |> List.map (fun s -> s.ToString()) |> String.concat ""
         Tag.create "linearGradient"
-        |> Tag.withAttributes
-            ([
-                [ Attribute.createXML "id" gradient.Id ]
-                Point.toAttributesWithModifier "" "1" gradient.Point1
-                Point.toAttributesWithModifier "" "2" gradient.Point2
-                gradient.GradientUnits |> Option.map (fun u -> [ Attribute.createXML "gradientUnits" (u.ToString()) ]) |> Option.defaultValue []
-                gradient.SpreadMethod |> Option.map (fun sm -> [ Attribute.createXML "spreadMethod" (sm.ToString()) ]) |> Option.defaultValue []
-                gradient.GradientTransform |> Option.map (fun t -> [ Attribute.createXML "gradientTransform" (Transform.toString t) ]) |> Option.defaultValue []
-                gradient.Href |> Option.map (fun h -> [ Attribute.createHref h ]) |> Option.defaultValue []
-            ] |> List.concat)
+        |> Tag.withAttribute (Attribute.createXML "id" gradient.Id)
+        |> Tag.addAttributes (Point.toAttributesWithModifier "" "1" gradient.Point1)
+        |> Tag.addAttributes (Point.toAttributesWithModifier "" "2" gradient.Point2)
+        |> (match gradient.GradientUnits with Some u -> Tag.addAttributes [Attribute.createXML "gradientUnits" (u.ToString())] | None -> id)
+        |> (match gradient.SpreadMethod with Some sm -> Tag.addAttributes [Attribute.createXML "spreadMethod" (sm.ToString())] | None -> id)
+        |> (match gradient.GradientTransform with Some t -> Tag.addAttributes [Attribute.createXML "gradientTransform" (Transform.toString t)] | None -> id)
+        |> (match gradient.Href with Some h -> Tag.addAttributes [Attribute.createHref h] | None -> id)
         |> Tag.withBody body
 
     override this.ToString() =
@@ -78,17 +75,14 @@ with
     static member ToTag gradient =
         let body = gradient.Stops |> List.map (fun s -> s.ToString()) |> String.concat ""
         Tag.create "radialGradient"
-        |> Tag.withAttributes
-            ([
-                [ Attribute.createXML "id" gradient.Id ]
-                Point.toAttributesWithModifier "c" "" gradient.Center
-                gradient.Focal |> Option.map (Point.toAttributesWithModifier "f" "") |> Option.defaultValue []
-                [ Attribute.createXML "r" (Length.toString gradient.Radius) ]
-                gradient.GradientUnits |> Option.map (fun u -> [ Attribute.createXML "gradientUnits" (u.ToString()) ]) |> Option.defaultValue []
-                gradient.SpreadMethod |> Option.map (fun sm -> [ Attribute.createXML "spreadMethod" (sm.ToString()) ]) |> Option.defaultValue []
-                gradient.GradientTransform |> Option.map (fun t -> [ Attribute.createXML "gradientTransform" (Transform.toString t) ]) |> Option.defaultValue []
-                gradient.Href |> Option.map (fun h -> [ Attribute.createHref h ]) |> Option.defaultValue []
-            ] |> List.concat)
+        |> Tag.withAttribute (Attribute.createXML "id" gradient.Id)
+        |> Tag.addAttributes (Point.toAttributesWithModifier "c" "" gradient.Center)
+        |> (match gradient.Focal with Some f -> Tag.addAttributes (Point.toAttributesWithModifier "f" "" f) | None -> id)
+        |> Tag.addAttribute (Attribute.createXML "r" (Length.toString gradient.Radius))
+        |> (match gradient.GradientUnits with Some u -> Tag.addAttributes [Attribute.createXML "gradientUnits" (u.ToString())] | None -> id)
+        |> (match gradient.SpreadMethod with Some sm -> Tag.addAttributes [Attribute.createXML "spreadMethod" (sm.ToString())] | None -> id)
+        |> (match gradient.GradientTransform with Some t -> Tag.addAttributes [Attribute.createXML "gradientTransform" (Transform.toString t)] | None -> id)
+        |> (match gradient.Href with Some h -> Tag.addAttributes [Attribute.createHref h] | None -> id)
         |> Tag.withBody body
 
     override this.ToString() =

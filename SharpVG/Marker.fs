@@ -32,17 +32,12 @@ with
     static member ToTag marker =
         let body = Body.toString marker.Body
         Tag.create "marker"
-        |> Tag.withAttributes
-            ([
-                [ Attribute.createXML "id" marker.Id ]
-                marker.ViewBox |> Option.map ViewBox.toAttributes |> Option.defaultValue []
-                marker.RefPoint |> Option.map (fun p ->
-                    [ Attribute.createXML "refX" (Length.toString p.X)
-                      Attribute.createXML "refY" (Length.toString p.Y) ]) |> Option.defaultValue []
-                marker.Size |> Option.map Area.toAttributes |> Option.defaultValue []
-                marker.Units |> Option.map (fun u -> [ Attribute.createXML "markerUnits" (u.ToString()) ]) |> Option.defaultValue []
-                marker.Orient |> Option.map (fun o -> [ Attribute.createXML "orient" (o.ToString()) ]) |> Option.defaultValue []
-            ] |> List.concat)
+        |> Tag.withAttribute (Attribute.createXML "id" marker.Id)
+        |> (match marker.ViewBox with Some v -> Tag.addAttributes (ViewBox.toAttributes v) | None -> id)
+        |> (match marker.RefPoint with Some p -> Tag.addAttributes [Attribute.createXML "refX" (Length.toString p.X); Attribute.createXML "refY" (Length.toString p.Y)] | None -> id)
+        |> (match marker.Size with Some s -> Tag.addAttributes (Area.toAttributes s) | None -> id)
+        |> (match marker.Units with Some u -> Tag.addAttributes [Attribute.createXML "markerUnits" (u.ToString())] | None -> id)
+        |> (match marker.Orient with Some o -> Tag.addAttributes [Attribute.createXML "orient" (o.ToString())] | None -> id)
         |> Tag.withBody body
 
     override this.ToString() =

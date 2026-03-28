@@ -23,19 +23,15 @@ type Filter =
 with
     static member ToTag filter =
 
-        let body = filter.FilterEffects |> List.map FilterEffect.toString |> List.toSeq |> (String.concat "")
+        let body = filter.FilterEffects |> List.map FilterEffect.toString |> String.concat ""
 
         Tag.create "filter"
-            |> Tag.withAttributes (
-                [
-                    filter.Id |> Option.map (fun id -> [ Attribute.createXML "id" id ])
-                    filter.Location |> Option.map Point.toAttributes
-                    filter.Area |> Option.map Area.toAttributes
-                    filter.FilterUnits |> Option.map (fun filterUnits -> [ Attribute.createXML "filterUnits" (filterUnits.ToString()) ])
-                    filter.PrimitiveUnits |> Option.map (fun primitiveUnits -> [ Attribute.createXML "primitiveUnits" (primitiveUnits.ToString()) ])
-                ] |> List.choose id |> List.concat
-            )
-            |> (Tag.withBody body)
+        |> (match filter.Id with Some i -> Tag.withAttribute (Attribute.createXML "id" i) | None -> id)
+        |> (match filter.Location with Some p -> Tag.addAttributes (Point.toAttributes p) | None -> id)
+        |> (match filter.Area with Some a -> Tag.addAttributes (Area.toAttributes a) | None -> id)
+        |> (match filter.FilterUnits with Some u -> Tag.addAttributes [Attribute.createXML "filterUnits" (u.ToString())] | None -> id)
+        |> (match filter.PrimitiveUnits with Some u -> Tag.addAttributes [Attribute.createXML "primitiveUnits" (u.ToString())] | None -> id)
+        |> Tag.withBody body
 
     override this.ToString() =
         this |> Filter.ToTag |> Tag.toString

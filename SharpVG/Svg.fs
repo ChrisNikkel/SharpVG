@@ -33,13 +33,7 @@ with
         let definitionsBlock =
             this.Definitions |> Option.map SvgDefinitions.toString |> Option.defaultValue ""
 
-        let body =
-            if Seq.isEmpty this.Body then
-                ""
-            else
-                this.Body
-                |> Seq.map (function | GroupElement.Element e -> e |> Element.toString | GroupElement.Group g -> g |> Group.toString)
-                |> String.concat ""
+        let body = Body.toString this.Body
 
         Tag.create "svg"
         |> Tag.withAttributes attributes

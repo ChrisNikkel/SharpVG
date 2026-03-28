@@ -10,11 +10,8 @@ with
     static member ToTag clipPath =
         let body = Body.toString clipPath.Body
         Tag.create "clipPath"
-        |> Tag.withAttributes
-            ([
-                [ Attribute.createXML "id" clipPath.Id ]
-                clipPath.ClipPathUnits |> Option.map (fun u -> [ Attribute.createXML "clipPathUnits" (u.ToString()) ]) |> Option.defaultValue []
-            ] |> List.concat)
+        |> Tag.withAttribute (Attribute.createXML "id" clipPath.Id)
+        |> (match clipPath.ClipPathUnits with Some u -> Tag.addAttributes [Attribute.createXML "clipPathUnits" (u.ToString())] | None -> id)
         |> Tag.withBody body
 
     override this.ToString() =

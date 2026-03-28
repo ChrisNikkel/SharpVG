@@ -13,14 +13,11 @@ with
     static member ToTag mask =
         let body = Body.toString mask.Body
         Tag.create "mask"
-        |> Tag.withAttributes
-            ([
-                [ Attribute.createXML "id" mask.Id ]
-                mask.MaskUnits |> Option.map (fun u -> [ Attribute.createXML "maskUnits" (u.ToString()) ]) |> Option.defaultValue []
-                mask.MaskContentUnits |> Option.map (fun u -> [ Attribute.createXML "maskContentUnits" (u.ToString()) ]) |> Option.defaultValue []
-                mask.Location |> Option.map Point.toAttributes |> Option.defaultValue []
-                mask.Size |> Option.map Area.toAttributes |> Option.defaultValue []
-            ] |> List.concat)
+        |> Tag.withAttribute (Attribute.createXML "id" mask.Id)
+        |> (match mask.MaskUnits with Some u -> Tag.addAttributes [Attribute.createXML "maskUnits" (u.ToString())] | None -> id)
+        |> (match mask.MaskContentUnits with Some u -> Tag.addAttributes [Attribute.createXML "maskContentUnits" (u.ToString())] | None -> id)
+        |> (match mask.Location with Some p -> Tag.addAttributes (Point.toAttributes p) | None -> id)
+        |> (match mask.Size with Some s -> Tag.addAttributes (Area.toAttributes s) | None -> id)
         |> Tag.withBody body
 
     override this.ToString() =
