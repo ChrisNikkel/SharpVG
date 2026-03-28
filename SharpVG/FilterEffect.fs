@@ -254,7 +254,7 @@ with
                 |> Tag.addAttributes (inputsToAttributes input1 input2)
             | Flood (flood) -> Flood.ToTag flood
             | GaussianBlur (gaussianBlur, input) -> GaussianBlur.ToTag gaussianBlur |> Tag.addAttributes (inputsToAttributes input None)
-            | Image (image) -> Tag.createWithAttribute "feImage" (Attribute.createXML "xlink:href" image)
+            | Image (image) -> Tag.createWithAttribute "feImage" (Attribute.createHref image)
             | Merge inputs ->
                 let body = inputs |> List.map (fun src -> Tag.createWithAttribute "feMergeNode" (Attribute.createXML "in" (src.ToString())) |> Tag.toString) |> String.concat ""
                 Tag.create "feMerge" |> Tag.withBody body
