@@ -77,6 +77,10 @@ Tests live in `Tests/` and use xUnit + FsCheck (property-based testing). `BasicC
 
 **Coverage:** Use the same variable names (`center`, `radius`, `position`, `area`, etc.) as the docs so examples and tests stay in sync.
 
+### Changelog
+
+When adding or changing public API behavior, add an entry to `CHANGELOG.md` under the `Unreleased` section. Use the existing format: `### Added`, `### Changed`, `### Fixed`, `### Removed` subsections as appropriate.
+
 ### Coding (library / tests)
 
 - **F# style**: Match existing style (modules, `let` bindings, pipelines).
