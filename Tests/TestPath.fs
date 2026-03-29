@@ -94,20 +94,20 @@ module TestPath =
 
     [<Fact>]
     let ``addCubicBezierCurvesTo multiple triplets`` () =
-        let p = Point.origin
-        let result = Path.empty |> Path.addCubicBezierCurvesTo Absolute (seq { p, p, p; p, p, p }) |> Path.toString
+        let origin = Point.origin
+        let result = Path.empty |> Path.addCubicBezierCurvesTo Absolute (seq { origin, origin, origin; origin, origin, origin }) |> Path.toString
         Assert.Equal("<path d=\"C0,0 0,0 0,0 0,0 0,0 0,0\"/>", result)
 
     [<Fact>]
     let ``addSmoothCubicBezierCurvesTo multiple pairs`` () =
-        let p = Point.origin
-        let result = Path.empty |> Path.addSmoothCubicBezierCurvesTo Absolute (seq { p, p; p, p }) |> Path.toString
+        let origin = Point.origin
+        let result = Path.empty |> Path.addSmoothCubicBezierCurvesTo Absolute (seq { origin, origin; origin, origin }) |> Path.toString
         Assert.Equal("<path d=\"S0,0 0,0 0,0 0,0\"/>", result)
 
     [<Fact>]
     let ``addQuadraticBezierCurvesTo multiple pairs`` () =
-        let p = Point.origin
-        let result = Path.empty |> Path.addQuadraticBezierCurvesTo Absolute (seq { p, p; p, p }) |> Path.toString
+        let origin = Point.origin
+        let result = Path.empty |> Path.addQuadraticBezierCurvesTo Absolute (seq { origin, origin; origin, origin }) |> Path.toString
         Assert.Equal("<path d=\"Q0,0 0,0 0,0 0,0\"/>", result)
 
     [<Fact>]

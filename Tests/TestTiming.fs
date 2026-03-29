@@ -54,25 +54,25 @@ module TestTiming =
     let ``create timing with repeat count indefinite`` () =
         let repetition = { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = None }
         let attrs = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 3.0) |> Timing.withRepetition repetition |> Timing.toAttributes
-        let s = attrs |> List.map Attribute.toString |> String.concat " "
-        Assert.Contains("begin=\"0s\"", s)
-        Assert.Contains("dur=\"3s\"", s)
-        Assert.Contains("repeatCount=\"indefinite\"", s)
+        let attributeString = attrs |> List.map Attribute.toString |> String.concat " "
+        Assert.Contains("begin=\"0s\"", attributeString)
+        Assert.Contains("dur=\"3s\"", attributeString)
+        Assert.Contains("repeatCount=\"indefinite\"", attributeString)
 
     // Wiki: Animation (Timing section) examples
     [<Fact>]
     let ``Timing wiki - duration and repeat example`` () =
         let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 3.0) |> Timing.withRepetition { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = None }
-        let s = timing |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " "
-        Assert.Contains("begin=\"0s\"", s)
-        Assert.Contains("dur=\"3s\"", s)
-        Assert.Contains("repeatCount=\"indefinite\"", s)
+        let attributeString = timing |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " "
+        Assert.Contains("begin=\"0s\"", attributeString)
+        Assert.Contains("dur=\"3s\"", attributeString)
+        Assert.Contains("repeatCount=\"indefinite\"", attributeString)
 
     [<Fact>]
     let ``Timing wiki - restart and fill example`` () =
         let timing = Timing.create (TimeSpan.FromSeconds 2.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0) |> Timing.withResart Always |> Timing.withFinalState Freeze
-        let s = timing |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " "
-        Assert.Contains("begin=\"2s\"", s)
-        Assert.Contains("dur=\"1s\"", s)
-        Assert.Contains("restart=\"always\"", s)
-        Assert.Contains("fill=\"freeze\"", s)
+        let attributeString = timing |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " "
+        Assert.Contains("begin=\"2s\"", attributeString)
+        Assert.Contains("dur=\"1s\"", attributeString)
+        Assert.Contains("restart=\"always\"", attributeString)
+        Assert.Contains("fill=\"freeze\"", attributeString)

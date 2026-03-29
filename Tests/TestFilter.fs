@@ -154,15 +154,16 @@ module TestFilter =
     [<Fact>]
     let ``Filter withFilterUnits userSpaceOnUse`` () =
         let fe = FilterEffect.createGaussianBlur 3.0
-        let f = Filter.create fe
-        let result = Filter.withFilterUnits f (Some UserSpaceOnUse) |> Filter.toString
+        let filter = Filter.create fe
+        let result = Filter.withFilterUnits filter (Some UserSpaceOnUse) |> Filter.toString
         Assert.Contains("filterUnits=\"userSpaceOnUse\"", result)
 
     [<Fact>]
     let ``Filter withLocation adds position attributes`` () =
         let fe = FilterEffect.createGaussianBlur 3.0
-        let f = Filter.create fe
-        let result = Filter.withLocation f (Some (Point.ofInts (-10, -10))) |> Filter.toString
+        let filter = Filter.create fe
+        let position = Point.ofInts (-10, -10)
+        let result = Filter.withLocation filter (Some position) |> Filter.toString
         Assert.Contains("x=\"-10\"", result)
         Assert.Contains("y=\"-10\"", result)
 
@@ -183,15 +184,15 @@ module TestFilter =
     let ``BlendMode values are lowercase per SVG spec`` () =
         let modes = [Normal; Multiply; Screen; Overlay; Darken; Lighten; ColorDodge; ColorBurn; HardLight; SoftLight; Difference; Exclusion; Hue; Saturation; Color; Luminosity]
         for mode in modes do
-            let s = mode.ToString()
-            Assert.Equal(s, s.ToLowerInvariant())
+            let modeString = mode.ToString()
+            Assert.Equal(modeString, modeString.ToLowerInvariant())
 
     [<Fact>]
     let ``Composite operator values are lowercase per SVG spec`` () =
         let ops = [Composite.Over; Composite.In; Composite.Out; Composite.Atop; Composite.Xor; Composite.Lighter; Composite.Arithmetic]
         for op in ops do
-            let s = op.ToString()
-            Assert.Equal(s, s.ToLowerInvariant())
+            let operatorString = op.ToString()
+            Assert.Equal(operatorString, operatorString.ToLowerInvariant())
 
     [<Fact>]
     let ``EdgeMode none value is correct per SVG spec`` () =
@@ -203,8 +204,8 @@ module TestFilter =
     let ``Filter withFilterEffects multiple effects`` () =
         let fe1 = FilterEffect.createGaussianBlur 3.0
         let fe2 = FilterEffect.createColorMatrix (Saturate 0.5)
-        let f = Filter.create fe1
-        let result = Filter.withFilterEffects f [fe1; fe2] |> Filter.toString
+        let filter = Filter.create fe1
+        let result = Filter.withFilterEffects filter [fe1; fe2] |> Filter.toString
         Assert.Contains("feGaussianBlur", result)
         Assert.Contains("feColorMatrix", result)
 

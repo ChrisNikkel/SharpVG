@@ -81,14 +81,14 @@ module Tests =
         checkTag "text" tag
 
     [<SvgProperty>]
-    let ``animate circles`` (x, y, radius, c, r, g, b, p, o, fo) =
-        let p1 = Point.ofInts (100, 100)
-        let p2 = Point.ofInts (500, 500)
-        let p3 = Point.ofInts (200, 200)
+    let ``animate circles`` (x, y, radius, c, r, g, b, penWidth, o, fo) =
+        let pathPoint1 = Point.ofInts (100, 100)
+        let pathPoint2 = Point.ofInts (500, 500)
+        let pathPoint3 = Point.ofInts (200, 200)
         let point = Point.ofFloats (x, y)
-        let path = Path.empty |> (Path.addSmoothQuadraticBezierCurveTo Absolute p1) |> (Path.addLineTo Absolute p2) |> (Path.addSmoothQuadraticBezierCurveTo Absolute p3)
+        let path = Path.empty |> (Path.addSmoothQuadraticBezierCurveTo Absolute pathPoint1) |> (Path.addLineTo Absolute pathPoint2) |> (Path.addSmoothQuadraticBezierCurveTo Absolute pathPoint3)
         let timing = Timing.create <| TimeSpan.FromSeconds(0.0)
-        let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat p, o, fo
+        let fill, stroke, strokeWidth, opacity, fillOpacity = Hex c, Values(r, g, b), Length.ofFloat penWidth, o, fo
         let style = Style.create fill stroke strokeWidth opacity fillOpacity
         let circle = Circle.create point (Length.ofFloat radius)
         let animation = Animation.createMotion timing path None
