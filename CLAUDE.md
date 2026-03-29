@@ -58,7 +58,7 @@ Tests live in `Tests/` and use xUnit + FsCheck (property-based testing). `BasicC
 
 **Named bindings:** Do not use inline construction inside API calls in examples (e.g. no `Point.ofInts (x, y)` or `Length.ofInt n` inside the call). Define values with `let` first, then use the variable. Tuples of named bindings are fine when appropriate (e.g. `(startPoint, endPoint)` for a line).
 
-**Standard names** (use consistently):
+**Standard names** (use consistently; always prefer full words over abbreviations — `duration` not `dur`, `position` not `pos`, `width` not `w`):
 
 - **Points**: `center` (circle/ellipse center), `position` (rect/shape position), `pathPoint1`, `pathPoint2`, `startingPoint` for path motion. For lines: `startPoint`, `endPoint` (or `fromPoint`, `toPoint`).
 - **Areas/sizes**: `area` (rect size), `size` when referring to dimensions.
