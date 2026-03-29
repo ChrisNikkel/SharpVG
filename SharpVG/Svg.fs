@@ -107,5 +107,9 @@ module Svg =
         let s = Option.ofObj s |> Option.defaultValue ""
         s.Replace("&", "&amp;").Replace("\"", "&quot;").Replace("<", "&lt;").Replace(">", "&gt;")
 
+    let toHtmlWithCss title css svg =
+        let styleBlock = if System.String.IsNullOrEmpty(css) then "" else "\n<style>\n" + css + "\n</style>"
+        "<!DOCTYPE html>\n<html>\n<head>\n<title>" + escapeHtmlTitle title + "</title>" + styleBlock + "\n</head>\n<body>\n" + toString svg + "\n</body>\n</html>\n"
+
     let toHtml title svg =
-        "<!DOCTYPE html>\n<html>\n<head>\n<title>" + escapeHtmlTitle title + "</title>\n</head>\n<body>\n" + (toString svg) + "\n</body>\n</html>\n"
+        toHtmlWithCss title "" svg
