@@ -54,8 +54,6 @@ Tests live in `Tests/` and use xUnit + FsCheck (property-based testing). `BasicC
 
 ## Code standards
 
-### Documentation (code examples)
-
 **Named bindings:** Do not use inline construction inside API calls in examples (e.g. no `Point.ofInts (x, y)` or `Length.ofInt n` inside the call). Define values with `let` first, then use the variable. Tuples of named bindings are fine when appropriate (e.g. `(startPoint, endPoint)` for a line).
 
 **Standard names** (use consistently; always prefer full words over abbreviations — `duration` not `dur`, `position` not `pos`, `width` not `w`):
