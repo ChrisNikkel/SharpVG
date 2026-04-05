@@ -229,3 +229,84 @@ module TestSvg =
             |> Svg.mapAtEditPath [0] (Element.withAttribute "r" "99")
             |> Svg.toString
         Assert.Contains("r=\"99\"", result)
+
+    [<Fact>]
+    let ``toStringForEditing injects data-edit-id on group tags`` () =
+        let inner = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let group = [inner] |> Group.ofList
+        let svg = group |> Svg.ofGroup
+        let result = svg |> Svg.toStringForEditing
+        // The <g> tag at index 0 should carry data-edit-id="0"
+        Assert.Contains("<g ", result)
+        Assert.Contains("data-edit-id=\"0\"", result)
+        // The inner element at 0:0 should also be annotated
+        Assert.Contains("data-edit-id=\"0:0\"", result)
+
+    [<Fact>]
+    let ``toStringForEditing group data-edit-id is distinct from child ids`` () =
+        let circle = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let rect = Rect.create Point.origin (Area.ofInts (10, 10)) |> Element.create
+        let group = [circle; rect] |> Group.ofList
+        let svg = group |> Svg.ofGroup
+        let result = svg |> Svg.toStringForEditing
+        Assert.Contains("data-edit-id=\"0\"", result)    // the <g>
+        Assert.Contains("data-edit-id=\"0:0\"", result)  // circle
+        Assert.Contains("data-edit-id=\"0:1\"", result)  // rect
+
+    [<Fact>]
+    let ``findGroupAtEditPath finds a top-level group`` () =
+        let inner = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let group = [inner] |> Group.ofList |> Group.withName "myGroup"
+        let svg = group |> Svg.ofGroup
+        let found = Svg.findGroupAtEditPath [0] svg
+        Assert.True(found.IsSome)
+        Assert.Equal(Some "myGroup", found |> Option.bind (fun g -> g.Name))
+
+    [<Fact>]
+    let ``findGroupAtEditPath returns None for element at path`` () =
+        let circle = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let svg = [circle] |> Svg.ofList
+        let found = Svg.findGroupAtEditPath [0] svg
+        Assert.True(found.IsNone)
+
+    [<Fact>]
+    let ``findGroupAtEditPath returns None for out-of-bounds path`` () =
+        let inner = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let group = [inner] |> Group.ofList
+        let svg = group |> Svg.ofGroup
+        let found = Svg.findGroupAtEditPath [5] svg
+        Assert.True(found.IsNone)
+
+    [<Fact>]
+    let ``mapGroupAtEditPath transforms group at path`` () =
+        let inner = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let group = [inner] |> Group.ofList
+        let svg = group |> Svg.ofGroup
+        let result =
+            svg
+            |> Svg.mapGroupAtEditPath [0] (Group.withName "renamed")
+            |> Svg.toString
+        Assert.Contains("id=\"renamed\"", result)
+
+    [<Fact>]
+    let ``mapGroupAtEditPath is no-op when path resolves to element`` () =
+        let circle = Circle.create Point.origin (Length.ofInt 5) |> Element.createWithName "c"
+        let svg = [circle] |> Svg.ofList
+        let result =
+            svg
+            |> Svg.mapGroupAtEditPath [0] (Group.withName "should-not-appear")
+            |> Svg.toString
+        Assert.DoesNotContain("should-not-appear", result)
+
+    [<Fact>]
+    let ``mapAtEditPath is no-op when path resolves to group`` () =
+        let inner = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let group = [inner] |> Group.ofList |> Group.withName "g1"
+        let svg = group |> Svg.ofGroup
+        // mapAtEditPath at [0] where [0] is a group — should not crash, group unchanged
+        let result =
+            svg
+            |> Svg.mapAtEditPath [0] (Element.withAttribute "data-touched" "yes")
+            |> Svg.toString
+        Assert.DoesNotContain("data-touched", result)
+        Assert.Contains("id=\"g1\"", result)
