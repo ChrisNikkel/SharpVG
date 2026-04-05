@@ -150,3 +150,28 @@ module Svg =
                 | GroupElement.Group g -> GroupElement.Group { g with Body = replaceBody g.Body }
                 | other -> other)
         { svg with Body = replaceBody svg.Body }
+
+    let addElement (element: Element) (svg: Svg) : Svg =
+        { svg with Body = Seq.append svg.Body (Seq.singleton (GroupElement.Element element)) }
+
+    let addElements (elements: seq<Element>) (svg: Svg) : Svg =
+        { svg with Body = Seq.append svg.Body (elements |> Seq.map GroupElement.Element) }
+
+    let addGroup (group: Group) (svg: Svg) : Svg =
+        { svg with Body = Seq.append svg.Body (Seq.singleton (GroupElement.Group group)) }
+
+    let removeById (id: ElementId) (svg: Svg) : Svg =
+        let rec filterBody (body: Body) : Body =
+            body |> Seq.choose (function
+                | GroupElement.Element e when e.Name = Some id -> None
+                | GroupElement.Group g -> Some (GroupElement.Group { g with Body = filterBody g.Body })
+                | other -> Some other)
+        { svg with Body = filterBody svg.Body }
+
+    let removeWhere (predicate: Element -> bool) (svg: Svg) : Svg =
+        let rec filterBody (body: Body) : Body =
+            body |> Seq.choose (function
+                | GroupElement.Element e when not (Element.isRaw e) && predicate e -> None
+                | GroupElement.Group g -> Some (GroupElement.Group { g with Body = filterBody g.Body })
+                | other -> Some other)
+        { svg with Body = filterBody svg.Body }

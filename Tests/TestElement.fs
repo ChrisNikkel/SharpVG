@@ -172,3 +172,88 @@ module TestElement =
             |> Element.withTransform transform
             |> Element.toString
         checkBodylessTag "circle" result
+
+    // Editing API — attribute helpers
+    [<Fact>]
+    let ``getAttribute returns Some for existing attribute`` () =
+        let center = Point.ofInts (10, 10)
+        let radius = Length.ofInt 5
+        let element = Circle.create center radius |> Element.create
+        Assert.Equal(Some "10", Element.getAttribute "cx" element)
+
+    [<Fact>]
+    let ``getAttribute returns None for missing attribute`` () =
+        let center = Point.ofInts (10, 10)
+        let radius = Length.ofInt 5
+        let element = Circle.create center radius |> Element.create
+        Assert.Equal(None, Element.getAttribute "nonexistent" element)
+
+    [<Fact>]
+    let ``withAttribute adds new attribute visible in toString`` () =
+        let center = Point.ofInts (0, 0)
+        let radius = Length.ofInt 5
+        let element = Circle.create center radius |> Element.create |> Element.withAttribute "data-foo" "bar"
+        Assert.Contains("data-foo=\"bar\"", Element.toString element)
+
+    [<Fact>]
+    let ``withAttribute updates existing attribute`` () =
+        let center = Point.ofInts (10, 10)
+        let radius = Length.ofInt 5
+        let element =
+            Circle.create center radius
+            |> Element.create
+            |> Element.withAttribute "r" "99"
+        let output = Element.toString element
+        Assert.Contains("r=\"99\"", output)
+        Assert.DoesNotContain("r=\"5\"", output)
+
+    [<Fact>]
+    let ``removeAttribute removes the attribute from output`` () =
+        let center = Point.ofInts (10, 10)
+        let radius = Length.ofInt 5
+        let element =
+            Circle.create center radius
+            |> Element.create
+            |> Element.removeAttribute "cx"
+        Assert.DoesNotContain("cx=", Element.toString element)
+
+    // Editing API — animation helpers
+    [<Fact>]
+    let ``clearAnimations removes all animations`` () =
+        let timing = Timing.create (TimeSpan.Zero) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let anim = Animation.createSet timing AttributeType.XML "r" "10"
+        let element =
+            Circle.create Point.origin (Length.ofInt 5)
+            |> Element.create
+            |> Element.withAnimation anim
+            |> Element.clearAnimations
+        Assert.DoesNotContain("<set", Element.toString element)
+
+    [<Fact>]
+    let ``removeAnimationWhere removes only matching animations`` () =
+        let timing = Timing.create (TimeSpan.Zero) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let anim1 = Animation.createSet timing AttributeType.XML "r" "10"
+        let anim2 = Animation.createSet timing AttributeType.XML "cx" "20"
+        let element =
+            Circle.create Point.origin (Length.ofInt 5)
+            |> Element.create
+            |> Element.withAnimation anim1
+            |> Element.addAnimation anim2
+            |> Element.removeAnimationWhere (fun a ->
+                match a.AnimationType with
+                | Set s -> s.AttributeName = "r"
+                | _ -> false)
+        let output = Element.toString element
+        Assert.DoesNotContain("attributeName=\"r\"", output)
+        Assert.Contains("attributeName=\"cx\"", output)
+
+    [<Fact>]
+    let ``mapAnimations transforms each animation`` () =
+        let timing = Timing.create (TimeSpan.Zero) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let anim = Animation.createSet timing AttributeType.XML "r" "10"
+        let element =
+            Circle.create Point.origin (Length.ofInt 5)
+            |> Element.create
+            |> Element.withAnimation anim
+            |> Element.mapAnimations (fun a -> { a with Additive = Some Additive.Sum })
+        Assert.Contains("additive=\"sum\"", Element.toString element)

@@ -2,6 +2,15 @@
 
 All notable changes to SharpVG will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- `Element.getAttribute`, `Element.withAttribute`, `Element.removeAttribute` — read, write, and remove individual attributes on any element (works for both parsed and constructed elements)
+- `Element.clearAnimations`, `Element.removeAnimationWhere`, `Element.mapAnimations` — animation editing helpers
+- `Svg.addElement`, `Svg.addElements`, `Svg.addGroup` — append elements or groups to an SVG
+- `Svg.removeById`, `Svg.removeWhere` — remove elements from an SVG body (recursively through nested groups)
+- `Group.removeById`, `Group.removeWhere` — remove elements from a group body (recursively through nested groups)
+
 ## [0.1.0] - 2026-03-14
 
 ### Added

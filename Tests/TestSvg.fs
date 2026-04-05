@@ -102,3 +102,73 @@ module TestSvg =
         Assert.Contains("width=\"400\"", result)
         Assert.Contains("height=\"400\"", result)
         Assert.Contains("viewBox=\"0,0 100,100\"", result)
+
+    // Editing API — structural helpers
+    [<Fact>]
+    let ``addElement appends element to SVG body`` () =
+        let circle = Circle.create (Point.ofInts (10, 10)) (Length.ofInt 5) |> Element.create
+        let rect = Rect.create (Point.ofInts (0, 0)) (Area.ofInts (20, 20)) |> Element.create
+        let result =
+            circle
+            |> Svg.ofElement
+            |> Svg.addElement rect
+            |> Svg.toString
+        Assert.Contains("<circle", result)
+        Assert.Contains("<rect", result)
+
+    [<Fact>]
+    let ``addElements appends multiple elements to SVG body`` () =
+        let circle = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let rect1 = Rect.create Point.origin (Area.ofInts (10, 10)) |> Element.create
+        let rect2 = Rect.create Point.origin (Area.ofInts (20, 20)) |> Element.create
+        let result =
+            circle
+            |> Svg.ofElement
+            |> Svg.addElements [rect1; rect2]
+            |> Svg.toString
+        Assert.Contains("<circle", result)
+        Assert.Contains("<rect", result)
+
+    [<Fact>]
+    let ``addGroup appends group to SVG body`` () =
+        let circle = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let group = [circle] |> Group.ofList
+        let result =
+            [] |> Svg.ofList |> Svg.addGroup group |> Svg.toString
+        Assert.Contains("<g>", result)
+        Assert.Contains("<circle", result)
+
+    [<Fact>]
+    let ``removeById removes the named element`` () =
+        let circle = Circle.create Point.origin (Length.ofInt 5) |> Element.createWithName "target"
+        let rect = Rect.create Point.origin (Area.ofInts (10, 10)) |> Element.create
+        let result =
+            [circle; rect]
+            |> Svg.ofList
+            |> Svg.removeById "target"
+            |> Svg.toString
+        Assert.DoesNotContain("id=\"target\"", result)
+        Assert.Contains("<rect", result)
+
+    [<Fact>]
+    let ``removeById removes element nested in group`` () =
+        let inner = Circle.create Point.origin (Length.ofInt 5) |> Element.createWithName "inner"
+        let group = [inner] |> Group.ofList
+        let result =
+            group
+            |> Svg.ofGroup
+            |> Svg.removeById "inner"
+            |> Svg.toString
+        Assert.DoesNotContain("id=\"inner\"", result)
+
+    [<Fact>]
+    let ``removeWhere removes matching elements`` () =
+        let small = Circle.create Point.origin (Length.ofInt 5) |> Element.createWithName "small"
+        let large = Circle.create Point.origin (Length.ofInt 50) |> Element.createWithName "large"
+        let result =
+            [small; large]
+            |> Svg.ofList
+            |> Svg.removeWhere (fun e -> e.Name = Some "small")
+            |> Svg.toString
+        Assert.DoesNotContain("id=\"small\"", result)
+        Assert.Contains("id=\"large\"", result)

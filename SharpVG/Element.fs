@@ -193,3 +193,32 @@ module Element =
     let setTo timing newElement element =
         let attributesDiff = ((newElement |> toTag).Attributes |> Set.ofList) - ((element |> toTag).Attributes |> Set.ofList) |> Set.toList
         element |> withAnimations (attributesDiff |> List.map (fun {Name = n; Value = v; Type = t} -> Animation.createSet timing t n v))
+
+    let getAttribute (name: string) (element: Element) : string option =
+        match element.Content with
+        | TagContent t -> t.Attributes |> List.tryFind (fun a -> a.Name = name) |> Option.map _.Value
+        | RawContent r -> r.Attributes |> List.tryFind (fun a -> a.Name = name) |> Option.map _.Value
+
+    let withAttribute (name: string) (value: string) (element: Element) : Element =
+        match element.Content with
+        | TagContent t ->
+            { element with Content = TagContent (t |> Tag.insertAttributes [Attribute.createXML name value]) }
+        | RawContent r ->
+            let updated = Attribute.createXML name value :: (r.Attributes |> List.filter (fun a -> a.Name <> name))
+            { element with Content = RawContent { r with Attributes = updated } }
+
+    let removeAttribute (name: string) (element: Element) : Element =
+        match element.Content with
+        | TagContent t ->
+            { element with Content = TagContent { t with Attributes = t.Attributes |> List.filter (fun a -> a.Name <> name) } }
+        | RawContent r ->
+            { element with Content = RawContent { r with Attributes = r.Attributes |> List.filter (fun a -> a.Name <> name) } }
+
+    let clearAnimations (element: Element) : Element =
+        { element with Animations = Seq.empty }
+
+    let removeAnimationWhere (predicate: Animation -> bool) (element: Element) : Element =
+        { element with Animations = element.Animations |> Seq.filter (predicate >> not) }
+
+    let mapAnimations (f: Animation -> Animation) (element: Element) : Element =
+        { element with Animations = element.Animations |> Seq.map f }

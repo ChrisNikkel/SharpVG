@@ -92,6 +92,22 @@ module Group =
             | Group g -> findById id g
             | _ -> None)
 
+    let rec removeById (id: ElementId) (group: Group) : Group =
+        { group with
+            Body =
+                group.Body |> Seq.choose (function
+                    | Element e when e.Name = Some id -> None
+                    | Group g -> Some (Group (removeById id g))
+                    | other -> Some other) }
+
+    let rec removeWhere (predicate: Element -> bool) (group: Group) : Group =
+        { group with
+            Body =
+                group.Body |> Seq.choose (function
+                    | Element e when not (Element.isRaw e) && predicate e -> None
+                    | Group g -> Some (Group (removeWhere predicate g))
+                    | other -> Some other) }
+
     let rec toStyleSet group =
         group.Body
             |> Seq.map (function | Element(e) -> e.Style |> Option.toList |> Set.ofList | Group(g) -> g |> toStyleSet)

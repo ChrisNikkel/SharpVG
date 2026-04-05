@@ -672,3 +672,24 @@ module TestSvgParser =
         | Ok result ->
             // Warnings is always a list — never throws
             result.Warnings |> List.length >= 0
+
+    // Editing API integration: parse → edit → serialize
+    [<Fact>]
+    let ``edit parsed SVG - withAttribute changes shape geometry`` () =
+        let input = "<svg xmlns=\"http://www.w3.org/2000/svg\"><circle id=\"c\" cx=\"10\" cy=\"10\" r=\"5\"/></svg>"
+        let svg = parseOk input
+        let edited =
+            svg
+            |> Svg.mapElementsWhere (fun e -> e.Name = Some "c") (Element.withAttribute "r" "50")
+        let output = Svg.toString edited
+        Assert.Contains("r=\"50\"", output)
+        Assert.DoesNotContain("r=\"5\"", output)
+
+    [<Fact>]
+    let ``edit parsed SVG - removeById removes element`` () =
+        let input = "<svg xmlns=\"http://www.w3.org/2000/svg\"><circle id=\"c\" cx=\"10\" cy=\"10\" r=\"5\"/><rect id=\"r\" x=\"0\" y=\"0\" width=\"10\" height=\"10\"/></svg>"
+        let svg = parseOk input
+        let edited = svg |> Svg.removeById "c"
+        let output = Svg.toString edited
+        Assert.DoesNotContain("id=\"c\"", output)
+        Assert.Contains("<rect", output)
