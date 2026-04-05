@@ -582,6 +582,83 @@ module TestSvgParser =
                     | _ -> false)
             not (hasRaw stripped.Body)
 
+    // --- SVGZ ---
+
+    [<Fact>]
+    let ``SvgParser ofGzipStream - roundtrips SVG through gzip`` () =
+        let center = Point.ofInts (50, 50)
+        let radius = Length.ofInt 30
+        let original = Circle.create center radius |> Element.create |> Svg.ofElement
+        let svgBytes = Svg.toString original |> System.Text.Encoding.UTF8.GetBytes
+        let compressed =
+            use ms = new System.IO.MemoryStream()
+            do
+                use gz = new System.IO.Compression.GZipStream(ms, System.IO.Compression.CompressionMode.Compress, leaveOpen = true)
+                gz.Write(svgBytes, 0, svgBytes.Length)
+            ms.ToArray()
+        use readMs = new System.IO.MemoryStream(compressed)
+        match SvgParser.ofGzipStream readMs with
+        | Error e -> failwithf "ofGzipStream failed: %s" e.Message
+        | Ok result ->
+            let output = Svg.toString result.Value
+            Assert.Contains("<circle", output)
+
+    [<Fact>]
+    let ``SvgParser ofGzipStream - bad data returns Error`` () =
+        use ms = new System.IO.MemoryStream([| 0uy; 1uy; 2uy; 3uy |])
+        match SvgParser.ofGzipStream ms with
+        | Error _ -> ()
+        | Ok _ -> Assert.Fail("Expected Error for non-gzip data")
+
+    // --- HTML extraction ---
+
+    [<Fact>]
+    let ``SvgParser ofHtmlString - extracts inline SVG from well-formed XHTML`` () =
+        let html = """<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/xhtml"><body><svg xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="5"/></svg></body></html>"""
+        let results = SvgParser.ofHtmlString html
+        Assert.Equal(1, results.Length)
+        match results.[0] with
+        | Error e -> failwithf "ofHtmlString failed: %s" e.Message
+        | Ok result -> Assert.Contains("<circle", Svg.toString result.Value)
+
+    [<Fact>]
+    let ``SvgParser ofHtmlString - extracts inline SVG from HTML5`` () =
+        // SharpVG toHtml output is well-formed enough for XML parse path
+        let center = Point.ofInts (50, 50)
+        let radius = Length.ofInt 20
+        let html = Circle.create center radius |> Element.create |> Svg.ofElement |> Svg.toHtml "Test"
+        let results = SvgParser.ofHtmlString html
+        Assert.Equal(1, results.Length)
+        match results.[0] with
+        | Error e -> failwithf "ofHtmlString failed: %s" e.Message
+        | Ok result -> Assert.Contains("<circle", Svg.toString result.Value)
+
+    [<Fact>]
+    let ``SvgParser ofHtmlString - returns empty list when no SVG present`` () =
+        let results = SvgParser.ofHtmlString "<html><body><p>No SVG here</p></body></html>"
+        Assert.Empty(results)
+
+    [<Fact>]
+    let ``SvgParser ofHtmlString - extracts multiple SVG elements`` () =
+        let html = """<html><body>
+            <svg xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="10" height="10"/></svg>
+            <p>between</p>
+            <svg xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="4"/></svg>
+        </body></html>"""
+        let results = SvgParser.ofHtmlString html
+        Assert.Equal(2, results.Length)
+        Assert.True(results |> List.forall (function Ok _ -> true | Error _ -> false))
+
+    [<Fact>]
+    let ``SvgParser ofHtmlString - parsed SVG from HTML serializes to well-formed XML`` () =
+        let center = Point.ofInts (40, 40)
+        let radius = Length.ofInt 25
+        let html = Circle.create center radius |> Element.create |> Svg.ofElement |> Svg.toHtml "Test"
+        let results = SvgParser.ofHtmlString html
+        match results with
+        | [ Ok result ] -> SvgCheck.assertValid (Svg.toString result.Value)
+        | _ -> Assert.Fail("Expected exactly one Ok result")
+
     // Property: parsed SVG title survives round-trip
     [<SvgProperty>]
     let ``SvgParser property - warnings list is always a list`` (r: float) =

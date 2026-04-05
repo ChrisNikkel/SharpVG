@@ -966,6 +966,54 @@ module private SvgRootParser =
         Ok { Value = svg; Warnings = finalState.Warnings }
 
 
+module private SvgHtmlParser =
+
+    open System.Text.RegularExpressions
+
+    // Try to extract SVG root elements from HTML.
+    // Strategy 1: parse as XML (works for XHTML / well-formed HTML).
+    // Strategy 2: regex extraction (works for HTML5 where the document isn't XML-valid).
+    let extractSvgStrings (html: string) : string list =
+        try
+            let doc = XDocument.Parse(html)
+            doc.Descendants()
+            |> Seq.filter (fun el -> el.Name.LocalName = "svg")
+            |> Seq.map _.ToString()
+            |> Seq.toList
+        with _ ->
+            // HTML5 fallback: find <svg ...> ... </svg> blocks.
+            // Handles nesting by tracking depth; good enough for typical embedding.
+            let svgOpen = Regex(@"<svg[\s>]", RegexOptions.IgnoreCase)
+            let svgClose = Regex(@"</svg\s*>", RegexOptions.IgnoreCase)
+            let mutable result = []
+            let mutable searchFrom = 0
+            let mutable loop = true
+            while loop do
+                let openMatch = svgOpen.Match(html, searchFrom)
+                if not openMatch.Success then
+                    loop <- false
+                else
+                    let start = openMatch.Index
+                    let mutable depth = 1
+                    let mutable pos = start + openMatch.Length
+                    while depth > 0 && pos < html.Length do
+                        let nextOpen  = svgOpen.Match(html, pos)
+                        let nextClose = svgClose.Match(html, pos)
+                        match nextOpen.Success, nextClose.Success with
+                        | true, true when nextOpen.Index < nextClose.Index ->
+                            depth <- depth + 1
+                            pos <- nextOpen.Index + nextOpen.Length
+                        | _, true ->
+                            depth <- depth - 1
+                            pos <- nextClose.Index + nextClose.Length
+                        | _ ->
+                            depth <- 0   // malformed; stop
+                    if depth = 0 then
+                        result <- html.[start .. pos - 1] :: result
+                    searchFrom <- pos
+            List.rev result
+
+
 module SvgParser =
 
     let ofString (svgString: string) : Result<ParseResult<Svg>, ParseError> =
@@ -995,6 +1043,35 @@ module SvgParser =
             ofString content
         with ex ->
             Error { Message = ex.Message; ElementName = None }
+
+    let ofGzipStream (stream: System.IO.Stream) : Result<ParseResult<Svg>, ParseError> =
+        try
+            use gzip = new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionMode.Decompress)
+            use reader = new System.IO.StreamReader(gzip, System.Text.Encoding.UTF8)
+            ofString (reader.ReadToEnd())
+        with ex ->
+            Error { Message = ex.Message; ElementName = None }
+
+    let ofGzipFile (path: string) : Result<ParseResult<Svg>, ParseError> =
+        try
+            use file = System.IO.File.OpenRead(path)
+            ofGzipStream file
+        with ex ->
+            Error { Message = ex.Message; ElementName = None }
+
+    /// Extract and parse all SVG elements embedded in an HTML string.
+    /// Works with XHTML (XML parse) and HTML5 (regex extraction).
+    /// Returns one result per SVG found; an empty list means no SVG was present.
+    let ofHtmlString (html: string) : Result<ParseResult<Svg>, ParseError> list =
+        SvgHtmlParser.extractSvgStrings html
+        |> List.map ofString
+
+    let ofHtmlFile (path: string) : Result<ParseResult<Svg>, ParseError> list =
+        try
+            let content = System.IO.File.ReadAllText(path)
+            ofHtmlString content
+        with ex ->
+            [ Error { Message = ex.Message; ElementName = None } ]
 
     let stripUnknown (svg: Svg) : Svg =
         let rec stripBody (body: Body) : Body =
