@@ -12,7 +12,7 @@ with
             |> toTag
             |> Tag.toString
         and toTag group =
-            let body = group.Body |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> toString) |> String.concat ""
+            let body = group.Body |> Seq.map (function | Element(e) -> e |> Element.toString | Group(g) -> g |> toString | Raw(r) -> r |> RawElement.toString) |> String.concat ""
 
             let attributes =
                 [
@@ -29,6 +29,7 @@ with
 and GroupElement =
     | Group of Group
     | Element of Element
+    | Raw of RawElement
 and Body =
     seq<GroupElement>
 
@@ -80,7 +81,7 @@ module Group =
 
     let rec toStyleSet group =
         group.Body
-            |> Seq.map (function | Element(e) -> e.Style |> Option.toList |> Set.ofList | Group(g) -> g |> toStyleSet)
+            |> Seq.map (function | Element(e) -> e.Style |> Option.toList |> Set.ofList | Group(g) -> g |> toStyleSet | Raw _ -> Set.empty)
             |> Seq.fold (+) Set.empty
 
     let toTag group =
@@ -94,7 +95,8 @@ module Body =
         body
         |> Seq.map (function
             | Group g -> Group.toString g
-            | Element e -> Element.toString e)
+            | Element e -> Element.toString e
+            | Raw r -> RawElement.toString r)
         |> String.concat ""
 
     let toStyles body =
@@ -102,6 +104,7 @@ module Body =
         |> Seq.map (fun b ->
             match b with
                 | Group(g) -> g |> Group.toStyleSet
-                | Element(e) -> e.Style |> Option.toList |> Set.ofList)
+                | Element(e) -> e.Style |> Option.toList |> Set.ofList
+                | Raw _ -> Set.empty)
         |> Seq.fold (+) Set.empty
         |> Set.toSeq

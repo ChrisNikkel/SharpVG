@@ -62,6 +62,7 @@
     <Compile Include="Anchor.fs" />
     <Compile Include="Symbol.fs" />
     <Compile Include="Use.fs" />
+    <Compile Include="RawElement.fs" />
     <Compile Include="Group.fs" />
     <Compile Include="ClipPath.fs" />
     <Compile Include="Mask.fs" />
@@ -70,6 +71,7 @@
     <Compile Include="SvgDefinitions.fs" />
     <Compile Include="Graphic.fs" />
     <Compile Include="Svg.fs" />
+    <Compile Include="SvgParser.fs" />
   </ItemGroup>
 
 </Project>
