@@ -1,9 +1,13 @@
 namespace SharpVG
 
+type ElementContent =
+    | TagContent of Tag
+    | RawContent of RawElement
+
 type Element = {
         Name: ElementId option
         Classes: seq<string>
-        BaseTag: Tag
+        Content: ElementContent
         Style: Style option
         Href: string option
         Transforms: seq<Transform>
@@ -11,9 +15,16 @@ type Element = {
     }
 with
     static member ToTag element =
-        element.BaseTag
+        match element.Content with
+        | TagContent t -> t
+        | RawContent _ -> Tag.create ""
 
     static member ToFullTag element =
+        let baseTag =
+            match element.Content with
+            | TagContent t -> t
+            | RawContent _ -> Tag.create ""
+
         let styleClass =
             match element.Style with
                 | Some s -> s.Name
@@ -35,12 +46,14 @@ with
             |> List.choose id
             |> List.concat
 
-        element.BaseTag
+        baseTag
         |> Tag.insertAttributes attributes
         |> if element.Animations |> Seq.isEmpty then id else Tag.addBody (element.Animations |> Seq.map Animation.toString |> String.concat "")
 
     override this.ToString() =
-        this |> Element.ToFullTag |> Tag.toString
+        match this.Content with
+        | RawContent r -> RawElement.toString r
+        | TagContent _ -> this |> Element.ToFullTag |> Tag.toString
 
 module Element =
 
@@ -49,7 +62,7 @@ module Element =
         {
             Name = None
             Classes = Seq.empty
-            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+            Content = TagContent (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = None
             Href = None
             Transforms = Seq.empty
@@ -60,7 +73,7 @@ module Element =
         {
             Name = None
             Classes = Seq.empty
-            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+            Content = TagContent (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = Some(style)
             Href = None
             Transforms = Seq.empty
@@ -70,7 +83,7 @@ module Element =
     let inline createWithClass< ^T when ^T: (static member ToTag: ^T -> Tag)> theClass taggable =
         {
             Name = None
-            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+            Content = TagContent (^T : (static member ToTag: ^T -> Tag) (taggable))
             Classes = Seq.singleton theClass
             Style = None
             Href = None
@@ -81,7 +94,7 @@ module Element =
     let inline createWithClasses< ^T when ^T: (static member ToTag: ^T -> Tag)> classes taggable =
         {
             Name = None
-            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+            Content = TagContent (^T : (static member ToTag: ^T -> Tag) (taggable))
             Classes = classes
             Style = None
             Href = None
@@ -93,7 +106,7 @@ module Element =
         {
             Name = Option.ofObj name
             Classes = Seq.empty
-            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+            Content = TagContent (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = None
             Href = None
             Transforms = Seq.empty
@@ -104,7 +117,7 @@ module Element =
         {
             Name = name
             Classes = classes
-            BaseTag = (^T : (static member ToTag: ^T -> Tag) (taggable))
+            Content = TagContent (^T : (static member ToTag: ^T -> Tag) (taggable))
             Style = style
             Href = None
             Transforms = transform
@@ -155,6 +168,27 @@ module Element =
 
     let toString (element : Element) =
         element.ToString()
+
+    let ofRaw (rawElement: RawElement) : Element =
+        {
+            Name = None
+            Classes = Seq.empty
+            Content = RawContent rawElement
+            Style = None
+            Href = None
+            Transforms = Seq.empty
+            Animations = Seq.empty
+        }
+
+    let isRaw (element: Element) : bool =
+        match element.Content with
+        | RawContent _ -> true
+        | TagContent _ -> false
+
+    let rawContent (element: Element) : RawElement option =
+        match element.Content with
+        | RawContent r -> Some r
+        | TagContent _ -> None
 
     let setTo timing newElement element =
         let attributesDiff = ((newElement |> toTag).Attributes |> Set.ofList) - ((element |> toTag).Attributes |> Set.ofList) |> Set.toList

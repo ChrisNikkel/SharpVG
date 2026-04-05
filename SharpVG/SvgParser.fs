@@ -575,7 +575,7 @@ module private SvgElementParsers =
                 | _ -> None)
             |> Seq.toList
         let raw = RawElement.create xel.Name.LocalName attributes children
-        GroupElement.Raw raw, state
+        GroupElement.Element (Element.ofRaw raw), state
 
     let rec parseGroup (xel: XElement) (state: ParseState) : SharpVG.Group * ParseState =
         let (children, finalState) =
@@ -1077,7 +1077,7 @@ module SvgParser =
         let rec stripBody (body: Body) : Body =
             body
             |> Seq.choose (function
-                | GroupElement.Raw _ -> None
+                | GroupElement.Element e when Element.isRaw e -> None
                 | GroupElement.Element e -> Some (GroupElement.Element e)
                 | GroupElement.Group g ->
                     let cleaned = { g with Body = stripBody g.Body }

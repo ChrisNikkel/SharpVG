@@ -256,8 +256,11 @@ module TestSvgParser =
         let items = bodyElements svg
         Assert.Equal(1, items.Length)
         match items.[0] with
-        | GroupElement.Raw raw -> Assert.Equal("fancyWidget", raw.TagName)
-        | other -> failwithf "Expected Raw, got %A" other
+        | GroupElement.Element e ->
+            match Element.rawContent e with
+            | Some raw -> Assert.Equal("fancyWidget", raw.TagName)
+            | None -> failwith "Expected raw element"
+        | other -> failwithf "Expected raw Element, got %A" other
 
     [<Fact>]
     let ``SvgParser stripUnknown - removes Raw elements`` () =
@@ -275,8 +278,8 @@ module TestSvgParser =
         let items = bodyElements svg
         Assert.Equal(1, items.Length)
         match items.[0] with
-        | GroupElement.Raw _ -> ()
-        | other -> failwithf "Expected Raw element preserved, got %A" other
+        | GroupElement.Element e when Element.isRaw e -> ()
+        | other -> failwithf "Expected raw Element preserved, got %A" other
 
     [<Fact>]
     let ``SvgParser stripUnknown - removes Raw elements inside groups`` () =
@@ -577,7 +580,7 @@ module TestSvgParser =
             let stripped = SvgParser.stripUnknown result.Value
             let rec hasRaw (body: Body) =
                 body |> Seq.exists (function
-                    | GroupElement.Raw _ -> true
+                    | GroupElement.Element e when Element.isRaw e -> true
                     | GroupElement.Group g -> hasRaw g.Body
                     | _ -> false)
             not (hasRaw stripped.Body)

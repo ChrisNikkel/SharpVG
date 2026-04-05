@@ -58,11 +58,11 @@
     <Compile Include="Filter.fs" />
     <Compile Include="Gradient.fs" />
     <Compile Include="ViewBox.fs" />
+    <Compile Include="RawElement.fs" />
     <Compile Include="Element.fs" />
     <Compile Include="Anchor.fs" />
     <Compile Include="Symbol.fs" />
     <Compile Include="Use.fs" />
-    <Compile Include="RawElement.fs" />
     <Compile Include="Group.fs" />
     <Compile Include="ClipPath.fs" />
     <Compile Include="Mask.fs" />

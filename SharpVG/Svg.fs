@@ -119,9 +119,9 @@ module Svg =
     let mapElements (f: Element -> Element) (svg: Svg) : Svg =
         let rec mapBody (body: Body) : Body =
             body |> Seq.map (function
-                | GroupElement.Element e -> GroupElement.Element (f e)
+                | GroupElement.Element e when not (Element.isRaw e) -> GroupElement.Element (f e)
                 | GroupElement.Group g   -> GroupElement.Group { g with Body = mapBody g.Body }
-                | GroupElement.Raw r     -> GroupElement.Raw r)
+                | other -> other)
         { svg with Body = mapBody svg.Body }
 
     let mapElementsWhere (predicate: Element -> bool) (f: Element -> Element) (svg: Svg) : Svg =
@@ -138,9 +138,9 @@ module Svg =
     let findAll (predicate: Element -> bool) (svg: Svg) : Element list =
         let rec collectBody (body: Body) : Element list =
             body |> Seq.toList |> List.collect (function
-                | GroupElement.Element e -> if predicate e then [e] else []
+                | GroupElement.Element e when not (Element.isRaw e) -> if predicate e then [e] else []
                 | GroupElement.Group g   -> collectBody g.Body
-                | GroupElement.Raw _     -> [])
+                | _ -> [])
         collectBody svg.Body
 
     let replaceById (id: ElementId) (replacement: Element) (svg: Svg) : Svg =

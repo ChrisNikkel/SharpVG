@@ -2,90 +2,83 @@
 
 ## Overview
 
-This document describes the architecture for adding SVG parsing and mutation to SharpVG. The design principle is: **parsing is an input path into the existing domain model**. Once parsed, everything uses the types and functions that already exist.
+This document describes the architecture for SVG parsing and mutation in SharpVG. The design principle is: **parsing is an input path into the existing domain model**. Once parsed, everything uses the types and functions that already exist.
 
 ---
 
-## Current Architecture
+## Architecture
 
 ```mermaid
 flowchart TD
-    A["Shape.create<br/>(Circle, Rect, Line, …)"] --> B["Element.create<br/>(SRTP ToTag constraint)"]
-    B --> C["Group / SvgDefinitions<br/>(composition)"]
-    C --> D["Svg<br/>(top-level container)"]
-    D --> E["Tag.toString<br/>(SVG string output)"]
-
-    style A fill:#dbeafe
-    style B fill:#dbeafe
-    style C fill:#dbeafe
-    style D fill:#dbeafe
-    style E fill:#dcfce7
-```
-
-The current flow is strictly **generative** — data flows downward toward strings.
-
----
-
-## Target Architecture
-
-```mermaid
-flowchart TD
-    subgraph NEW ["New (additive)"]
+    subgraph PARSE ["Parsing entry points"]
         direction TB
-        P["SVG file / string / stream"]
+        P["SVG file / string / stream / HTML"]
         PS["SvgParser<br/>(System.Xml.Linq)"]
-        RE["RawElement<br/>(unknown element passthrough)"]
-        MUT["SvgMutation helpers<br/>Svg.mapElements<br/>Svg.findById<br/>Svg.replaceById"]
         P --> PS
         PS -->|"recognized elements"| E
         PS -->|"unknown elements"| RE
         RE --> GE
-        MUT -.->|"traverses & copies"| E
     end
 
-    subgraph EXISTING ["Existing (unchanged)"]
+    subgraph GENERATE ["Generative path"]
         direction TB
         SH["Shape.create<br/>(Circle, Rect, …)"]
+        SH --> E
+    end
+
+    subgraph CORE ["Core model"]
+        direction TB
         E["Element<br/>(Name, Style, Transforms, …)"]
-        GE["GroupElement<br/>Element | Group | Raw ①"]
+        RE["RawElement<br/>(unknown element passthrough)"]
+        GE["GroupElement<br/>Element | Group | Raw"]
         G["Group / SvgDefinitions"]
         SV["Svg"]
         OUT["Tag.toString<br/>(SVG string output)"]
-        SH --> E
+        MUT["Mutation helpers<br/>(Svg + Group modules)"]
         E --> GE
         GE --> G
         G --> SV
         SV --> OUT
+        MUT -.->|"traverses & copies"| GE
     end
 
-    style NEW fill:#fef9c3,stroke:#ca8a04
-    style EXISTING fill:#dbeafe,stroke:#3b82f6
+    style PARSE fill:#fef9c3,stroke:#ca8a04
+    style GENERATE fill:#dbeafe,stroke:#3b82f6
+    style CORE fill:#dbeafe,stroke:#3b82f6
     style OUT fill:#dcfce7,stroke:#16a34a
 ```
 
-① `GroupElement.Raw` is the only change to an existing type — one new DU case added to carry `RawElement` through `Body`.
-
-Parsing is a **new entry point** into the existing model. No existing types change except `GroupElement`.
+Parsing is an entry point into the existing model. `GroupElement` has three cases: `Element`, `Group`, and `Raw` (for unknown passthrough elements).
 
 ---
 
-## New Modules (Compilation Order)
+## Modules (Compilation Order)
 
-These are inserted **after** all existing modules in `SharpVG.fsproj`:
+The relevant portion of `SharpVG.fsproj` (tail end of the compile order):
 
 ```
-...existing files...
-SvgDefinitions.fs    (already last before Graphic/Svg)
+...
+Element.fs
+Anchor.fs
+Symbol.fs
+Use.fs
+RawElement.fs        ← unknown element passthrough
+Group.fs             ← GroupElement DU (Element | Group | Raw) lives here
+ClipPath.fs
+Mask.fs
+Pattern.fs
+Marker.fs
+SvgDefinitions.fs
 Graphic.fs
-RawElement.fs        ← NEW (unknown element passthrough)
-SvgParser.fs         ← NEW (XML → domain model)
-SvgMutation.fs       ← NEW (traversal/mutation helpers)
-Svg.fs               (gains new helpers via partial module)
+Svg.fs               ← includes mutation helpers (mapElements, findById, etc.)
+SvgParser.fs         ← XML → domain model
 ```
+
+Mutation helpers are in `Svg.fs` (for `Svg`) and `Group.fs` (for `Group`). There is no separate `SvgMutation.fs` file.
 
 ---
 
-## New Types
+## Types
 
 ### `RawElement`
 
@@ -110,8 +103,6 @@ and RawContent =
 ```fsharp
 type ParseError =
     {
-        Line: int
-        Column: int
         Message: string
         ElementName: string option
     }
@@ -122,9 +113,8 @@ type ParseError =
 ```fsharp
 type ParseWarning =
     {
-        Line: int
-        Column: int
         Message: string
+        ElementName: string option
     }
 ```
 
@@ -140,24 +130,18 @@ type ParseResult<'T> =
 
 Top-level parse returns `Result<ParseResult<Svg>, ParseError>`.
 
-### Extended `GroupElement` DU
+### `GroupElement` DU
 
-The existing `GroupElement` DU (`Group | Element`) gains one case:
+`GroupElement` is defined in `Group.fs` with three cases:
 
 ```fsharp
-// Current:
 type GroupElement =
     | Group of Group
     | Element of Element
-
-// After:
-type GroupElement =
-    | Group of Group
-    | Element of Element
-    | Raw of RawElement     ← NEW
+    | Raw of RawElement
 ```
 
-This lets `Body` (which is `seq<GroupElement>`) carry unknown elements without breaking anything. `Body.toString` already pattern-matches on this DU — it gains a `Raw` arm that calls `RawElement.toString`.
+`Body` (which is `seq<GroupElement>`) can therefore carry unknown elements. `Group.ToTag` pattern-matches on this DU with a `Raw` arm that calls `RawElement.toString`.
 
 ---
 
@@ -172,18 +156,22 @@ Uses a three-layer approach — no new dependencies, idiomatic F# throughout:
 ```fsharp
 module SvgParser =
 
-    val ofString : string -> Result<ParseResult<Svg>, ParseError>
-    val ofFile   : string -> Result<ParseResult<Svg>, ParseError>
-    val ofStream : System.IO.Stream -> Result<ParseResult<Svg>, ParseError>
+    val ofString     : string -> Result<ParseResult<Svg>, ParseError>
+    val ofFile       : string -> Result<ParseResult<Svg>, ParseError>
+    val ofStream     : System.IO.Stream -> Result<ParseResult<Svg>, ParseError>
+    val ofHtmlString : string -> Result<ParseResult<Svg>, ParseError> list
+    val ofHtmlFile   : string -> Result<ParseResult<Svg>, ParseError> list
 ```
+
+`ofHtmlString` / `ofHtmlFile` extract all `<svg>` elements from an HTML document (tries XML parse first, falls back to regex extraction for HTML5). Each embedded SVG produces one `Result` in the returned list.
 
 ### Internal parsing pipeline
 
 ```mermaid
 flowchart TD
-    IN["ofString / ofFile / ofStream"] --> XD["XDocument.Parse<br/>(System.Xml.Linq)"]
+    IN["ofString / ofFile / ofStream<br/>ofHtmlString / ofHtmlFile"] --> XD["XDocument.Parse<br/>(System.Xml.Linq)"]
     XD --> ROOT["parseSvgRoot<br/>reads size, viewBox, title, desc, defs"]
-    ROOT --> CH["parseChildren<br/>(recursive)"]
+    ROOT --> CH["parseElement<br/>(recursive)"]
 
     CH --> D{element name?}
     D -->|circle| PC["parseCircle → Circle"]
@@ -195,12 +183,13 @@ flowchart TD
     D -->|polyline| PY["parsePolyline → Polyline"]
     D -->|text| PT["parseText → Text"]
     D -->|image| PI["parseImage → Image"]
-    D -->|g| PGR["parseGroup → Group<br/>(recurses into parseChildren)"]
+    D -->|g| PGR["parseGroup → Group<br/>(recurses into parseElement)"]
     D -->|use| PU["parseUse → Use"]
+    D -->|a| PA["parseAnchor → Anchor"]
     D -->|defs| PDE["parseDefs → SvgDefinitions"]
     D -->|"anything else"| RAW["parseRaw → RawElement"]
 
-    PC & PR & PL & PE & PP & PG & PY & PT & PI & PU --> EL["Element.create<br/>(GroupElement.Element)"]
+    PC & PR & PL & PE & PP & PG & PY & PT & PI & PU & PA --> EL["Element.create<br/>(GroupElement.Element)"]
     PGR --> GEL["GroupElement.Group"]
     RAW --> REL["GroupElement.Raw"]
 
@@ -209,30 +198,35 @@ flowchart TD
     BODY & DEFS --> SVG["Svg"]
     SVG --> OUT["Result&lt;ParseResult&lt;Svg&gt;, ParseError&gt;"]
 
-    style RAW fill:#fef9c3,stroke:#ca8a04
-    style REL fill:#fef9c3,stroke:#ca8a04
     style OUT fill:#dcfce7,stroke:#16a34a
 ```
-parseElement : XElement -> ParseState -> GroupElement
+
+```
+parseElement : XElement -> ParseState -> GroupElement * ParseState
     ├── parseCircle
+    ├── parseEllipse
     ├── parseRect
     ├── parseLine
     ├── parsePath
-    ├── parseGroup (recursive)
-    ├── parseDefs
-    ├── ... (one function per recognized element)
-    └── parseRaw   (fallback for unknown elements)
+    ├── parsePolygon
+    ├── parsePolyline
+    ├── parseText
+    ├── parseImage
+    ├── parseUse
+    ├── parseGroup (recursive — calls parseElement on children)
+    ├── parseAnchor (wraps children as Anchor elements)
+    ├── parseDefs (dispatches to gradient/clipPath/mask/pattern/marker/filter/symbol parsers)
+    └── parseRaw (fallback — captures tag name, attributes, and direct children as-is)
 ```
 
 ### `ParseState`
 
-Accumulated warnings and a namespace map (for `xlink:`/`href` normalization):
+Private accumulator for warnings threaded through the parse:
 
 ```fsharp
 type ParseState =
     {
         Warnings: ParseWarning list
-        Namespace: string   // "http://www.w3.org/2000/svg"
     }
 ```
 
@@ -240,44 +234,54 @@ type ParseState =
 
 ```fsharp
 // Internal helpers (not public):
-val tryFloat    : string -> XElement -> float option
-val tryLength   : string -> XElement -> Length option
-val tryPoint    : string -> string -> XElement -> Point option
-val tryStyle    : XElement -> Style option          // parses presentation attrs
-val tryTransform: XElement -> Transform seq
-val tryId       : XElement -> ElementId option
+val tryStyle      : XElement -> Style option      // parses presentation attrs + inline CSS style attr
+val tryTransforms : XElement -> Transform seq
+val tryAttr       : string -> XElement -> string option
+val tryHref       : XElement -> string option     // checks href then xlink:href
+val applyCommon   : XElement -> Element -> Element  // applies id, class, style, transform
 ```
 
-`tryStyle` reads presentation attributes (`fill`, `stroke`, `stroke-width`, etc.) and the `style` attribute (CSS inline), merging both into a `Style` option. It records a warning for properties it doesn't understand.
+`tryStyle` reads presentation attributes (`fill`, `stroke`, `stroke-width`, etc.) and the `style` attribute (CSS inline), merging both into a `Style` option.
+
+`applyCommon` is called on every shape element after construction to apply shared attributes (`id`, `class`, `style`, `transform`).
 
 ### Recognized element dispatch
 
 ```fsharp
-let private parseElement (xel: XElement) state : GroupElement * ParseState =
-    match xel.Name.LocalName with
-    | "circle"   -> parseCircle xel state   |> mapFst (Graphic.ofCircle >> Graphic.toElement >> GroupElement.Element)
-    | "rect"     -> parseRect xel state     |> ...
-    | "g"        -> parseGroup xel state    |> mapFst GroupElement.Group
-    | "defs"     -> parseDefs xel state     // returns nothing in body (goes to SvgDefinitions)
-    | _          -> parseRaw xel state      |> mapFst GroupElement.Raw
+let parseElement (xel: XElement) (state: ParseState) : GroupElement * ParseState =
+    match xel with
+    | El "circle"   -> parseCircle xel state
+    | El "ellipse"  -> parseEllipse xel state
+    | El "rect"     -> parseRect xel state
+    | El "line"     -> parseLine xel state
+    | El "path"     -> parsePath xel state
+    | El "polygon"  -> parsePolygon xel state
+    | El "polyline" -> parsePolyline xel state
+    | El "text"     -> parseText xel state
+    | El "image"    -> parseImage xel state
+    | El "use"      -> parseUse xel state
+    | El "g"        -> let (group, s2) = parseGroup xel state
+                       GroupElement.Group group, s2
+    | El "a"        -> parseAnchor xel state
+    | _             -> parseRaw xel state
 ```
 
 ---
 
-## `SvgMutation` Module (new public API)
+## Mutation Helpers
 
-Traversal and targeted mutation helpers. These are the functions that make parsed SVGs useful:
+Traversal and targeted mutation helpers live directly in `Svg.fs` and `Group.fs` (not a separate module):
 
 ```fsharp
-module Svg =   // extends existing Svg module
+module Svg =
 
-    // Map every Element in body (does not recurse into defs)
+    // Map every Element in body (recurses into groups, skips Raw nodes)
     val mapElements : (Element -> Element) -> Svg -> Svg
 
     // Map elements satisfying a predicate
     val mapElementsWhere : (Element -> bool) -> (Element -> Element) -> Svg -> Svg
 
-    // Find first element by id
+    // Find first element by id (depth-first)
     val findById : ElementId -> Svg -> Element option
 
     // Find all elements matching predicate (depth-first)
@@ -286,44 +290,13 @@ module Svg =   // extends existing Svg module
     // Replace element with given id
     val replaceById : ElementId -> Element -> Svg -> Svg
 
-module Group =  // extends existing Group module
+module Group =
 
     val mapElements : (Element -> Element) -> Group -> Group
     val findById    : ElementId -> Group -> Element option
 ```
 
-These operate on the `Body` type (which is `seq<GroupElement>`), recursing into `Group` nodes but leaving `Raw` nodes unchanged.
-
----
-
-## `Body` Module Changes
-
-`Body` is currently a type alias (`seq<GroupElement>`) without its own module. It gains a module:
-
-```fsharp
-module Body =
-    let toString body =
-        body
-        |> Seq.map (function
-            | GroupElement.Element e -> Element.toString e
-            | GroupElement.Group g   -> Group.toString g
-            | GroupElement.Raw r     -> RawElement.toString r)   // NEW arm
-        |> String.concat ""
-
-    let toStyles body = ...   // already exists, gains Raw arm (returns empty)
-
-    let mapElements f body =
-        body |> Seq.map (function
-            | GroupElement.Element e -> GroupElement.Element (f e)
-            | GroupElement.Group g   -> GroupElement.Group (Group.mapElements f g)
-            | GroupElement.Raw r     -> GroupElement.Raw r)
-
-    let findById id body =
-        body |> Seq.tryPick (function
-            | GroupElement.Element e when e.Name = Some id -> Some e
-            | GroupElement.Group g   -> Group.findById id g
-            | _                      -> None)
-```
+These operate on `Body` (`seq<GroupElement>`), recursing into `Group` nodes and leaving `Raw` nodes unchanged.
 
 ---
 
@@ -347,75 +320,41 @@ preserves the unknown elements in their original position in document order.
 
 ---
 
-## Migration / Compatibility
+## Compatibility
 
-- **No breaking changes.** `GroupElement` gains a new DU case — all existing `match` expressions on `GroupElement` that use wildcard `_` continue to work. Those that are exhaustive will get a compiler warning pointing them to add the `Raw` arm. (There are none in the current codebase — all matches already use `_`.)
-- `Svg`, `Group`, `Element`, `Style`, `Transform` etc. are **unchanged**.
-- The new `SvgParser` module is purely additive.
+- **No breaking changes.** The `GroupElement.Raw` DU case was additive — all existing `match` expressions on `GroupElement` that use wildcard `_` continue to work.
+- `Svg`, `Group`, `Element`, `Style`, `Transform` etc. are otherwise unchanged.
+- `SvgParser` and the mutation helpers are purely additive.
 
 ---
 
-## Phased Delivery
+## Implementation Status
 
-```mermaid
-gantt
-    title SharpVG Parsing & Mutation — Phased Delivery
-    dateFormat  X
-    axisFormat Phase %s
-
-    section Phase 1 — Core parsing
-    RawElement type + GroupElement.Raw     :p1a, 0, 1
-    SvgParser.ofString / ofFile            :p1b, 0, 1
-    Basic shapes (circle rect line …)      :p1c, 0, 1
-    Attribute parsing (id class style transform) :p1d, 0, 1
-    Unknown elements → RawElement          :p1e, 0, 1
-
-    section Phase 2 — Structural elements
-    defs symbol gradient clipPath mask     :p2a, 1, 2
-    pattern marker filter anchor           :p2b, 1, 2
-    SvgParser.ofStream                     :p2c, 1, 2
-
-    section Phase 3 — Mutation helpers
-    Svg.mapElements / findById / replaceById :p3a, 2, 3
-    Group.mapElements / findById           :p3b, 2, 3
-
-    section Phase 4 — Advanced
-    Inline style block parsing             :p4a, 3, 4
-    xlink:href normalization               :p4b, 3, 4
-    Strict parse mode                      :p4c, 3, 4
-```
-
-### Phase 1 — Core parsing (MVP)
-- `RawElement` type + `GroupElement.Raw` case
-- `SvgParser.ofString` / `ofFile`
-- Recognized: `circle`, `rect`, `line`, `ellipse`, `path`, `polygon`, `polyline`, `text`, `image`, `g`, `use`
-- Attribute parsing: `id`, `class`, `style` (presentation attrs), `transform`
+### Done
+- `RawElement` type + `GroupElement.Raw` case (`RawElement.fs`, `Group.fs`)
+- `SvgParser.ofString` / `ofFile` / `ofStream` / `ofHtmlString` / `ofHtmlFile`
+- Recognized shapes: `circle`, `rect`, `line`, `ellipse`, `path`, `polygon`, `polyline`, `text`, `image`, `g`, `use`, `a`
+- Attribute parsing: `id`, `class`, `style` (presentation attrs + inline CSS), `transform`
+- `<defs>` with `symbol`, `linearGradient`, `radialGradient`, `clipPath`, `mask`, `pattern`, `marker`, `filter`
+- `xlink:href` normalization to `href`
 - Unknown elements → `RawElement` passthrough
+- Mutation helpers: `Svg.mapElements`, `Svg.mapElementsWhere`, `Svg.findById`, `Svg.findAll`, `Svg.replaceById`, `Group.mapElements`, `Group.findById`
 
-### Phase 2 — Definitions & structural elements
-- Parse `<defs>`, `<symbol>`, `<linearGradient>`, `<radialGradient>`, `<clipPath>`, `<mask>`, `<pattern>`, `<marker>`, `<filter>`
-- Parse `<a>` (Anchor)
-- `SvgParser.ofStream`
-
-### Phase 3 — Mutation helpers
-- `Svg.mapElements`, `Svg.findById`, `Svg.replaceById`
-- `Group.mapElements`, `Group.findById`
-
-### Phase 4 — Advanced
+### Not yet implemented
 - Inline `<style>` block parsing → named `Style` records
-- `xlink:href` normalization
-- Strict mode (fail on any unknown element rather than warn)
+- Strict parse mode (fail on unknown elements instead of producing `RawElement`)
 - `SvgParser.ofSeq` (parse multiple SVG documents from a stream)
 
 ---
 
 ## Open Design Decisions
 
-| Decision | Option A | Option B | Recommendation |
-|---|---|---|---|
-| XML library | `System.Xml.Linq` (XDocument) | `System.Xml` (XmlReader, SAX) | XDocument — simpler, sufficient for expected sizes |
-| Unknown attributes | Preserve in `RawElement.Attributes` bag | Drop silently | Preserve — enables faithful round-trip |
-| Inline `<style>` | Opaque string passthrough | Parse CSS into `Style` records | Opaque string in Phase 1; parse in Phase 4 |
-| `href` normalization | Always normalize to `href` | Preserve original | Normalize to `href` (SVG 2 convention) |
-| `GroupElement.Raw` | Add to existing DU | Separate `ParsedBody` type | Add to existing DU — least disruption |
-| Error handling | `Result` | `Option` + exceptions | `Result<ParseResult<T>, ParseError>` — explicit, composable |
+| Decision | Resolution |
+|---|---|
+| XML library | `System.Xml.Linq` (XDocument) — simpler, sufficient for expected sizes |
+| Unknown attributes | Preserved in `RawElement.Attributes` — enables faithful round-trip |
+| Inline `<style>` block | Not yet parsed — treated as `RawElement` passthrough |
+| `href` normalization | Normalized to `href` (SVG 2 convention); `xlink:href` also checked |
+| `GroupElement.Raw` | Added to existing DU — least disruption |
+| Error handling | `Result<ParseResult<T>, ParseError>` — explicit, composable |
+| Mutation helpers location | Implemented directly in `Svg` and `Group` modules; no separate `SvgMutation.fs` |
