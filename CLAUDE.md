@@ -85,3 +85,8 @@ When adding or changing public API behavior, add an entry to `CHANGELOG.md` unde
 
 - **F# style**: Match existing style (modules, `let` bindings, pipelines).
 - **SharpVG API**: Use `Point.ofInts (x, y)` and `Area.ofInts (w, h)` (tuple form), not the curried form.
+- **Record construction**: `Field = value` with one space on each side of `=`. Opening `{` always on its own line; closing `}` always on its own line. Never put a multi-field record on one line (e.g. no `{ Field = value; Field2 = value2 }`).
+
+### Mermaid diagrams
+
+- **Never use `\n` inside node labels** — it renders as a literal backslash-n. Use `<br/>` for line breaks within a label, or split the text across multiple nodes instead.
