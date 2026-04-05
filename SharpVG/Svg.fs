@@ -175,3 +175,68 @@ module Svg =
                 | GroupElement.Group g -> Some (GroupElement.Group { g with Body = filterBody g.Body })
                 | other -> Some other)
         { svg with Body = filterBody svg.Body }
+
+    // --- Editor rendering support ---
+
+    /// Parses a `data-edit-id` attribute value (colon-separated integers) back to a tree path.
+    let parseEditPath (editId: string) : int list option =
+        try
+            if System.String.IsNullOrEmpty(editId) then None
+            else editId.Split(':') |> Array.map int |> Array.toList |> Some
+        with _ -> None
+
+    /// Renders the SVG with a `data-edit-id` attribute injected into every element,
+    /// encoding each element's tree position as a colon-separated index path
+    /// (e.g. "0", "1:2", "1:2:0" for nested elements).
+    /// These IDs are ephemeral — they are not part of the model and are absent from toString/toHtml.
+    let toStringForEditing (svg: Svg) : string =
+        let rec annotateBody (prefix: int list) (body: Body) : Body =
+            body |> Seq.mapi (fun i ge ->
+                let path = prefix @ [i]
+                let editId = path |> List.map string |> String.concat ":"
+                match ge with
+                | GroupElement.Element e ->
+                    GroupElement.Element (e |> Element.withAttribute "data-edit-id" editId)
+                | GroupElement.Group g ->
+                    GroupElement.Group { g with Body = annotateBody path g.Body })
+        { svg with Body = annotateBody [] svg.Body } |> toString
+
+    /// Renders a full HTML page with `data-edit-id` attributes injected for editor use.
+    let toHtmlForEditing (title: string) (svg: Svg) : string =
+        "<!DOCTYPE html>\n<html>\n<head>\n<title>" + escapeHtmlTitle title + "</title>\n</head>\n<body>\n" + toStringForEditing svg + "\n</body>\n</html>\n"
+
+    /// Finds the element at the given tree path (as returned by parseEditPath).
+    let findAtEditPath (path: int list) (svg: Svg) : Element option =
+        let rec findInBody (remaining: int list) (body: Body) : Element option =
+            match remaining with
+            | [] -> None
+            | [i] ->
+                body |> Seq.tryItem i |> Option.bind (function
+                    | GroupElement.Element e -> Some e
+                    | _ -> None)
+            | i :: rest ->
+                body |> Seq.tryItem i |> Option.bind (function
+                    | GroupElement.Group g -> findInBody rest g.Body
+                    | _ -> None)
+        findInBody path svg.Body
+
+    /// Applies a transformation to the element at the given tree path.
+    let mapAtEditPath (path: int list) (f: Element -> Element) (svg: Svg) : Svg =
+        let rec mapBody (remaining: int list) (body: Body) : Body =
+            match remaining with
+            | [] -> body
+            | [i] ->
+                body |> Seq.mapi (fun j ge ->
+                    if j = i then
+                        match ge with
+                        | GroupElement.Element e -> GroupElement.Element (f e)
+                        | other -> other
+                    else ge)
+            | i :: rest ->
+                body |> Seq.mapi (fun j ge ->
+                    if j = i then
+                        match ge with
+                        | GroupElement.Group g -> GroupElement.Group { g with Body = mapBody rest g.Body }
+                        | other -> other
+                    else ge)
+        { svg with Body = mapBody path svg.Body }

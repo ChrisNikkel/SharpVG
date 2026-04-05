@@ -172,3 +172,60 @@ module TestSvg =
             |> Svg.toString
         Assert.DoesNotContain("id=\"small\"", result)
         Assert.Contains("id=\"large\"", result)
+
+    // Editor rendering support
+    [<Fact>]
+    let ``toStringForEditing injects data-edit-id on top-level elements`` () =
+        let circle = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let rect = Rect.create Point.origin (Area.ofInts (10, 10)) |> Element.create
+        let result = [circle; rect] |> Svg.ofList |> Svg.toStringForEditing
+        Assert.Contains("data-edit-id=\"0\"", result)
+        Assert.Contains("data-edit-id=\"1\"", result)
+
+    [<Fact>]
+    let ``toStringForEditing injects nested path for elements inside groups`` () =
+        let inner = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let group = [inner] |> Group.ofList
+        let result = group |> Svg.ofGroup |> Svg.toStringForEditing
+        Assert.Contains("data-edit-id=\"0:0\"", result)
+
+    [<Fact>]
+    let ``toStringForEditing does not affect model toString output`` () =
+        let circle = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let svg = [circle] |> Svg.ofList
+        let normal = svg |> Svg.toString
+        let forEditing = svg |> Svg.toStringForEditing
+        Assert.DoesNotContain("data-edit-id", normal)
+        Assert.Contains("data-edit-id", forEditing)
+
+    [<Fact>]
+    let ``parseEditPath parses colon-separated integers`` () =
+        Assert.Equal(Some [1; 2; 0], Svg.parseEditPath "1:2:0")
+        Assert.Equal(Some [0], Svg.parseEditPath "0")
+        Assert.Equal(None, Svg.parseEditPath "abc")
+        Assert.Equal(None, Svg.parseEditPath "")
+
+    [<Fact>]
+    let ``findAtEditPath finds top-level element`` () =
+        let circle = Circle.create Point.origin (Length.ofInt 5) |> Element.createWithName "c"
+        let svg = [circle] |> Svg.ofList
+        let found = Svg.findAtEditPath [0] svg
+        Assert.Equal(Some "c", found |> Option.bind Element.tryGetName)
+
+    [<Fact>]
+    let ``findAtEditPath finds element inside group`` () =
+        let inner = Circle.create Point.origin (Length.ofInt 5) |> Element.createWithName "inner"
+        let group = [inner] |> Group.ofList
+        let svg = group |> Svg.ofGroup
+        let found = Svg.findAtEditPath [0; 0] svg
+        Assert.Equal(Some "inner", found |> Option.bind Element.tryGetName)
+
+    [<Fact>]
+    let ``mapAtEditPath transforms element at path`` () =
+        let circle = Circle.create Point.origin (Length.ofInt 5) |> Element.create
+        let svg = [circle] |> Svg.ofList
+        let result =
+            svg
+            |> Svg.mapAtEditPath [0] (Element.withAttribute "r" "99")
+            |> Svg.toString
+        Assert.Contains("r=\"99\"", result)
