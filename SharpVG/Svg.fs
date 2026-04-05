@@ -195,8 +195,9 @@ module Svg =
                 let path = prefix @ [i]
                 let editId = path |> List.map string |> String.concat ":"
                 match ge with
-                | GroupElement.Element e ->
+                | GroupElement.Element e when not (Element.isRaw e) ->
                     GroupElement.Element (e |> Element.withAttribute "data-edit-id" editId)
+                | GroupElement.Element e -> GroupElement.Element e
                 | GroupElement.Group g ->
                     GroupElement.Group { g with Body = annotateBody path g.Body })
         { svg with Body = annotateBody [] svg.Body } |> toString

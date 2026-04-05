@@ -5,11 +5,33 @@ All notable changes to SharpVG will be documented in this file.
 ## [Unreleased]
 
 ### Added
-- `Element.getAttribute`, `Element.withAttribute`, `Element.removeAttribute` — read, write, and remove individual attributes on any element (works for both parsed and constructed elements)
-- `Element.clearAnimations`, `Element.removeAnimationWhere`, `Element.mapAnimations` — animation editing helpers
-- `Svg.addElement`, `Svg.addElements`, `Svg.addGroup` — append elements or groups to an SVG
-- `Svg.removeById`, `Svg.removeWhere` — remove elements from an SVG body (recursively through nested groups)
-- `Group.removeById`, `Group.removeWhere` — remove elements from a group body (recursively through nested groups)
+- **SVG parsing** — `SvgParser` module for loading SVG into the SharpVG model:
+  - `SvgParser.ofString`, `ofFile`, `ofStream` — parse SVG from string, file, or stream
+  - `SvgParser.ofGzipStream`, `ofGzipFile` — parse SVGZ (gzip-compressed SVG)
+  - `SvgParser.ofHtmlString`, `ofHtmlFile` — extract and parse all `<svg>` elements embedded in HTML (supports XHTML and HTML5)
+  - `SvgParser.stripUnknown` — remove unrecognized elements from a parsed SVG
+  - Recognized elements: `circle`, `ellipse`, `rect`, `line`, `path`, `polygon`, `polyline`, `text`, `image`, `g`, `use`, `a`, `linearGradient`, `radialGradient`, `clipPath`, `mask`, `pattern`, `marker`, `filter`, `symbol`
+  - Unrecognized elements preserved as raw `Element` values (round-trip faithful); `Element.isRaw` / `Element.rawContent` to inspect
+  - `ParseResult<T>` carries parsed value plus any non-fatal `ParseWarning` list
+- **Mutation helpers** on `Svg`:
+  - `Svg.mapElements`, `mapElementsWhere` — transform elements recursively
+  - `Svg.findById`, `findAll` — locate elements by id or predicate
+  - `Svg.replaceById` — replace a named element
+  - `Svg.addElement`, `addElements`, `addGroup` — append to SVG body
+  - `Svg.removeById`, `removeWhere` — remove elements from SVG body (recurses into groups)
+- **Mutation helpers** on `Group`:
+  - `Group.mapElements`, `findById` — transform or locate elements within a group
+  - `Group.removeById`, `removeWhere` — remove elements from a group (recurses into nested groups)
+- **Element attribute API**:
+  - `Element.getAttribute`, `withAttribute`, `removeAttribute` — read, write, remove individual attributes
+  - `Element.clearAnimations`, `removeAnimationWhere`, `mapAnimations` — animation editing helpers
+  - `Element.isRaw`, `rawContent`, `ofRaw` — inspect and construct raw/passthrough elements
+- **Editor rendering** on `Svg`:
+  - `Svg.toStringForEditing`, `toHtmlForEditing` — render SVG with ephemeral `data-edit-id` attributes encoding each element's tree position
+  - `Svg.parseEditPath` — parse a `data-edit-id` string back to an `int list` path
+  - `Svg.findAtEditPath`, `mapAtEditPath` — locate or transform the element at a given tree path
+- `SvgDefinitions.addSymbol` — add a `Symbol` to a definitions block
+- `SymbolDef` case added to `SvgDefinitionsContent` DU
 
 ## [0.1.0] - 2026-03-14
 
