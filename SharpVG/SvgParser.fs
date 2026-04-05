@@ -514,6 +514,16 @@ module private SvgElementParsers =
         let element = Image.create position area href |> Element.create |> applyCommon xel
         GroupElement.Element element, state
 
+    let parseUse (xel: XElement) (state: ParseState) : GroupElement * ParseState =
+        let href = xhref xel |> Option.defaultValue ""
+        let id = if href.StartsWith("#") then href.[1..] else href
+        let x = match xel with FloatAttr "x" v -> v | _ -> 0.0
+        let y = match xel with FloatAttr "y" v -> v | _ -> 0.0
+        let position = Point.ofFloats (x, y)
+        let useObj : Use = { Name = id; Position = position; Size = None }
+        let element = useObj |> Element.create |> applyCommon xel
+        GroupElement.Element element, state
+
     let parseRaw (xel: XElement) (state: ParseState) : GroupElement * ParseState =
         let attributes =
             xel.Attributes()
@@ -570,10 +580,35 @@ module private SvgElementParsers =
         | El "polyline" -> parsePolyline xel state
         | El "text"     -> parseText xel state
         | El "image"    -> parseImage xel state
+        | El "use"      -> parseUse xel state
         | El "g"        ->
             let (group, s2) = parseGroup xel state
             GroupElement.Group group, s2
         | _             -> parseRaw xel state
+
+    let parseDefs (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState =
+        xel.Elements()
+        |> Seq.fold (fun (defs, s) child ->
+            match child with
+            | El "g" ->
+                let (group, s2) = parseGroup child s
+                SvgDefinitions.addGroup group defs, s2
+            | El "circle" | El "ellipse" | El "rect" | El "line"
+            | El "path"   | El "polygon" | El "polyline" | El "text"
+            | El "image"  | El "use" ->
+                let (ge, s2) = parseElement child s
+                match ge with
+                | GroupElement.Element e -> SvgDefinitions.addElement e defs, s2
+                | _ -> defs, s2
+            | _ ->
+                let attrs =
+                    child.Attributes()
+                    |> Seq.map (fun a -> Attribute.createXML a.Name.LocalName a.Value)
+                    |> Seq.toList
+                let raw = RawElement.create child.Name.LocalName attrs []
+                let contents = Seq.append defs.Contents (Seq.singleton (RawDef raw))
+                { defs with Contents = contents }, s)
+            (SvgDefinitions.create, state)
 
 
 module private SvgRootParser =
@@ -597,11 +632,23 @@ module private SvgRootParser =
     let parseSvgRoot (root: XElement) : Result<ParseResult<Svg>, ParseError> =
         let state = emptyState
 
+        // Separate <defs> from body elements — defs go into SvgDefinitions, rest into Body
+        let defsElements = root.Elements() |> Seq.filter (fun e -> e.Name.LocalName = "defs") |> Seq.toList
+        let bodyElements = root.Elements() |> Seq.filter (fun e -> e.Name.LocalName <> "defs") |> Seq.toList
+
+        let (definitions, stateAfterDefs) =
+            defsElements
+            |> List.fold (fun (defs, s) defsEl ->
+                let (parsed, s2) = SvgElementParsers.parseDefs defsEl s
+                let merged =
+                    { defs with Contents = Seq.append defs.Contents parsed.Contents }
+                merged, s2) (SvgDefinitions.create, state)
+
         let (children, finalState) =
-            root.Elements()
-            |> Seq.fold (fun (acc, s) child ->
+            bodyElements
+            |> List.fold (fun (acc, s) child ->
                 let (ge, s2) = SvgElementParsers.parseElement child s
-                (acc @ [ge], s2)) ([], state)
+                (acc @ [ge], s2)) ([], stateAfterDefs)
 
         let width =
             root.Attribute(XName.Get "width") |> Option.ofObj
@@ -628,10 +675,13 @@ module private SvgRootParser =
             root.Element(XName.Get "desc")
             |> Option.ofObj |> Option.map _.Value
 
+        let defsOption =
+            if Seq.isEmpty definitions.Contents then None else Some definitions
+
         let svg =
             {
                 Body = children |> Seq.ofList
-                Definitions = None
+                Definitions = defsOption
                 Size = size
                 ViewBox = viewBox
                 PreserveAspectRatio = None

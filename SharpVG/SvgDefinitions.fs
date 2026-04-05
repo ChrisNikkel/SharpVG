@@ -9,6 +9,7 @@ type SvgDefinitionsContent =
     | FilterDef of Filter
     | MaskDef of Mask
     | PatternDef of Pattern
+    | RawDef of RawElement
 
 type SvgDefinitions = {
     Contents: seq<SvgDefinitionsContent>
@@ -25,7 +26,8 @@ with
                 | MarkerDef m -> m |> Marker.toString
                 | FilterDef f -> f |> Filter.toString
                 | MaskDef m -> m |> Mask.toString
-                | PatternDef p -> p |> Pattern.toString)
+                | PatternDef p -> p |> Pattern.toString
+                | RawDef r -> r |> RawElement.toString)
             |> String.concat ""
         Tag.create "defs"
         |> Tag.withBody body

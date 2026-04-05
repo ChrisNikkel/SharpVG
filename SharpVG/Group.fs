@@ -79,6 +79,20 @@ module Group =
         |> withTransform (Transform.createScale (UserSpace 1.0) |> Transform.withY (UserSpace -1.0))
         |> addTransform (Transform.createTranslate x |> Transform.withY y)
 
+    let rec mapElements (f: Element -> Element) (group: Group) : Group =
+        { group with
+            Body =
+                group.Body |> Seq.map (function
+                    | Element e -> Element (f e)
+                    | Group g   -> Group (mapElements f g)
+                    | Raw r     -> Raw r) }
+
+    let rec findById (id: ElementId) (group: Group) : Element option =
+        group.Body |> Seq.tryPick (function
+            | Element e when e.Name = Some id -> Some e
+            | Group g -> findById id g
+            | _ -> None)
+
     let rec toStyleSet group =
         group.Body
             |> Seq.map (function | Element(e) -> e.Style |> Option.toList |> Set.ofList | Group(g) -> g |> toStyleSet | Raw _ -> Set.empty)

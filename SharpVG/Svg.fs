@@ -113,3 +113,40 @@ module Svg =
 
     let toHtml title svg =
         toHtmlWithCss title "" svg
+
+    // --- Mutation helpers ---
+
+    let mapElements (f: Element -> Element) (svg: Svg) : Svg =
+        let rec mapBody (body: Body) : Body =
+            body |> Seq.map (function
+                | GroupElement.Element e -> GroupElement.Element (f e)
+                | GroupElement.Group g   -> GroupElement.Group { g with Body = mapBody g.Body }
+                | GroupElement.Raw r     -> GroupElement.Raw r)
+        { svg with Body = mapBody svg.Body }
+
+    let mapElementsWhere (predicate: Element -> bool) (f: Element -> Element) (svg: Svg) : Svg =
+        mapElements (fun e -> if predicate e then f e else e) svg
+
+    let findById (id: ElementId) (svg: Svg) : Element option =
+        let rec searchBody (body: Body) : Element option =
+            body |> Seq.tryPick (function
+                | GroupElement.Element e when e.Name = Some id -> Some e
+                | GroupElement.Group g -> searchBody g.Body
+                | _ -> None)
+        searchBody svg.Body
+
+    let findAll (predicate: Element -> bool) (svg: Svg) : Element list =
+        let rec collectBody (body: Body) : Element list =
+            body |> Seq.toList |> List.collect (function
+                | GroupElement.Element e -> if predicate e then [e] else []
+                | GroupElement.Group g   -> collectBody g.Body
+                | GroupElement.Raw _     -> [])
+        collectBody svg.Body
+
+    let replaceById (id: ElementId) (replacement: Element) (svg: Svg) : Svg =
+        let rec replaceBody (body: Body) : Body =
+            body |> Seq.map (function
+                | GroupElement.Element e when e.Name = Some id -> GroupElement.Element replacement
+                | GroupElement.Group g -> GroupElement.Group { g with Body = replaceBody g.Body }
+                | other -> other)
+        { svg with Body = replaceBody svg.Body }
