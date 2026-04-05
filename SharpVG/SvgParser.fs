@@ -24,6 +24,12 @@ type ParseResult<'T> =
         Warnings: ParseWarning list
     }
 
+type ParseMode =
+    /// Unknown elements are silently preserved as raw passthrough values. (Default)
+    | Lenient
+    /// Unknown elements produce a ParseWarning for each occurrence.
+    | Strict
+
 // --- Private implementation ---
 
 module private SvgParserHelpers =
@@ -35,9 +41,11 @@ module private SvgParserHelpers =
     type ParseState =
         {
             Warnings: ParseWarning list
+            Mode: ParseMode
         }
 
-    let emptyState : ParseState = { Warnings = [] }
+    let stateFor (mode: ParseMode) : ParseState = { Warnings = []; Mode = mode }
+    let emptyState : ParseState = stateFor Lenient
 
     let warnState msg elementName (state: ParseState) : ParseState =
         { state with Warnings = state.Warnings @ [{ Message = msg; ElementName = elementName }] }
@@ -555,6 +563,10 @@ module private SvgElementParsers =
         GroupElement.Element element, state
 
     let parseRaw (xel: XElement) (state: ParseState) : GroupElement * ParseState =
+        let state =
+            match state.Mode with
+            | Strict -> warnState (sprintf "Unknown element '%s'" xel.Name.LocalName) (Some xel.Name.LocalName) state
+            | Lenient -> state
         let attributes =
             xel.Attributes()
             |> Seq.map (fun a -> Attribute.createXML a.Name.LocalName a.Value)
@@ -887,6 +899,10 @@ module private SvgElementParsers =
                 | GroupElement.Element e -> SvgDefinitions.addElement e defs, s2
                 | _ -> defs, s2
             | _ ->
+                let s =
+                    match s.Mode with
+                    | Strict -> warnState (sprintf "Unknown definition element '%s'" child.Name.LocalName) (Some child.Name.LocalName) s
+                    | Lenient -> s
                 let attrs =
                     child.Attributes()
                     |> Seq.map (fun a -> Attribute.createXML a.Name.LocalName a.Value)
@@ -901,8 +917,8 @@ module private SvgRootParser =
 
     open SvgParserHelpers
 
-    let parseSvgRoot (root: XElement) : Result<ParseResult<Svg>, ParseError> =
-        let state = emptyState
+    let parseSvgRoot (mode: ParseMode) (root: XElement) : Result<ParseResult<Svg>, ParseError> =
+        let state = stateFor mode
 
         // Separate <defs> from body elements — defs go into SvgDefinitions, rest into Body
         let defsElements = root.Elements() |> Seq.filter (fun e -> e.Name.LocalName = "defs") |> Seq.toList
@@ -1016,7 +1032,7 @@ module private SvgHtmlParser =
 
 module SvgParser =
 
-    let ofString (svgString: string) : Result<ParseResult<Svg>, ParseError> =
+    let ofStringWith (mode: ParseMode) (svgString: string) : Result<ParseResult<Svg>, ParseError> =
         try
             let doc = XDocument.Parse(svgString)
             match doc.Root with
@@ -1025,53 +1041,74 @@ module SvgParser =
             | root when root.Name.LocalName <> "svg" ->
                 Error { Message = sprintf "Root element is '%s', expected 'svg'" root.Name.LocalName; ElementName = Some root.Name.LocalName }
             | root ->
-                SvgRootParser.parseSvgRoot root
+                SvgRootParser.parseSvgRoot mode root
         with ex ->
             Error { Message = ex.Message; ElementName = None }
 
-    let ofFile (path: string) : Result<ParseResult<Svg>, ParseError> =
+    /// Parse SVG from a string in Lenient mode (unknown elements preserved as raw passthrough).
+    let ofString (svgString: string) = ofStringWith Lenient svgString
+
+    let ofFileWith (mode: ParseMode) (path: string) : Result<ParseResult<Svg>, ParseError> =
         try
             let content = System.IO.File.ReadAllText(path)
-            ofString content
+            ofStringWith mode content
         with ex ->
             Error { Message = ex.Message; ElementName = None }
 
-    let ofStream (stream: System.IO.Stream) : Result<ParseResult<Svg>, ParseError> =
+    /// Parse SVG from a file path in Lenient mode.
+    let ofFile (path: string) = ofFileWith Lenient path
+
+    let ofStreamWith (mode: ParseMode) (stream: System.IO.Stream) : Result<ParseResult<Svg>, ParseError> =
         try
             use reader = new System.IO.StreamReader(stream)
             let content = reader.ReadToEnd()
-            ofString content
+            ofStringWith mode content
         with ex ->
             Error { Message = ex.Message; ElementName = None }
 
-    let ofGzipStream (stream: System.IO.Stream) : Result<ParseResult<Svg>, ParseError> =
+    /// Parse SVG from a stream in Lenient mode.
+    let ofStream (stream: System.IO.Stream) = ofStreamWith Lenient stream
+
+    let ofGzipStreamWith (mode: ParseMode) (stream: System.IO.Stream) : Result<ParseResult<Svg>, ParseError> =
         try
             use gzip = new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionMode.Decompress)
             use reader = new System.IO.StreamReader(gzip, System.Text.Encoding.UTF8)
-            ofString (reader.ReadToEnd())
+            ofStringWith mode (reader.ReadToEnd())
         with ex ->
             Error { Message = ex.Message; ElementName = None }
 
-    let ofGzipFile (path: string) : Result<ParseResult<Svg>, ParseError> =
+    /// Parse SVGZ (gzip-compressed SVG) from a stream in Lenient mode.
+    let ofGzipStream (stream: System.IO.Stream) = ofGzipStreamWith Lenient stream
+
+    let ofGzipFileWith (mode: ParseMode) (path: string) : Result<ParseResult<Svg>, ParseError> =
         try
             use file = System.IO.File.OpenRead(path)
-            ofGzipStream file
+            ofGzipStreamWith mode file
         with ex ->
             Error { Message = ex.Message; ElementName = None }
+
+    /// Parse SVGZ from a file path in Lenient mode.
+    let ofGzipFile (path: string) = ofGzipFileWith Lenient path
 
     /// Extract and parse all SVG elements embedded in an HTML string.
     /// Works with XHTML (XML parse) and HTML5 (regex extraction).
     /// Returns one result per SVG found; an empty list means no SVG was present.
-    let ofHtmlString (html: string) : Result<ParseResult<Svg>, ParseError> list =
+    let ofHtmlStringWith (mode: ParseMode) (html: string) : Result<ParseResult<Svg>, ParseError> list =
         SvgHtmlParser.extractSvgStrings html
-        |> List.map ofString
+        |> List.map (ofStringWith mode)
 
-    let ofHtmlFile (path: string) : Result<ParseResult<Svg>, ParseError> list =
+    /// Extract and parse all SVG elements embedded in an HTML string in Lenient mode.
+    let ofHtmlString (html: string) = ofHtmlStringWith Lenient html
+
+    let ofHtmlFileWith (mode: ParseMode) (path: string) : Result<ParseResult<Svg>, ParseError> list =
         try
             let content = System.IO.File.ReadAllText(path)
-            ofHtmlString content
+            ofHtmlStringWith mode content
         with ex ->
             [ Error { Message = ex.Message; ElementName = None } ]
+
+    /// Extract and parse all SVG elements embedded in an HTML file in Lenient mode.
+    let ofHtmlFile (path: string) = ofHtmlFileWith Lenient path
 
     let stripUnknown (svg: Svg) : Svg =
         let rec stripBody (body: Body) : Body =

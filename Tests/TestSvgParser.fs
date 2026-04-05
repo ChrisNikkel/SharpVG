@@ -693,3 +693,78 @@ module TestSvgParser =
         let output = Svg.toString edited
         Assert.DoesNotContain("id=\"c\"", output)
         Assert.Contains("<rect", output)
+
+    // --- Strict / Lenient parse mode ---
+
+    [<Fact>]
+    let ``Lenient mode - unknown element produces no warnings`` () =
+        let input = "<svg xmlns=\"http://www.w3.org/2000/svg\"><custom foo=\"bar\"/></svg>"
+        match SvgParser.ofStringWith Lenient input with
+        | Error e -> Assert.Fail(sprintf "Expected Ok, got Error: %s" e.Message)
+        | Ok result -> Assert.Empty(result.Warnings)
+
+    [<Fact>]
+    let ``Strict mode - unknown body element produces a warning`` () =
+        let input = "<svg xmlns=\"http://www.w3.org/2000/svg\"><custom foo=\"bar\"/></svg>"
+        match SvgParser.ofStringWith Strict input with
+        | Error e -> Assert.Fail(sprintf "Expected Ok, got Error: %s" e.Message)
+        | Ok result ->
+            Assert.NotEmpty(result.Warnings)
+            Assert.Contains("custom", result.Warnings.[0].Message)
+
+    [<Fact>]
+    let ``Strict mode - known element produces no warnings`` () =
+        let input = "<svg xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"10\" cy=\"10\" r=\"5\"/></svg>"
+        match SvgParser.ofStringWith Strict input with
+        | Error e -> Assert.Fail(sprintf "Expected Ok, got Error: %s" e.Message)
+        | Ok result -> Assert.Empty(result.Warnings)
+
+    [<Fact>]
+    let ``Strict mode - multiple unknown elements each produce a warning`` () =
+        let input = "<svg xmlns=\"http://www.w3.org/2000/svg\"><foo/><bar/><circle cx=\"0\" cy=\"0\" r=\"1\"/></svg>"
+        match SvgParser.ofStringWith Strict input with
+        | Error e -> Assert.Fail(sprintf "Expected Ok, got Error: %s" e.Message)
+        | Ok result -> Assert.Equal(2, result.Warnings.Length)
+
+    [<Fact>]
+    let ``Strict mode - unknown element still parsed as raw passthrough`` () =
+        // Strict mode warns but doesn't drop the element — body still contains the raw element
+        let input = "<svg xmlns=\"http://www.w3.org/2000/svg\"><custom id=\"x\"/></svg>"
+        match SvgParser.ofStringWith Strict input with
+        | Error e -> Assert.Fail(sprintf "Expected Ok, got Error: %s" e.Message)
+        | Ok result ->
+            let bodyItems = result.Value.Body |> Seq.toList
+            Assert.NotEmpty(bodyItems)
+            let rawElements =
+                bodyItems
+                |> List.choose (function GroupElement.Element e when Element.isRaw e -> Some e | _ -> None)
+            Assert.NotEmpty(rawElements)
+
+    [<Fact>]
+    let ``Strict mode - unknown defs element produces a warning`` () =
+        let input = "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs><customGradient id=\"g\"/></defs></svg>"
+        match SvgParser.ofStringWith Strict input with
+        | Error e -> Assert.Fail(sprintf "Expected Ok, got Error: %s" e.Message)
+        | Ok result ->
+            Assert.NotEmpty(result.Warnings)
+            Assert.Contains("customGradient", result.Warnings.[0].Message)
+
+    [<Fact>]
+    let ``Strict mode - warning ElementName matches the unknown tag name`` () =
+        let input = "<svg xmlns=\"http://www.w3.org/2000/svg\"><weirdtag/></svg>"
+        match SvgParser.ofStringWith Strict input with
+        | Error e -> Assert.Fail(sprintf "Expected Ok, got Error: %s" e.Message)
+        | Ok result ->
+            let warning = result.Warnings |> List.head
+            Assert.Equal(Some "weirdtag", warning.ElementName)
+
+    [<Fact>]
+    let ``ofString uses Lenient mode by default`` () =
+        // Shorthand ofString should behave identically to ofStringWith Lenient
+        let input = "<svg xmlns=\"http://www.w3.org/2000/svg\"><unknown/></svg>"
+        let lenient = SvgParser.ofStringWith Lenient input
+        let shorthand = SvgParser.ofString input
+        match lenient, shorthand with
+        | Ok r1, Ok r2 ->
+            Assert.Equal(r1.Warnings.Length, r2.Warnings.Length)
+        | _ -> Assert.Fail("Both should parse successfully")

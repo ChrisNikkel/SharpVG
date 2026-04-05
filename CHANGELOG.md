@@ -32,6 +32,11 @@ All notable changes to SharpVG will be documented in this file.
   - `Svg.findAtEditPath`, `mapAtEditPath` — locate or transform the element at a given tree path
 - `SvgDefinitions.addSymbol` — add a `Symbol` to a definitions block
 - `SymbolDef` case added to `SvgDefinitionsContent` DU
+- **Parse mode** — `ParseMode` DU (`Lenient` | `Strict`) controls how unknown elements are handled:
+  - `Lenient` (default): unknown elements silently preserved as raw passthrough values
+  - `Strict`: unknown body and definition elements each produce a `ParseWarning`; the element is still parsed as a raw passthrough
+  - All entry points now have a `…With` variant accepting a `ParseMode`: `SvgParser.ofStringWith`, `ofFileWith`, `ofStreamWith`, `ofGzipStreamWith`, `ofGzipFileWith`, `ofHtmlStringWith`, `ofHtmlFileWith`
+  - Existing `ofString`, `ofFile`, etc. unchanged — they use `Lenient` mode
 
 ## [0.1.0] - 2026-03-14
 
