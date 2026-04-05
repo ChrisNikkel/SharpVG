@@ -301,6 +301,36 @@ module private SvgParserHelpers =
                     Some (Transform.Matrix (Length.ofFloat a, Length.ofFloat b, Length.ofFloat c, Length.ofFloat d, Length.ofFloat e, Length.ofFloat f))
                 | _ -> None)
 
+    let tryParseViewBox (s: string) : ViewBox option =
+        let nums =
+            s.Split([|','; ' '|], StringSplitOptions.RemoveEmptyEntries)
+            |> Array.choose tryParseFloat
+        match nums with
+        | [|minX; minY; width; height|] ->
+            Some (ViewBox.create (Point.ofFloats (minX, minY)) (Area.ofFloats (width, height)))
+        | _ -> None
+
+    let tryAttr name (xel: XElement) =
+        xel.Attribute(XName.Get name) |> Option.ofObj |> Option.map _.Value
+
+    // SVG 1.1 uses xlink:href; SVG 2 uses plain href. Check both, normalizing to href.
+    let private xlinkNs = XNamespace.Get "http://www.w3.org/1999/xlink"
+    let tryHref (xel: XElement) =
+        xel.Attribute(XName.Get "href") |> Option.ofObj
+        |> Option.orElse (xel.Attribute(xlinkNs + "href") |> Option.ofObj)
+        |> Option.map _.Value
+
+    let tryParseSpreadMethod (s: string) =
+        match s.ToLowerInvariant() with
+        | "reflect" -> Some Reflect
+        | "repeat"  -> Some Repeat
+        | _         -> Some Pad
+
+    let tryParseFilterUnits (s: string) =
+        match s.ToLowerInvariant() with
+        | "userspaceonuse" -> Some UserSpaceOnUse
+        | _               -> Some ObjectBoundingBox
+
     let applyCommon (xel: XElement) (element: Element) : Element =
         let withId =
             match xel.Attribute(XName.Get "id") |> Option.ofObj with
@@ -584,7 +614,255 @@ module private SvgElementParsers =
         | El "g"        ->
             let (group, s2) = parseGroup xel state
             GroupElement.Group group, s2
+        | El "a"        -> parseAnchor xel state
         | _             -> parseRaw xel state
+
+    and parseAnchor (xel: XElement) (state: ParseState) : GroupElement * ParseState =
+        let url = tryHref xel |> Option.defaultValue ""
+        let (children, finalState) =
+            xel.Elements()
+            |> Seq.fold (fun (acc, s) child ->
+                let (ge, s2) = parseElement child s
+                (acc @ [ge], s2)) ([], state)
+        let elements =
+            children |> List.choose (function GroupElement.Element e -> Some e | _ -> None)
+        let anchor = Anchor.create url |> Anchor.withBody (elements |> Seq.ofList)
+        GroupElement.Element (anchor |> Element.create |> applyCommon xel), finalState
+
+    let parseGradientStop (xel: XElement) : GradientStop option =
+        let offsetStr = tryAttr "offset" xel |> Option.defaultValue "0"
+        let offset =
+            if offsetStr.EndsWith("%") then
+                tryParseFloat (offsetStr.[..offsetStr.Length - 2]) |> Option.map (fun v -> v / 100.0) |> Option.defaultValue 0.0
+            else
+                tryParseFloat offsetStr |> Option.defaultValue 0.0
+        let color =
+            tryAttr "stop-color" xel
+            |> Option.bind tryParseColor
+            |> Option.defaultValue (Color.ofName Colors.Black)
+        let stop = GradientStop.create offset color
+        let withOpacity =
+            tryAttr "stop-opacity" xel
+            |> Option.bind tryParseFloat
+            |> Option.map (fun o -> stop |> GradientStop.withOpacity o)
+            |> Option.defaultValue stop
+        Some withOpacity
+
+    // Apply an optional transform: applyOpt f (Some v) x = f v x; applyOpt f None x = x
+    let inline applyOpt f optVal x =
+        match optVal with
+        | Some v -> f v x
+        | None   -> x
+
+    let parseLinearGradient (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState -> SvgDefinitions * ParseState =
+        let elemId = tryAttr "id" xel |> Option.defaultValue ""
+        let x1 = match xel with FloatAttr "x1" v -> v | _ -> 0.0
+        let y1 = match xel with FloatAttr "y1" v -> v | _ -> 0.0
+        let x2 = match xel with FloatAttr "x2" v -> v | _ -> 1.0
+        let y2 = match xel with FloatAttr "y2" v -> v | _ -> 0.0
+        let point1 = Point.ofFloats (x1, y1)
+        let point2 = Point.ofFloats (x2, y2)
+        let stops =
+            xel.Elements()
+            |> Seq.filter (fun e -> e.Name.LocalName = "stop")
+            |> Seq.choose parseGradientStop
+            |> Seq.toList
+        let gradient =
+            LinearGradient.create elemId point1 point2 stops
+            |> applyOpt LinearGradient.withSpreadMethod (tryAttr "spreadMethod" xel |> Option.bind tryParseSpreadMethod)
+            |> applyOpt LinearGradient.withGradientUnits (tryAttr "gradientUnits" xel |> Option.bind tryParseFilterUnits)
+            |> applyOpt LinearGradient.withHref (tryHref xel)
+        fun (defs, s) -> SvgDefinitions.addGradient (Gradient.ofLinear gradient) defs, s
+
+    let parseRadialGradient (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState -> SvgDefinitions * ParseState =
+        let elemId = tryAttr "id" xel |> Option.defaultValue ""
+        let cx = match xel with FloatAttr "cx" v -> v | _ -> 0.5
+        let cy = match xel with FloatAttr "cy" v -> v | _ -> 0.5
+        let r  = match xel with FloatAttr "r"  v -> v | _ -> 0.5
+        let center = Point.ofFloats (cx, cy)
+        let radius = Length.ofFloat r
+        let stops =
+            xel.Elements()
+            |> Seq.filter (fun e -> e.Name.LocalName = "stop")
+            |> Seq.choose parseGradientStop
+            |> Seq.toList
+        let focal =
+            match xel with
+            | FloatAttr "fx" fx ->
+                let fy = match xel with FloatAttr "fy" v -> v | _ -> cy
+                Some (Point.ofFloats (fx, fy))
+            | _ -> None
+        let gradient =
+            RadialGradient.create elemId center radius stops
+            |> applyOpt RadialGradient.withFocal focal
+            |> applyOpt RadialGradient.withSpreadMethod (tryAttr "spreadMethod" xel |> Option.bind tryParseSpreadMethod)
+            |> applyOpt RadialGradient.withGradientUnits (tryAttr "gradientUnits" xel |> Option.bind tryParseFilterUnits)
+            |> applyOpt RadialGradient.withHref (tryHref xel)
+        fun (defs, s) -> SvgDefinitions.addGradient (Gradient.ofRadial gradient) defs, s
+
+    let parseClipPath (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState -> SvgDefinitions * ParseState =
+        let elemId = tryAttr "id" xel |> Option.defaultValue ""
+        let (children, _) =
+            xel.Elements()
+            |> Seq.fold (fun (acc, s) child ->
+                let (ge, s2) = parseElement child s
+                (acc @ [ge], s2)) ([], state)
+        let elements = children |> List.choose (function GroupElement.Element e -> Some e | _ -> None)
+        let clipPath =
+            ClipPath.create elemId
+            |> ClipPath.addElements (elements |> Seq.ofList)
+            |> applyOpt ClipPath.withClipPathUnits (tryAttr "clipPathUnits" xel |> Option.bind tryParseFilterUnits)
+        fun (defs, s) -> SvgDefinitions.addClipPath clipPath defs, s
+
+    let parseMask (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState -> SvgDefinitions * ParseState =
+        let elemId = tryAttr "id" xel |> Option.defaultValue ""
+        let (children, _) =
+            xel.Elements()
+            |> Seq.fold (fun (acc, s) child ->
+                let (ge, s2) = parseElement child s
+                (acc @ [ge], s2)) ([], state)
+        let elements = children |> List.choose (function GroupElement.Element e -> Some e | _ -> None)
+        let location =
+            match xel with
+            | FloatAttr "x" x ->
+                let y = match xel with FloatAttr "y" v -> v | _ -> 0.0
+                Some (Point.ofFloats (x, y))
+            | _ -> None
+        let size =
+            match xel with
+            | FloatAttr "width" w ->
+                let h = match xel with FloatAttr "height" v -> v | _ -> 0.0
+                Some (Area.ofFloats (w, h))
+            | _ -> None
+        let mask =
+            Mask.create elemId
+            |> Mask.addElements (elements |> Seq.ofList)
+            |> applyOpt Mask.withLocation location
+            |> applyOpt Mask.withSize size
+            |> applyOpt Mask.withMaskUnits (tryAttr "maskUnits" xel |> Option.bind tryParseFilterUnits)
+            |> applyOpt Mask.withMaskContentUnits (tryAttr "maskContentUnits" xel |> Option.bind tryParseFilterUnits)
+        fun (defs, s) -> SvgDefinitions.addMask mask defs, s
+
+    let parsePattern (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState -> SvgDefinitions * ParseState =
+        let elemId = tryAttr "id" xel |> Option.defaultValue ""
+        let (children, _) =
+            xel.Elements()
+            |> Seq.fold (fun (acc, s) child ->
+                let (ge, s2) = parseElement child s
+                (acc @ [ge], s2)) ([], state)
+        let elements = children |> List.choose (function GroupElement.Element e -> Some e | _ -> None)
+        let position =
+            match xel with
+            | FloatAttr "x" x ->
+                let y = match xel with FloatAttr "y" v -> v | _ -> 0.0
+                Some (Point.ofFloats (x, y))
+            | _ -> None
+        let size =
+            match xel with
+            | FloatAttr "width" w ->
+                let h = match xel with FloatAttr "height" v -> v | _ -> 0.0
+                Some (Area.ofFloats (w, h))
+            | _ -> None
+        let viewBox = tryAttr "viewBox" xel |> Option.bind tryParseViewBox
+        let pattern =
+            Pattern.create elemId
+            |> Pattern.addElements (elements |> Seq.ofList)
+            |> applyOpt Pattern.withPosition position
+            |> applyOpt Pattern.withSize size
+            |> applyOpt Pattern.withViewBox viewBox
+            |> applyOpt Pattern.withPatternUnits (tryAttr "patternUnits" xel |> Option.bind tryParseFilterUnits)
+            |> applyOpt Pattern.withPatternContentUnits (tryAttr "patternContentUnits" xel |> Option.bind tryParseFilterUnits)
+        fun (defs, s) -> SvgDefinitions.addPattern pattern defs, s
+
+    let parseMarker (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState -> SvgDefinitions * ParseState =
+        let elemId = tryAttr "id" xel |> Option.defaultValue ""
+        let (children, _) =
+            xel.Elements()
+            |> Seq.fold (fun (acc, s) child ->
+                let (ge, s2) = parseElement child s
+                (acc @ [ge], s2)) ([], state)
+        let elements = children |> List.choose (function GroupElement.Element e -> Some e | _ -> None)
+        let viewBox = tryAttr "viewBox" xel |> Option.bind tryParseViewBox
+        let refPoint =
+            match xel with
+            | FloatAttr "refX" rx ->
+                let ry = match xel with FloatAttr "refY" v -> v | _ -> 0.0
+                Some (Point.ofFloats (rx, ry))
+            | _ -> None
+        let size =
+            match xel with
+            | FloatAttr "width" w ->
+                let h = match xel with FloatAttr "height" v -> v | _ -> 0.0
+                Some (Area.ofFloats (w, h))
+            | _ -> None
+        let orient =
+            tryAttr "orient" xel |> Option.bind (fun s ->
+                if s = "auto" then Some AutoOrient
+                else tryParseFloat s |> Option.map AngleOrient)
+        let units =
+            tryAttr "markerUnits" xel |> Option.bind (fun s ->
+                match s with
+                | "userSpaceOnUse" -> Some UserSpaceOnUseUnits
+                | _ -> Some StrokeWidthUnits)
+        let marker =
+            Marker.create elemId
+            |> Marker.addElements (elements |> Seq.ofList)
+            |> applyOpt Marker.withViewBox viewBox
+            |> applyOpt Marker.withRefPoint refPoint
+            |> applyOpt Marker.withSize size
+            |> applyOpt Marker.withOrient orient
+            |> applyOpt Marker.withUnits units
+        fun (defs, s) -> SvgDefinitions.addMarker marker defs, s
+
+    let parseFilter (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState -> SvgDefinitions * ParseState =
+        let elemId = tryAttr "id" xel
+        let location =
+            match xel with
+            | FloatAttr "x" x ->
+                let y = match xel with FloatAttr "y" v -> v | _ -> 0.0
+                Some (Point.ofFloats (x, y))
+            | _ -> None
+        let area =
+            match xel with
+            | FloatAttr "width" w ->
+                let h = match xel with FloatAttr "height" v -> v | _ -> 0.0
+                Some (Area.ofFloats (w, h))
+            | _ -> None
+        let filterUnits = tryAttr "filterUnits" xel |> Option.bind tryParseFilterUnits
+        let filter =
+            {
+                Filter.empty with
+                    Id = elemId
+                    Location = location
+                    Area = area
+                    FilterUnits = filterUnits
+            }
+        fun (defs, s) -> SvgDefinitions.addFilter filter defs, s
+
+    let parseSymbol (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState -> SvgDefinitions * ParseState =
+        let (children, _) =
+            xel.Elements()
+            |> Seq.fold (fun (acc, s) child ->
+                let (ge, s2) = parseElement child s
+                (acc @ [ge], s2)) ([], state)
+        let elements = children |> List.choose (function GroupElement.Element e -> Some e | _ -> None)
+        let viewBox =
+            tryAttr "viewBox" xel |> Option.bind tryParseViewBox
+            |> Option.defaultWith (fun () ->
+                let w = match xel with FloatAttr "width" v -> v | _ -> 0.0
+                let h = match xel with FloatAttr "height" v -> v | _ -> 0.0
+                ViewBox.create Point.origin (Area.ofFloats (w, h)))
+        let size =
+            match xel with
+            | FloatAttr "width" w ->
+                let h = match xel with FloatAttr "height" v -> v | _ -> 0.0
+                Some (Area.ofFloats (w, h))
+            | _ -> None
+        let symbol =
+            Symbol.create viewBox
+            |> Symbol.addElements (elements |> Seq.ofList)
+            |> (fun sym -> Symbol.withSize size sym)
+        fun (defs, s) -> SvgDefinitions.addSymbol symbol defs, s
 
     let parseDefs (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState =
         xel.Elements()
@@ -593,6 +871,14 @@ module private SvgElementParsers =
             | El "g" ->
                 let (group, s2) = parseGroup child s
                 SvgDefinitions.addGroup group defs, s2
+            | El "linearGradient"  -> parseLinearGradient child s (defs, s)
+            | El "radialGradient"  -> parseRadialGradient child s (defs, s)
+            | El "clipPath"        -> parseClipPath child s (defs, s)
+            | El "mask"            -> parseMask child s (defs, s)
+            | El "pattern"         -> parsePattern child s (defs, s)
+            | El "marker"          -> parseMarker child s (defs, s)
+            | El "filter"          -> parseFilter child s (defs, s)
+            | El "symbol"          -> parseSymbol child s (defs, s)
             | El "circle" | El "ellipse" | El "rect" | El "line"
             | El "path"   | El "polygon" | El "polyline" | El "text"
             | El "image"  | El "use" ->
@@ -614,20 +900,6 @@ module private SvgElementParsers =
 module private SvgRootParser =
 
     open SvgParserHelpers
-
-    let private tryParseViewBox (s: string) : ViewBox option =
-        let nums =
-            s.Split([|','; ' '|], StringSplitOptions.RemoveEmptyEntries)
-            |> Array.choose (fun t ->
-                match Double.TryParse(t, NumberStyles.Any, CultureInfo.InvariantCulture) with
-                | true, v -> Some v
-                | _ -> None)
-        match nums with
-        | [|minX; minY; width; height|] ->
-            let origin = Point.ofFloats (minX, minY)
-            let size = Area.ofFloats (width, height)
-            Some (ViewBox.create origin size)
-        | _ -> None
 
     let parseSvgRoot (root: XElement) : Result<ParseResult<Svg>, ParseError> =
         let state = emptyState
@@ -665,7 +937,7 @@ module private SvgRootParser =
 
         let viewBox =
             root.Attribute(XName.Get "viewBox") |> Option.ofObj
-            |> Option.bind (fun a -> tryParseViewBox a.Value)
+            |> Option.bind (fun a -> SvgParserHelpers.tryParseViewBox a.Value)
 
         let title =
             root.Elements()
@@ -712,6 +984,14 @@ module SvgParser =
     let ofFile (path: string) : Result<ParseResult<Svg>, ParseError> =
         try
             let content = System.IO.File.ReadAllText(path)
+            ofString content
+        with ex ->
+            Error { Message = ex.Message; ElementName = None }
+
+    let ofStream (stream: System.IO.Stream) : Result<ParseResult<Svg>, ParseError> =
+        try
+            use reader = new System.IO.StreamReader(stream)
+            let content = reader.ReadToEnd()
             ofString content
         with ex ->
             Error { Message = ex.Message; ElementName = None }

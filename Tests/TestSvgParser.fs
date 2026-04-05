@@ -300,7 +300,7 @@ module TestSvgParser =
 
     [<Fact>]
     let ``SvgParser ofString - unknown defs element becomes RawDef`` () =
-        let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs><filter id=\"f1\"/></defs></svg>"
+        let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs><fancyDefsWidget id=\"w1\"/></defs></svg>"
         Assert.True(svg.Definitions.IsSome)
         let defs = svg.Definitions.Value
         let hasRaw =
@@ -312,6 +312,114 @@ module TestSvgParser =
     let ``SvgParser ofString - empty defs produces no Definitions`` () =
         let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs></defs></svg>"
         Assert.True(svg.Definitions.IsNone)
+
+    // --- Structural defs elements ---
+
+    [<Fact>]
+    let ``SvgParser ofString - linearGradient in defs becomes GradientDef`` () =
+        let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs><linearGradient id=\"lg1\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"red\"/><stop offset=\"1\" stop-color=\"blue\"/></linearGradient></defs></svg>"
+        Assert.True(svg.Definitions.IsSome)
+        let hasGradient =
+            svg.Definitions.Value.Contents
+            |> Seq.exists (function GradientDef (Gradient.Linear _) -> true | _ -> false)
+        Assert.True(hasGradient)
+
+    [<Fact>]
+    let ``SvgParser ofString - radialGradient in defs becomes GradientDef`` () =
+        let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs><radialGradient id=\"rg1\" cx=\"0.5\" cy=\"0.5\" r=\"0.5\"><stop offset=\"0\" stop-color=\"white\"/><stop offset=\"1\" stop-color=\"black\"/></radialGradient></defs></svg>"
+        Assert.True(svg.Definitions.IsSome)
+        let hasGradient =
+            svg.Definitions.Value.Contents
+            |> Seq.exists (function GradientDef (Gradient.Radial _) -> true | _ -> false)
+        Assert.True(hasGradient)
+
+    [<Fact>]
+    let ``SvgParser ofString - linearGradient preserves stops`` () =
+        let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs><linearGradient id=\"lg1\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"red\"/><stop offset=\"0.5\" stop-color=\"green\"/><stop offset=\"1\" stop-color=\"blue\"/></linearGradient></defs></svg>"
+        let gradient =
+            svg.Definitions.Value.Contents
+            |> Seq.pick (function GradientDef (Gradient.Linear lg) -> Some lg | _ -> None)
+        Assert.Equal(3, gradient.Stops.Length)
+
+    [<Fact>]
+    let ``SvgParser ofString - clipPath in defs becomes ClipPathDef`` () =
+        let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs><clipPath id=\"cp1\"><rect x=\"0\" y=\"0\" width=\"100\" height=\"100\"/></clipPath></defs></svg>"
+        Assert.True(svg.Definitions.IsSome)
+        let hasClipPath =
+            svg.Definitions.Value.Contents
+            |> Seq.exists (function ClipPathDef _ -> true | _ -> false)
+        Assert.True(hasClipPath)
+
+    [<Fact>]
+    let ``SvgParser ofString - mask in defs becomes MaskDef`` () =
+        let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs><mask id=\"m1\"><circle cx=\"50\" cy=\"50\" r=\"40\"/></mask></defs></svg>"
+        Assert.True(svg.Definitions.IsSome)
+        let hasMask =
+            svg.Definitions.Value.Contents
+            |> Seq.exists (function MaskDef _ -> true | _ -> false)
+        Assert.True(hasMask)
+
+    [<Fact>]
+    let ``SvgParser ofString - pattern in defs becomes PatternDef`` () =
+        let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs><pattern id=\"p1\" width=\"10\" height=\"10\"><circle cx=\"5\" cy=\"5\" r=\"4\"/></pattern></defs></svg>"
+        Assert.True(svg.Definitions.IsSome)
+        let hasPattern =
+            svg.Definitions.Value.Contents
+            |> Seq.exists (function PatternDef _ -> true | _ -> false)
+        Assert.True(hasPattern)
+
+    [<Fact>]
+    let ``SvgParser ofString - marker in defs becomes MarkerDef`` () =
+        let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs><marker id=\"arr\" viewBox=\"0 0 10 10\" refX=\"5\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\"><path d=\"M 0 0 L 10 5 L 0 10 z\"/></marker></defs></svg>"
+        Assert.True(svg.Definitions.IsSome)
+        let hasMarker =
+            svg.Definitions.Value.Contents
+            |> Seq.exists (function MarkerDef _ -> true | _ -> false)
+        Assert.True(hasMarker)
+
+    [<Fact>]
+    let ``SvgParser ofString - filter in defs becomes FilterDef`` () =
+        let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs><filter id=\"blur\"><feGaussianBlur stdDeviation=\"5\"/></filter></defs></svg>"
+        Assert.True(svg.Definitions.IsSome)
+        let hasFilter =
+            svg.Definitions.Value.Contents
+            |> Seq.exists (function FilterDef _ -> true | _ -> false)
+        Assert.True(hasFilter)
+
+    [<Fact>]
+    let ``SvgParser ofString - symbol in defs becomes SymbolDef`` () =
+        let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><defs><symbol viewBox=\"0 0 100 100\"><circle cx=\"50\" cy=\"50\" r=\"40\"/></symbol></defs></svg>"
+        Assert.True(svg.Definitions.IsSome)
+        let hasSymbol =
+            svg.Definitions.Value.Contents
+            |> Seq.exists (function SymbolDef _ -> true | _ -> false)
+        Assert.True(hasSymbol)
+
+    [<Fact>]
+    let ``SvgParser ofString - anchor in body is parsed as element`` () =
+        let svg = parseOk "<svg xmlns=\"http://www.w3.org/2000/svg\"><a href=\"https://example.com\"><circle cx=\"50\" cy=\"50\" r=\"20\"/></a></svg>"
+        let items = bodyElements svg
+        Assert.Equal(1, items.Length)
+        match items.[0] with
+        | GroupElement.Element e -> Assert.Contains("<a ", e |> Element.toString)
+        | other -> failwithf "Expected Element for anchor, got %A" other
+
+    [<Fact>]
+    let ``SvgParser ofString - structural defs serialize to well-formed XML`` () =
+        let svg = parseOk """<svg xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="lg" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="red"/>
+                    <stop offset="1" stop-color="blue"/>
+                </linearGradient>
+                <clipPath id="cp"><rect x="0" y="0" width="50" height="50"/></clipPath>
+                <marker id="m" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+                    <path d="M 0 0 L 10 5 L 0 10 z"/>
+                </marker>
+            </defs>
+            <circle cx="50" cy="50" r="40"/>
+        </svg>"""
+        SvgCheck.assertValid (Svg.toString svg)
 
     // --- <use> parsing ---
 

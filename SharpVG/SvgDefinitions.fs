@@ -9,6 +9,7 @@ type SvgDefinitionsContent =
     | FilterDef of Filter
     | MaskDef of Mask
     | PatternDef of Pattern
+    | SymbolDef of Symbol
     | RawDef of RawElement
 
 type SvgDefinitions = {
@@ -27,6 +28,7 @@ with
                 | FilterDef f -> f |> Filter.toString
                 | MaskDef m -> m |> Mask.toString
                 | PatternDef p -> p |> Pattern.toString
+                | SymbolDef s -> s |> Symbol.toString
                 | RawDef r -> r |> RawElement.toString)
             |> String.concat ""
         Tag.create "defs"
@@ -67,6 +69,9 @@ module SvgDefinitions =
     let addPattern pattern (definitions: SvgDefinitions) =
         { definitions with Contents = Seq.append definitions.Contents (Seq.singleton (PatternDef pattern)) }
 
+    let addSymbol symbol (definitions: SvgDefinitions) =
+        { definitions with Contents = Seq.append definitions.Contents (Seq.singleton (SymbolDef symbol)) }
+
     let addElements elements (definitions: SvgDefinitions) =
         elements
         |> Seq.map ElementDef
@@ -77,6 +82,7 @@ module SvgDefinitions =
         |> Seq.choose (function
             | ElementDef e -> Some (e.Style |> Option.toList |> Set.ofList)
             | GroupDef g -> Some (g |> Group.toStyleSet)
+            | SymbolDef s -> Some (s.Elements |> Seq.map (fun e -> e.Style |> Option.toList |> Set.ofList) |> Seq.fold (+) Set.empty)
             | _ -> None)
         |> Seq.fold (+) Set.empty
         |> Set.toSeq
