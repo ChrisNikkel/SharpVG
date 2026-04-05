@@ -50,3 +50,55 @@ module TestSvg =
         Assert.Contains("<circle", result)
         Assert.Contains("width=\"100%\"", result)
         Assert.Contains("height=\"100%\"", result)
+
+    [<Fact>]
+    let ``SVG toHtmlWithCss includes style block`` () =
+        let center = Point.ofInts (60, 60)
+        let radius = Length.ofInt 50
+        let css = "circle { cursor: pointer; }"
+        let result =
+            Circle.create center radius
+            |> Element.create
+            |> Svg.ofElement
+            |> Svg.toHtmlWithCss "Example" css
+        Assert.Contains("<title>Example</title>", result)
+        Assert.Contains("<style>", result)
+        Assert.Contains("circle { cursor: pointer; }", result)
+        Assert.Contains("<circle", result)
+
+    [<Fact>]
+    let ``SVG toHtmlWithCss empty css matches toHtml`` () =
+        let circle = Circle.create Point.origin (Length.ofInt 10) |> Element.create
+        let htmlResult = circle |> Svg.ofElement |> Svg.toHtml "Test"
+        let cssResult = circle |> Svg.ofElement |> Svg.toHtmlWithCss "Test" ""
+        Assert.Equal(htmlResult, cssResult)
+
+    [<Fact>]
+    let ``SVG withTitle adds title element`` () =
+        let result = [] |> Svg.ofList |> Svg.withTitle "My Chart" |> Svg.toString
+        Assert.Contains("<title>My Chart</title>", result)
+
+    [<Fact>]
+    let ``SVG withDescription adds desc element`` () =
+        let result = [] |> Svg.ofList |> Svg.withDescription "A description" |> Svg.toString
+        Assert.Contains("<desc>A description</desc>", result)
+
+    // Wiki: ViewBox page — setting viewBox on SVG
+    [<Fact>]
+    let ``ViewBox wiki - svg with size and viewBox`` () =
+        let center = Point.ofInts (50, 50)
+        let radius = Length.ofInt 40
+        let circle = Circle.create center radius |> Element.create
+        let size = Area.ofInts (400, 400)
+        let viewBoxMin = Point.ofInts (0, 0)
+        let viewBoxSize = Area.ofInts (100, 100)
+        let viewBox = ViewBox.create viewBoxMin viewBoxSize
+        let result =
+            circle
+            |> Svg.ofElement
+            |> Svg.withSize size
+            |> Svg.withViewBox viewBox
+            |> Svg.toString
+        Assert.Contains("width=\"400\"", result)
+        Assert.Contains("height=\"400\"", result)
+        Assert.Contains("viewBox=\"0,0 100,100\"", result)

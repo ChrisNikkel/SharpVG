@@ -2,6 +2,9 @@
 
 open SharpVG
 open Xunit
+open FsCheck
+open FsCheck.Xunit
+open BasicChecks
 
 module TestStyle =
 
@@ -178,4 +181,72 @@ module TestStyle =
     let ``style withDisplay none`` () =
         let result = Style.empty |> Style.withDisplay DisplayNone |> Style.toString
         Assert.Contains("display:none", result)
+
+    [<Fact>]
+    let ``style withVectorEffect none`` () =
+        let result = Style.empty |> Style.withVectorEffect VectorEffectNone |> Style.toString
+        Assert.Contains("vector-effect:none", result)
+
+    [<Fact>]
+    let ``style withVectorEffect non-scaling-stroke`` () =
+        let result = Style.empty |> Style.withVectorEffect NonScalingStroke |> Style.toString
+        Assert.Contains("vector-effect:non-scaling-stroke", result)
+
+    [<Fact>]
+    let ``style withShapeRendering auto`` () =
+        let result = Style.empty |> Style.withShapeRendering ShapeRenderingAuto |> Style.toString
+        Assert.Contains("shape-rendering:auto", result)
+
+    [<Fact>]
+    let ``style withShapeRendering optimizeSpeed`` () =
+        let result = Style.empty |> Style.withShapeRendering OptimizeSpeed |> Style.toString
+        Assert.Contains("shape-rendering:optimizeSpeed", result)
+
+    [<Fact>]
+    let ``style withShapeRendering crispEdges`` () =
+        let result = Style.empty |> Style.withShapeRendering CrispEdges |> Style.toString
+        Assert.Contains("shape-rendering:crispEdges", result)
+
+    [<Fact>]
+    let ``style withShapeRendering geometricPrecision`` () =
+        let result = Style.empty |> Style.withShapeRendering GeometricPrecision |> Style.toString
+        Assert.Contains("shape-rendering:geometricPrecision", result)
+
+    [<Fact>]
+    let ``style withPaintOrder fill`` () =
+        let result = Style.empty |> Style.withPaintOrder [FillLayer] |> Style.toString
+        Assert.Contains("paint-order:fill", result)
+
+    [<Fact>]
+    let ``style withPaintOrder stroke markers`` () =
+        let result = Style.empty |> Style.withPaintOrder [StrokeLayer; MarkersLayer] |> Style.toString
+        Assert.Contains("paint-order:stroke markers", result)
+
+    [<Property>]
+    let ``withVectorEffect always adds vector-effect property to style`` (effect: VectorEffect) =
+        let result = Style.empty |> Style.withVectorEffect effect |> Style.toString
+        result.Contains("vector-effect:")
+
+    [<Property>]
+    let ``withShapeRendering always adds shape-rendering property to style`` (rendering: ShapeRendering) =
+        let result = Style.empty |> Style.withShapeRendering rendering |> Style.toString
+        result.Contains("shape-rendering:")
+
+    [<Property>]
+    let ``withPaintOrder with any single layer always adds paint-order property`` (layer: PaintLayer) =
+        let result = Style.empty |> Style.withPaintOrder [layer] |> Style.toString
+        result.Contains("paint-order:")
+
+    [<SvgProperty>]
+    let ``style with fill and stroke always has balanced quotes`` (r, g, b, p) =
+        let strokeColor = Color.ofValues (r, g, b)
+        let style = Style.createWithStroke strokeColor |> Style.withStrokeWidth (Length.ofFloat p)
+        let result = style |> Style.toString
+        happensEvenly '"' result
+
+    [<SvgProperty>]
+    let ``element with any fill color always produces bodyless tag`` (r, g, b) =
+        let style = Style.createWithFill (Color.ofValues (r, g, b))
+        let result = Rect.create Point.origin Area.full |> Element.createWithStyle style |> Element.toString
+        checkBodylessTag "rect" result
 

@@ -2,6 +2,9 @@ namespace SharpVG.Tests
 
 open SharpVG
 open Xunit
+open FsCheck
+open FsCheck.Xunit
+open BasicChecks
 
 module TestFilter =
 
@@ -227,3 +230,128 @@ module TestFilter =
         let result = FilterEffect.createDropShadowFull 2.0 2.0 3.0 (Color.ofName Colors.Black) 0.5 |> FilterEffect.toString
         Assert.Contains("flood-color=\"black\"", result)
         Assert.Contains("flood-opacity=\"0.5\"", result)
+
+    // FilterEffectSource variants
+    [<Fact>]
+    let ``FilterEffectSource BackgroundImage renders correctly`` () =
+        let fe = FilterEffect.createMerge [BackgroundImage]
+        let result = fe |> FilterEffect.toString
+        Assert.Contains("in=\"BackgroundImage\"", result)
+
+    [<Fact>]
+    let ``FilterEffectSource BackgroundAlpha renders correctly`` () =
+        let fe = FilterEffect.createMerge [BackgroundAlpha]
+        let result = fe |> FilterEffect.toString
+        Assert.Contains("in=\"BackgroundAlpha\"", result)
+
+    [<Fact>]
+    let ``FilterEffectSource FillPaint renders correctly`` () =
+        let fe = FilterEffect.createMerge [FillPaint]
+        let result = fe |> FilterEffect.toString
+        Assert.Contains("in=\"FillPaint\"", result)
+
+    [<Fact>]
+    let ``FilterEffectSource StrokePaint renders correctly`` () =
+        let fe = FilterEffect.createMerge [StrokePaint]
+        let result = fe |> FilterEffect.toString
+        Assert.Contains("in=\"StrokePaint\"", result)
+
+    [<Fact>]
+    let ``FilterEffectSource NamedFilterEffect uses effect name`` () =
+        let blur = FilterEffect.withName (FilterEffect.createGaussianBlur 3.0) "blurResult"
+        let offset = FilterEffect.createOffsetWithInput (Point.ofInts (2, 2)) (NamedFilterEffect blur)
+        let result = offset |> FilterEffect.toString
+        Assert.Contains("in=\"blurResult\"", result)
+
+    // TransferFuncType variants
+    [<Fact>]
+    let ``TransferFuncType LinearTransfer renders slope and intercept`` () =
+        let fe = FilterEffect.createComponentTransfer (LinearTransfer(0.5, 0.1)) IdentityTransfer IdentityTransfer IdentityTransfer
+        let result = fe |> FilterEffect.toString
+        Assert.Contains("type=\"linear\"", result)
+        Assert.Contains("slope=\"0.5\"", result)
+        Assert.Contains("intercept=\"0.1\"", result)
+
+    [<Fact>]
+    let ``TransferFuncType GammaTransfer renders amplitude exponent offset`` () =
+        let fe = FilterEffect.createComponentTransfer (GammaTransfer(1.0, 2.0, 0.0)) IdentityTransfer IdentityTransfer IdentityTransfer
+        let result = fe |> FilterEffect.toString
+        Assert.Contains("type=\"gamma\"", result)
+        Assert.Contains("amplitude=\"1\"", result)
+        Assert.Contains("exponent=\"2\"", result)
+
+    // LightSource variants
+    [<Fact>]
+    let ``LightSource PointLight renders x y z`` () =
+        let fe = FilterEffect.createSpecularLighting 1.0 1.0 10.0 (PointLight(10.0, 20.0, 30.0))
+        let result = fe |> FilterEffect.toString
+        Assert.Contains("fePointLight", result)
+        Assert.Contains("x=\"10\"", result)
+        Assert.Contains("y=\"20\"", result)
+        Assert.Contains("z=\"30\"", result)
+
+    [<Fact>]
+    let ``LightSource SpotLight renders source and target coords`` () =
+        let fe = FilterEffect.createSpecularLighting 1.0 1.0 10.0 (SpotLight(0.0, 0.0, 50.0, 100.0, 100.0, 0.0, None))
+        let result = fe |> FilterEffect.toString
+        Assert.Contains("feSpotLight", result)
+
+    // DiffuseLighting and NamedFilterEffect rendering
+    [<Fact>]
+    let ``DiffuseLighting renders feDiffuseLighting tag`` () =
+        let fe = FilterEffect.createDiffuseLighting 1.0 0.5 1.0
+        let result = fe |> FilterEffect.toString
+        Assert.Contains("feDiffuseLighting", result)
+        Assert.Contains("surfaceScale=\"1\"", result)
+        Assert.Contains("diffuseConstant=\"0.5\"", result)
+
+    [<Fact>]
+    let ``NamedFilterEffect toString renders named effect`` () =
+        let blur = FilterEffect.withName (FilterEffect.createGaussianBlur 2.0) "blurOut"
+        let result = blur.ToString()
+        Assert.Contains("feGaussianBlur", result)
+
+    // Wiki: Filter page — gaussian blur example
+    [<Fact>]
+    let ``Filter wiki - gaussian blur applied via style`` () =
+        let blur = FilterEffect.createGaussianBlur 4.0
+        let filter = Filter.create blur |> Filter.withId "myBlur"
+        let definitions = SvgDefinitions.create |> SvgDefinitions.addFilter filter
+        let style = Style.createWithFill (Color.ofName Colors.Blue) |> Style.withFilter "myBlur"
+        let position = Point.ofInts (20, 20)
+        let area = Area.ofInts (200, 100)
+        let rect = Rect.create position area |> Element.createWithStyle style
+        let output =
+            [ rect ]
+            |> Svg.ofElementsWithDefinitions definitions
+            |> Svg.toString
+        Assert.Contains("<filter id=\"myBlur\">", output)
+        Assert.Contains("feGaussianBlur", output)
+        Assert.Contains("filter=\"url(#myBlur)\"", output)
+
+    [<SvgProperty>]
+    let ``gaussian blur filter with any positive stdDeviation always produces valid tag`` (stdDeviation: float) =
+        let result = Filter.create (FilterEffect.createGaussianBlur stdDeviation) |> Filter.withId "f" |> Filter.toString
+        checkTag "filter" result
+
+    [<SvgProperty>]
+    let ``offset filter with any positive coordinates always produces valid tag`` (dx: float, dy: float) =
+        let result = Filter.create (FilterEffect.createOffset (Point.ofFloats (dx, dy))) |> Filter.withId "f" |> Filter.toString
+        checkTag "filter" result
+
+    [<SvgIdProperty>]
+    let ``filter with any safe id always starts with that id attribute`` (id: string) =
+        let result = Filter.create (FilterEffect.createGaussianBlur 1.0) |> Filter.withId id |> Filter.toString
+        result.StartsWith(sprintf "<filter id=\"%s\"" id)
+
+    [<SvgProperty>]
+    let ``adding multiple effects to filter always produces balanced tags`` (stdDeviation: float, dx: float, dy: float) =
+        let blur = FilterEffect.createGaussianBlur stdDeviation
+        let offset = FilterEffect.createOffset (Point.ofFloats (dx, dy))
+        let result = Filter.create blur |> Filter.addFilterEffect offset |> Filter.withId "f" |> Filter.toString
+        checkTag "filter" result
+
+    [<SvgProperty>]
+    let ``turbulence filter with any baseFrequency always produces valid tag`` (freq: float) =
+        let result = Filter.create (FilterEffect.createTurbulence FractalNoise freq 2) |> Filter.withId "t" |> Filter.toString
+        checkTag "filter" result

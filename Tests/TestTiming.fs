@@ -76,3 +76,16 @@ module TestTiming =
         Assert.Contains("dur=\"1s\"", attributeString)
         Assert.Contains("restart=\"always\"", attributeString)
         Assert.Contains("fill=\"freeze\"", attributeString)
+
+    [<Fact>]
+    let ``Timing withRepetition with RepeatDuration`` () =
+        let repetition = { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = Some (RepeatDuration (TimeSpan.FromSeconds 10.0)) }
+        let attributeString = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 2.0) |> Timing.withRepetition repetition |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " "
+        Assert.Contains("repeatCount=\"indefinite\"", attributeString)
+        Assert.Contains("repeatDuration=\"10s\"", attributeString)
+
+    [<Fact>]
+    let ``Timing withRepetition with RepeatDuration indefinite`` () =
+        let repetition = { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = Some RepeatDurationValue.Indefinite }
+        let attributeString = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withRepetition repetition |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " "
+        Assert.Contains("repeatDuration=\"indefinite\"", attributeString)

@@ -155,6 +155,31 @@ module TestText =
         Assert.Contains("alignment-baseline=\"hanging\"", result)
 
     [<Fact>]
+    let ``text withBaseline central`` () =
+        let result = Text.create Point.origin "Hi" |> Text.withBaseline CentralBaseline |> Text.toString
+        Assert.Contains("dominant-baseline=\"central\"", result)
+
+    [<Fact>]
+    let ``text withBaseline alphabetic`` () =
+        let result = Text.create Point.origin "Hi" |> Text.withBaseline AlphabeticBaseline |> Text.toString
+        Assert.Contains("dominant-baseline=\"alphabetic\"", result)
+
+    [<Fact>]
+    let ``text withBaseline ideographic`` () =
+        let result = Text.create Point.origin "Hi" |> Text.withBaseline IdeographicBaseline |> Text.toString
+        Assert.Contains("dominant-baseline=\"ideographic\"", result)
+
+    [<Fact>]
+    let ``text withBaseline text-bottom`` () =
+        let result = Text.create Point.origin "Hi" |> Text.withBaseline TextBottomBaseline |> Text.toString
+        Assert.Contains("dominant-baseline=\"text-bottom\"", result)
+
+    [<Fact>]
+    let ``text withBaseline text-top`` () =
+        let result = Text.create Point.origin "Hi" |> Text.withBaseline TextTopBaseline |> Text.toString
+        Assert.Contains("dominant-baseline=\"text-top\"", result)
+
+    [<Fact>]
     let ``text withWordSpacing`` () =
         let result = Text.create Point.origin "Hi" |> Text.withWordSpacing 4.0 |> Text.toString
         Assert.Contains("word-spacing=\"4\"", result)

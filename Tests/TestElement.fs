@@ -1,7 +1,11 @@
 namespace SharpVG.Tests
 
+open System
 open SharpVG
 open Xunit
+open FsCheck
+open FsCheck.Xunit
+open BasicChecks
 
 module TestElement =
 
@@ -82,3 +86,89 @@ module TestElement =
     let ``element createWithClasses renders all classes space-separated`` () =
         let result = Circle.create Point.origin (Length.ofInt 5) |> Element.createWithClasses ["foo"; "bar"] |> Element.toString
         Assert.Contains("class=\"foo bar\"", result)
+
+    [<Fact>]
+    let ``element withAnimation adds animation child`` () =
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let animation = Animation.createAnimation timing AttributeType.XML "fill" "red" "blue"
+        let result = Circle.create Point.origin (Length.ofInt 10) |> Element.create |> Element.withAnimation animation |> Element.toString
+        Assert.Contains("<animate", result)
+        Assert.Contains("attributeName=\"fill\"", result)
+
+    [<Fact>]
+    let ``element addAnimation appends to existing animations`` () =
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let animation1 = Animation.createAnimation timing AttributeType.XML "fill" "red" "blue"
+        let animation2 = Animation.createAnimation timing AttributeType.XML "r" "5" "20"
+        let result =
+            Circle.create Point.origin (Length.ofInt 10)
+            |> Element.create
+            |> Element.withAnimation animation1
+            |> Element.addAnimation animation2
+            |> Element.toString
+        Assert.Contains("attributeName=\"fill\"", result)
+        Assert.Contains("attributeName=\"r\"", result)
+
+    [<Fact>]
+    let ``element withAnimations replaces animations`` () =
+        let timing = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0)
+        let animation1 = Animation.createAnimation timing AttributeType.XML "fill" "red" "blue"
+        let animation2 = Animation.createAnimation timing AttributeType.XML "r" "5" "20"
+        let result =
+            Circle.create Point.origin (Length.ofInt 10)
+            |> Element.create
+            |> Element.withAnimations [animation1; animation2]
+            |> Element.toString
+        Assert.Contains("attributeName=\"fill\"", result)
+        Assert.Contains("attributeName=\"r\"", result)
+
+    [<Fact>]
+    let ``element setTo creates set animations for attribute differences`` () =
+        let timing = Timing.create (TimeSpan.FromSeconds 1.0)
+        let original = Circle.create Point.origin (Length.ofInt 10) |> Element.create
+        let target = Circle.create Point.origin (Length.ofInt 30) |> Element.create
+        let result = Element.setTo timing target original |> Element.toString
+        Assert.Contains("<set", result)
+
+    [<Fact>]
+    let ``element createFull sets all fields`` () =
+        let fillColor = Color.ofName Colors.Green
+        let style = Style.createWithFill fillColor
+        let translateX = Length.ofInt 10
+        let transform = Transform.createTranslate translateX
+        let result =
+            Circle.create Point.origin (Length.ofInt 5)
+            |> Element.createFull (Some "fullEl") ["cls"] (Some style) (Seq.singleton transform) Seq.empty
+            |> Element.toString
+        Assert.Contains("id=\"fullEl\"", result)
+        Assert.Contains("class=\"cls\"", result)
+        Assert.Contains("fill=\"green\"", result)
+        Assert.Contains("transform=", result)
+
+    [<SvgIdProperty>]
+    let ``element with any safe name always contains that id`` (name: string) =
+        let result = Circle.create Point.origin (Length.ofInt 5) |> Element.createWithName name |> Element.toString
+        result.Contains(sprintf "id=\"%s\"" name)
+
+    [<SvgIdProperty>]
+    let ``element isNamed is always true after withName`` (name: string) =
+        let element = Rect.create Point.origin Area.full |> Element.create |> Element.withName name
+        Element.isNamed element
+
+    [<SvgIdProperty>]
+    let ``element tryGetName always returns Some with the given name`` (name: string) =
+        let element = Circle.create Point.origin (Length.ofInt 5) |> Element.createWithName name
+        Element.tryGetName element = Some name
+
+    [<SvgProperty>]
+    let ``element with style and transform always produces bodyless tag`` (x: float, y: float, r: float, r2, g, b) =
+        let translateX = Length.ofFloat x
+        let translateY = Length.ofFloat y
+        let transform = Transform.createTranslate translateX |> Transform.withY translateY
+        let style = Style.createWithFill (Color.ofValues (r2, g, b))
+        let result =
+            Circle.create Point.origin (Length.ofFloat r)
+            |> Element.createWithStyle style
+            |> Element.withTransform transform
+            |> Element.toString
+        checkBodylessTag "circle" result

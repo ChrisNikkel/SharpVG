@@ -2,6 +2,9 @@ namespace SharpVG.Tests
 
 open SharpVG
 open Xunit
+open FsCheck
+open FsCheck.Xunit
+open BasicChecks
 
 module TestPreserveAspectRatio =
 
@@ -70,3 +73,23 @@ module TestPreserveAspectRatio =
             |> Svg.withPreserveAspectRatio (PreserveAspectRatio.createWithScale XMidYMid Slice)
             |> Svg.toString
         Assert.Contains("preserveAspectRatio=\"xMidYMid slice\"", result)
+
+    [<Property>]
+    let ``create with any AspectRatioAlign always produces preserveAspectRatio attribute`` (align: AspectRatioAlign) =
+        let result = PreserveAspectRatio.create align |> PreserveAspectRatio.toAttribute |> Attribute.toString
+        result.StartsWith("preserveAspectRatio=\"") && result.EndsWith("\"")
+
+    [<Property>]
+    let ``createWithScale with any align and scale always produces valid attribute`` (align: AspectRatioAlign, scale: AspectRatioScale) =
+        let result = PreserveAspectRatio.createWithScale align scale |> PreserveAspectRatio.toAttribute |> Attribute.toString
+        result.Contains(align.ToString()) && result.Contains(scale.ToString())
+
+    [<Property>]
+    let ``toString always contains the align value`` (align: AspectRatioAlign) =
+        let result = PreserveAspectRatio.create align |> PreserveAspectRatio.toString
+        result = align.ToString()
+
+    [<Property>]
+    let ``Uniform preserveAspectRatio is never equal to none`` (align: AspectRatioAlign) =
+        let result = PreserveAspectRatio.create align |> PreserveAspectRatio.toString
+        result <> "none"

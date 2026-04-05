@@ -14,8 +14,19 @@ type PositiveFloat =
         Arb.Default.Float()
         |> Arb.mapFilter abs (fun t -> t > 0.0)
 
+/// Generates short strings safe for use as SVG id attributes (letters only, no XML special chars).
+type SafeIdString =
+    static member String() =
+        Gen.elements (['a'..'z'] @ ['A'..'Z'])
+        |> Gen.nonEmptyListOf
+        |> Gen.map (List.truncate 20 >> List.toArray >> System.String)
+        |> Arb.fromGen
+
 type SvgProperty() =
     inherit PropertyAttribute(Arbitrary = [| typeof<PositiveFloat> |])
+
+type SvgIdProperty() =
+    inherit PropertyAttribute(Arbitrary = [| typeof<PositiveFloat>; typeof<SafeIdString> |])
 
 
 let isTagEnclosed (tag:string) =
