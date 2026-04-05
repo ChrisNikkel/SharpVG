@@ -668,12 +668,14 @@ module private SvgRootParser =
             |> Option.bind (fun a -> tryParseViewBox a.Value)
 
         let title =
-            root.Element(XName.Get "title")
-            |> Option.ofObj |> Option.map _.Value
+            root.Elements()
+            |> Seq.tryFind (fun e -> e.Name.LocalName = "title")
+            |> Option.map _.Value
 
         let description =
-            root.Element(XName.Get "desc")
-            |> Option.ofObj |> Option.map _.Value
+            root.Elements()
+            |> Seq.tryFind (fun e -> e.Name.LocalName = "desc")
+            |> Option.map _.Value
 
         let defsOption =
             if Seq.isEmpty definitions.Contents then None else Some definitions
