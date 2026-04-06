@@ -250,3 +250,53 @@ module TestStyle =
         let result = Rect.create Point.origin Area.full |> Element.createWithStyle style |> Element.toString
         checkBodylessTag "rect" result
 
+    // Wiki: Style page — pen-based style example
+    [<Fact>]
+    let ``Style wiki - rect styled with stroke and fill pens`` () =
+        let strokeColor = Color.ofName Colors.Blue
+        let fillColor = Color.ofName Colors.Cyan
+        let penWidth = Length.ofInt 3
+        let strokePen = Pen.createWithOpacityAndWidth strokeColor 1.0 penWidth
+        let fillPen = Pen.create fillColor
+        let style = Style.createWithPen strokePen |> Style.withFillPen fillPen
+        let position = Point.ofInts (10, 10)
+        let area = Area.ofInts (50, 50)
+        let result = Rect.create position area |> Element.createWithStyle style |> Element.toString
+        Assert.Contains("<rect", result)
+        Assert.Contains("stroke=\"blue\"", result)
+        Assert.Contains("fill=\"cyan\"", result)
+        Assert.Contains("stroke-width=\"3\"", result)
+
+    // Wiki: Style page — named styles and CSS string generation
+    [<Fact>]
+    let ``Style wiki - named style toString and toCssString`` () =
+        let style1 =
+            Style.createWithName "Default"
+            |> Style.withFill (Color.ofName Colors.Blue)
+            |> Style.withStroke (Color.ofName Colors.Aqua)
+            |> Style.withOpacity 0.5
+        let color = Color.ofPercents (0.5, 0.5, 0.5)
+        let style2 = Style.createNamed color color Length.one 1.0 1.0 "Boring"
+        Assert.Contains("stroke:aqua", Style.toString style1)
+        Assert.Contains("fill:blue", Style.toString style1)
+        Assert.Contains("opacity:0.5", Style.toString style1)
+        Assert.Contains(".Boring", Style.toCssString style2)
+        Assert.Contains("stroke:", Style.toCssString style2)
+
+    // Wiki: Style page — Styles.toString wraps named styles in CDATA block
+    [<Fact>]
+    let ``Style wiki - Styles.toString produces style tag with CDATA`` () =
+        let style1 =
+            Style.createWithName "Default"
+            |> Style.withFill (Color.ofName Colors.Blue)
+            |> Style.withStroke (Color.ofName Colors.Aqua)
+            |> Style.withOpacity 0.5
+        let color = Color.ofPercents (0.5, 0.5, 0.5)
+        let style2 = Style.createNamed color color Length.one 1.0 1.0 "Boring"
+        let styles = seq { yield style1; yield style2 }
+        let result = Styles.toString styles
+        Assert.Contains("<style", result)
+        Assert.Contains("<![CDATA[", result)
+        Assert.Contains(".Default", result)
+        Assert.Contains(".Boring", result)
+

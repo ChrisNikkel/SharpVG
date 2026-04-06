@@ -42,3 +42,25 @@ module TestViewBox =
         let vb = ViewBox.create (Point.ofFloats (x, y)) (Area.ofFloats (w, h))
         let attr = vb |> ViewBox.toAttributes |> List.map Attribute.toString |> String.concat ""
         happensEvenly '"' attr
+
+    // Wiki: ViewBox page — SVG with size and viewBox, coordinate mapping example
+    [<Fact>]
+    let ``ViewBox wiki - svg with 400x400 viewport and 100x100 viewBox`` () =
+        let center = Point.ofInts (50, 50)
+        let radius = Length.ofInt 40
+        let circle = Circle.create center radius |> Element.create
+        let size = Area.ofInts (400, 400)
+        let viewBoxMin = Point.ofInts (0, 0)
+        let viewBoxSize = Area.ofInts (100, 100)
+        let viewBox = ViewBox.create viewBoxMin viewBoxSize
+        let result =
+            circle
+            |> Svg.ofElement
+            |> Svg.withSize size
+            |> Svg.withViewBox viewBox
+            |> Svg.toString
+        Assert.Contains("width=\"400\"", result)
+        Assert.Contains("height=\"400\"", result)
+        Assert.Contains("viewBox=\"0,0 100,100\"", result)
+        Assert.Contains("<circle", result)
+        Assert.Contains("r=\"40\"", result)

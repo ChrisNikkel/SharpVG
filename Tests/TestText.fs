@@ -319,3 +319,35 @@ module TestText =
         let textPath = TextPath.create "myPath" "Along a path"
         let result = Text.create Point.origin "" |> Text.withTextPaths [textPath] |> Text.toString
         Assert.Contains("<textPath href=\"#myPath\">Along a path</textPath>", result)
+
+    // Wiki: Text page — basic styled text example
+    [<Fact>]
+    let ``Text wiki - styled text with bold and italic`` () =
+        let position = Point.ofInts (55, 45)
+        let style = Style.create (Color.ofName Colors.White) (Color.ofName Colors.Black) (Length.ofInt 1) 1.0 1.0
+        let result =
+            Text.create position "Hello World!"
+            |> Text.withFontWeight BoldWeight
+            |> Text.withFontStyle ItalicStyle
+            |> Element.createWithStyle style
+            |> Element.toString
+        Assert.Contains("<text", result)
+        Assert.Contains("x=\"55\"", result)
+        Assert.Contains("y=\"45\"", result)
+        Assert.Contains("Hello World!", result)
+        Assert.Contains("font-weight=\"bold\"", result)
+        Assert.Contains("font-style=\"italic\"", result)
+
+    // Wiki: Text page — mixed font styles with TSpan
+    [<Fact>]
+    let ``Text wiki - mixed styles with tspan`` () =
+        let result =
+            Text.create (Point.ofInts (10, 40)) "Hello "
+            |> Text.addSpan (TSpan.create "world" |> TSpan.withFontWeight BoldWeight)
+            |> Text.addSpan (TSpan.create "!" |> TSpan.withFontStyle ItalicStyle)
+            |> Element.create
+            |> Element.toString
+        Assert.Contains("<text x=\"10\" y=\"40\">", result)
+        Assert.Contains("Hello ", result)
+        Assert.Contains("<tspan font-weight=\"bold\">world</tspan>", result)
+        Assert.Contains("<tspan font-style=\"italic\">!</tspan>", result)

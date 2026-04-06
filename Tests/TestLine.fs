@@ -24,3 +24,18 @@ module TestLine =
         let point2 = Point.create (Length.ofFloat 30.25) (Length.ofFloat 40.5)
         let expected = "<line x1=\"10.5\" y1=\"20.75\" x2=\"30.25\" y2=\"40.5\"/>"
         Assert.Equal(expected, Line.create point1 point2 |> Line.toString)
+
+    // Wiki: Line page — styled line example
+    [<Fact>]
+    let ``Line wiki - styled line with start, end, and stroke`` () =
+        let startPoint = Point.ofInts (5, 0)
+        let endPoint = Point.ofInts (60, 9)
+        let style = Style.create (Color.ofName Colors.Cyan) (Color.ofName Colors.Blue) (Length.ofInt 3) 1.0 1.0
+        let result = Line.create startPoint endPoint |> Element.createWithStyle style |> Element.toString
+        Assert.Contains("<line", result)
+        Assert.Contains("x1=\"5\"", result)
+        Assert.Contains("y1=\"0\"", result)
+        Assert.Contains("x2=\"60\"", result)
+        Assert.Contains("y2=\"9\"", result)
+        Assert.Contains("stroke=\"blue\"", result)
+        Assert.Contains("fill=\"cyan\"", result)

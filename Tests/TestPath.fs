@@ -120,3 +120,19 @@ module TestPath =
         let arc = { Radius = Point.origin; RotationXAxis = 0.0; LargeArc = false; Sweep = false; Point = Point.origin }
         let result = Path.empty |> Path.addEllipticalArcCurvesTo Absolute (seq { arc; arc }) |> Path.toString
         Assert.Equal("<path d=\"A0,0 0 0,0 0,0 0,0 0 0,0 0,0\"/>", result)
+
+    // Wiki: Path page — M, L, V, H command chain
+    [<Fact>]
+    let ``Path wiki - move, line, vertical, horizontal command chain`` () =
+        let path =
+            Path.empty
+            |> Path.addMoveTo Absolute (Point.ofFloats (10.0, 10.0))
+            |> Path.addLineTo Absolute (Point.ofFloats (90.0, 90.0))
+            |> Path.addVerticalLineTo Absolute (Length.ofFloat 10.0)
+            |> Path.addHorizontalLineTo Absolute (Length.ofFloat 50.0)
+        let style = Style.create (Color.ofName Colors.Yellow) (Color.ofName Colors.Red) (Length.ofInt 3) 1.0 1.0
+        let result = path |> Element.createWithStyle style |> Element.toString
+        Assert.Contains("<path", result)
+        Assert.Contains("d=\"M10,10 L90,90 V10 H50\"", result)
+        Assert.Contains("fill=\"yellow\"", result)
+        Assert.Contains("stroke=\"red\"", result)

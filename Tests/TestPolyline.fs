@@ -43,3 +43,20 @@ module TestPolyline =
         let result = Polyline.ofList points |> Element.create |> Svg.ofElement |> Svg.toString
         Assert.Contains("<polyline", result)
         Assert.Contains("<svg", result)
+
+    // Wiki: Polyline page — four-point styled polyline example
+    [<Fact>]
+    let ``Polyline wiki - four-point styled polyline`` () =
+        let points =
+            seq {
+                yield Point.ofInts (55, 45)
+                yield Point.ofInts (45, 45)
+                yield Point.ofInts (45, 15)
+                yield Point.ofInts (10, 5)
+            }
+        let style = Style.create (Color.ofName Colors.Yellow) (Color.ofName Colors.Red) (Length.ofInt 3) 1.0 1.0
+        let result = points |> Polyline.ofSeq |> Element.createWithStyle style |> Element.toString
+        Assert.Contains("<polyline", result)
+        Assert.Contains("points=\"55,45 45,45 45,15 10,5\"", result)
+        Assert.Contains("fill=\"yellow\"", result)
+        Assert.Contains("stroke=\"red\"", result)

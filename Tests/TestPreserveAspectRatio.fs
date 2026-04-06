@@ -93,3 +93,27 @@ module TestPreserveAspectRatio =
     let ``Uniform preserveAspectRatio is never equal to none`` (align: AspectRatioAlign) =
         let result = PreserveAspectRatio.create align |> PreserveAspectRatio.toString
         result <> "none"
+
+    // Wiki: PreserveAspectRatio page — string values table
+    [<Fact>]
+    let ``PreserveAspectRatio wiki - create XMidYMid produces xMidYMid`` () =
+        let par = PreserveAspectRatio.create XMidYMid
+        Assert.Equal("xMidYMid", PreserveAspectRatio.toString par)
+
+    [<Fact>]
+    let ``PreserveAspectRatio wiki - createWithScale XMidYMid Slice produces xMidYMid slice`` () =
+        let parSlice = PreserveAspectRatio.createWithScale XMidYMid Slice
+        Assert.Equal("xMidYMid slice", PreserveAspectRatio.toString parSlice)
+
+    [<Fact>]
+    let ``PreserveAspectRatio wiki - none produces none`` () =
+        Assert.Equal("none", PreserveAspectRatio.toString PreserveAspectRatio.none)
+
+    // Wiki: PreserveAspectRatio page — symbol with preserveAspectRatio
+    [<Fact>]
+    let ``PreserveAspectRatio wiki - symbol with par renders attribute`` () =
+        let par = PreserveAspectRatio.create XMidYMid
+        let viewBox = ViewBox.create Point.origin (Area.ofInts (100, 100))
+        let symbol = Symbol.create viewBox |> Symbol.withPreserveAspectRatio par
+        let result = Symbol.toString symbol
+        Assert.Contains("preserveAspectRatio=\"xMidYMid\"", result)
