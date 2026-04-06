@@ -27,9 +27,10 @@ All notable changes to SharpVG will be documented in this file.
   - `Element.clearAnimations`, `removeAnimationWhere`, `mapAnimations` — animation editing helpers
   - `Element.isRaw`, `rawContent`, `ofRaw` — inspect and construct raw/passthrough elements
 - **Editor rendering** on `Svg`:
-  - `Svg.toStringForEditing`, `toHtmlForEditing` — render SVG with ephemeral `data-edit-id` attributes encoding each element's tree position
+  - `Svg.toStringForEditing`, `toHtmlForEditing` — render SVG with ephemeral `data-edit-id` attributes encoding each element's tree position; both `<g>` tags and leaf elements are annotated
   - `Svg.parseEditPath` — parse a `data-edit-id` string back to an `int list` path
   - `Svg.findAtEditPath`, `mapAtEditPath` — locate or transform the element at a given tree path
+  - `Svg.findGroupAtEditPath`, `mapGroupAtEditPath` — locate or transform the group at a given tree path
 - `SvgDefinitions.addSymbol` — add a `Symbol` to a definitions block
 - `SymbolDef` case added to `SvgDefinitionsContent` DU
 - **Parse mode** — `ParseMode` DU (`Lenient` | `Strict`) controls how unknown elements are handled:
