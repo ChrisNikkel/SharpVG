@@ -768,3 +768,99 @@ module TestSvgParser =
         | Ok r1, Ok r2 ->
             Assert.Equal(r1.Warnings.Length, r2.Warnings.Length)
         | _ -> Assert.Fail("Both should parse successfully")
+
+    // --- <style> block parsing ---
+
+    [<Fact>]
+    let ``style block - class selector fill applied to matching element`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg">
+  <style>.red { fill: red; }</style>
+  <circle class="red" cx="10" cy="10" r="5"/>
+</svg>"""
+        let svg = parseOk input
+        let elements = Svg.findAll (fun _ -> true) svg
+        let circle = elements |> List.head
+        Assert.True(circle.Style.IsSome)
+        Assert.Equal(Some (Color.ofName Colors.Red), circle.Style.Value.Fill)
+
+    [<Fact>]
+    let ``style block - unmatched class produces no style`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg">
+  <style>.red { fill: red; }</style>
+  <circle class="blue" cx="10" cy="10" r="5"/>
+</svg>"""
+        let svg = parseOk input
+        let elements = Svg.findAll (fun _ -> true) svg
+        let circle = elements |> List.head
+        let fill = circle.Style |> Option.bind (fun s -> s.Fill)
+        Assert.True(fill.IsNone)
+
+    [<Fact>]
+    let ``style block - inline style overrides class style`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg">
+  <style>.colored { fill: red; stroke: blue; }</style>
+  <circle class="colored" cx="10" cy="10" r="5" fill="green"/>
+</svg>"""
+        let svg = parseOk input
+        let circle = Svg.findAll (fun _ -> true) svg |> List.head
+        // fill was set inline to green — sheet rule should not override it
+        Assert.Equal(Some (Color.ofName Colors.Green), circle.Style.Value.Fill)
+        // stroke was only in sheet — should be applied
+        Assert.Equal(Some (Color.ofName Colors.Blue), circle.Style.Value.Stroke)
+
+    [<Fact>]
+    let ``style block - element type selector applied`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg">
+  <style>circle { fill: blue; }</style>
+  <circle cx="10" cy="10" r="5"/>
+  <rect x="0" y="0" width="10" height="10"/>
+</svg>"""
+        let svg = parseOk input
+        let elements = Svg.findAll (fun _ -> true) svg
+        let circle = elements |> List.find (fun e -> e.Style |> Option.bind (fun s -> s.Fill) |> Option.isSome)
+        let rect   = elements |> List.find (fun e -> e.Style |> Option.bind (fun s -> s.Fill) |> Option.isNone)
+        Assert.Equal(Some (Color.ofName Colors.Blue), circle.Style.Value.Fill)
+        Assert.True(rect.Style |> Option.bind (fun s -> s.Fill) |> Option.isNone)
+
+    [<Fact>]
+    let ``style block - multiple classes applied`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg">
+  <style>.a { fill: red; } .b { stroke: blue; }</style>
+  <circle class="a b" cx="10" cy="10" r="5"/>
+</svg>"""
+        let svg = parseOk input
+        let circle = Svg.findAll (fun _ -> true) svg |> List.head
+        Assert.Equal(Some (Color.ofName Colors.Red),  circle.Style.Value.Fill)
+        Assert.Equal(Some (Color.ofName Colors.Blue), circle.Style.Value.Stroke)
+
+    [<Fact>]
+    let ``style block - style in defs is applied`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg">
+  <defs><style>.fill-green { fill: green; }</style></defs>
+  <rect class="fill-green" x="0" y="0" width="10" height="10"/>
+</svg>"""
+        let svg = parseOk input
+        let rect = Svg.findAll (fun _ -> true) svg |> List.head
+        Assert.Equal(Some (Color.ofName Colors.Green), rect.Style.Value.Fill)
+
+    [<Fact>]
+    let ``style block - element not in SVG body has no class-matched style`` () =
+        // A circle without a matching class gets no style from the sheet
+        let input = """<svg xmlns="http://www.w3.org/2000/svg">
+  <style>.special { fill: red; }</style>
+  <circle cx="10" cy="10" r="5"/>
+</svg>"""
+        let svg = parseOk input
+        let circle = Svg.findAll (fun _ -> true) svg |> List.head
+        let fill = circle.Style |> Option.bind (fun s -> s.Fill)
+        Assert.True(fill.IsNone)
+
+    [<Fact>]
+    let ``style block - CSS comment is ignored`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg">
+  <style>/* this is a comment */ .red { fill: red; }</style>
+  <circle class="red" cx="10" cy="10" r="5"/>
+</svg>"""
+        let svg = parseOk input
+        let circle = Svg.findAll (fun _ -> true) svg |> List.head
+        Assert.Equal(Some (Color.ofName Colors.Red), circle.Style.Value.Fill)

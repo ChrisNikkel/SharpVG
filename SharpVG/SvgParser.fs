@@ -42,10 +42,14 @@ module private SvgParserHelpers =
         {
             Warnings: ParseWarning list
             Mode: ParseMode
+            CssRules: (string * Style) list
         }
 
-    let stateFor (mode: ParseMode) : ParseState = { Warnings = []; Mode = mode }
+    let stateFor (mode: ParseMode) : ParseState = { Warnings = []; Mode = mode; CssRules = [] }
     let emptyState : ParseState = stateFor Lenient
+
+    let addCssRules (rules: (string * Style) list) (state: ParseState) : ParseState =
+        { state with CssRules = state.CssRules @ rules }
 
     let warnState msg elementName (state: ParseState) : ParseState =
         { state with Warnings = state.Warnings @ [{ Message = msg; ElementName = elementName }] }
@@ -244,6 +248,58 @@ module private SvgParserHelpers =
             match value.Trim() with
             | "none" -> Some { style with Display = Some DisplayNone }
             | _ -> Some { style with Display = Some Inline }
+        | "clip-path" ->
+            let v = value.Trim()
+            let id = if v.StartsWith("url(#") && v.EndsWith(")") then Some v.[5..v.Length - 2] else None
+            id |> Option.map (fun i -> { style with ClipPath = Some i })
+        | "filter" ->
+            let v = value.Trim()
+            let id = if v.StartsWith("url(#") && v.EndsWith(")") then Some v.[5..v.Length - 2] else None
+            id |> Option.map (fun i -> { style with Filter = Some i })
+        | "marker-start" ->
+            let v = value.Trim()
+            let id = if v.StartsWith("url(#") && v.EndsWith(")") then Some v.[5..v.Length - 2] else None
+            id |> Option.map (fun i -> { style with MarkerStart = Some i })
+        | "marker-mid" ->
+            let v = value.Trim()
+            let id = if v.StartsWith("url(#") && v.EndsWith(")") then Some v.[5..v.Length - 2] else None
+            id |> Option.map (fun i -> { style with MarkerMid = Some i })
+        | "marker-end" ->
+            let v = value.Trim()
+            let id = if v.StartsWith("url(#") && v.EndsWith(")") then Some v.[5..v.Length - 2] else None
+            id |> Option.map (fun i -> { style with MarkerEnd = Some i })
+        | "mask" ->
+            let v = value.Trim()
+            let id = if v.StartsWith("url(#") && v.EndsWith(")") then Some v.[5..v.Length - 2] else None
+            id |> Option.map (fun i -> { style with Mask = Some i })
+        | "stroke-miterlimit" ->
+            tryParseFloat value |> Option.map (fun f -> { style with StrokeMiterLimit = Some f })
+        | "paint-order" ->
+            let layers =
+                value.Trim().Split(' ')
+                |> Array.choose (fun s ->
+                    match s.Trim() with
+                    | "fill"    -> Some FillLayer
+                    | "stroke"  -> Some StrokeLayer
+                    | "markers" -> Some MarkersLayer
+                    | _ -> None)
+                |> Array.toList
+            if layers.IsEmpty then None else Some { style with PaintOrder = Some layers }
+        | "vector-effect" ->
+            match value.Trim() with
+            | "none"               -> Some { style with VectorEffect = Some VectorEffectNone }
+            | "non-scaling-stroke" -> Some { style with VectorEffect = Some NonScalingStroke }
+            | "non-scaling-size"   -> Some { style with VectorEffect = Some NonScalingSize }
+            | "non-rotation"       -> Some { style with VectorEffect = Some NonRotation }
+            | "fixed-position"     -> Some { style with VectorEffect = Some FixedPosition }
+            | _ -> None
+        | "shape-rendering" ->
+            match value.Trim() with
+            | "auto"              -> Some { style with ShapeRendering = Some ShapeRenderingAuto }
+            | "optimizeSpeed"     -> Some { style with ShapeRendering = Some OptimizeSpeed }
+            | "crispEdges"        -> Some { style with ShapeRendering = Some CrispEdges }
+            | "geometricPrecision"-> Some { style with ShapeRendering = Some GeometricPrecision }
+            | _ -> None
         | _ -> None
 
     let tryStyle (xel: XElement) : Style option =
@@ -276,6 +332,60 @@ module private SvgParserHelpers =
             | None -> fromPresentation
 
         if merged = Style.empty then None else Some merged
+
+    /// Parse a CSS text block into (selector, Style) pairs.
+    /// Supports class selectors (.foo), element-type selectors (circle), and
+    /// multi-selector rules (circle, .foo). Comments are stripped first.
+    let parseCssBlock (css: string) : (string * Style) list =
+        let noComments = Regex.Replace(css, @"/\*.*?\*/", "", RegexOptions.Singleline)
+        Regex.Matches(noComments, @"([^{]+)\{([^}]*)\}", RegexOptions.Singleline)
+        |> Seq.cast<Match>
+        |> Seq.toList
+        |> List.collect (fun m ->
+            let selectors =
+                m.Groups.[1].Value.Split(',')
+                |> Array.map (fun s -> s.Trim())
+                |> Array.filter (fun s -> s <> "")
+            let declarations = m.Groups.[2].Value
+            let style =
+                declarations.Split(';')
+                |> Array.fold (fun s decl ->
+                    match decl.Split([|':'|], 2) with
+                    | [|name; value|] ->
+                        match tryParseCssProperty name value s with
+                        | Some updated -> updated
+                        | None -> s
+                    | _ -> s) Style.empty
+            if style = Style.empty then []
+            else selectors |> Array.toList |> List.map (fun sel -> (sel, style)))
+
+    /// Merge sheet style into element style where the element has no value set (inline wins).
+    let fillStyleFromSheet (sheet: Style) (existing: Style) : Style =
+        {
+            Fill             = existing.Fill             |> Option.orElse sheet.Fill
+            Stroke           = existing.Stroke           |> Option.orElse sheet.Stroke
+            StrokeWidth      = existing.StrokeWidth      |> Option.orElse sheet.StrokeWidth
+            Opacity          = existing.Opacity          |> Option.orElse sheet.Opacity
+            FillOpacity      = existing.FillOpacity      |> Option.orElse sheet.FillOpacity
+            Name             = existing.Name             |> Option.orElse sheet.Name
+            StrokeLinecap    = existing.StrokeLinecap    |> Option.orElse sheet.StrokeLinecap
+            StrokeLinejoin   = existing.StrokeLinejoin   |> Option.orElse sheet.StrokeLinejoin
+            StrokeDashArray  = existing.StrokeDashArray  |> Option.orElse sheet.StrokeDashArray
+            StrokeDashOffset = existing.StrokeDashOffset |> Option.orElse sheet.StrokeDashOffset
+            FillRule         = existing.FillRule         |> Option.orElse sheet.FillRule
+            ClipPath         = existing.ClipPath         |> Option.orElse sheet.ClipPath
+            Filter           = existing.Filter           |> Option.orElse sheet.Filter
+            MarkerStart      = existing.MarkerStart      |> Option.orElse sheet.MarkerStart
+            MarkerMid        = existing.MarkerMid        |> Option.orElse sheet.MarkerMid
+            MarkerEnd        = existing.MarkerEnd        |> Option.orElse sheet.MarkerEnd
+            StrokeMiterLimit = existing.StrokeMiterLimit |> Option.orElse sheet.StrokeMiterLimit
+            Mask             = existing.Mask             |> Option.orElse sheet.Mask
+            Visibility       = existing.Visibility       |> Option.orElse sheet.Visibility
+            Display          = existing.Display          |> Option.orElse sheet.Display
+            PaintOrder       = existing.PaintOrder       |> Option.orElse sheet.PaintOrder
+            VectorEffect     = existing.VectorEffect     |> Option.orElse sheet.VectorEffect
+            ShapeRendering   = existing.ShapeRendering   |> Option.orElse sheet.ShapeRendering
+        }
 
     let tryTransforms (xel: XElement) : Transform seq =
         match xel.Attribute(XName.Get "transform") |> Option.ofObj with
@@ -891,6 +1001,7 @@ module private SvgElementParsers =
             | El "marker"          -> parseMarker child s (defs, s)
             | El "filter"          -> parseFilter child s (defs, s)
             | El "symbol"          -> parseSymbol child s (defs, s)
+            | El "style"           -> defs, addCssRules (parseCssBlock child.Value) s
             | El "circle" | El "ellipse" | El "rect" | El "line"
             | El "path"   | El "polygon" | El "polyline" | El "text"
             | El "image"  | El "use" ->
@@ -917,12 +1028,48 @@ module private SvgRootParser =
 
     open SvgParserHelpers
 
+    // Apply parsed CSS rules to an element based on class names and element-type selector.
+    // Sheet style fills in fields not already set by inline style (inline wins).
+    let private applySheetToElement (rules: (string * Style) list) (element: Element) : Element =
+        if rules.IsEmpty then element
+        else
+            // Collect matching styles: class rules (.foo) and element-type rules (circle, rect…)
+            // Element-type matching: we look at the Tag name in the element's content.
+            let tagName =
+                match element.Content with
+                | TagContent tag -> Some tag.Name
+                | RawContent _ -> None
+            let matchedStyle =
+                rules
+                |> List.fold (fun acc (sel, style) ->
+                    let classMatch = sel.StartsWith(".") && element.Classes |> Seq.exists (fun c -> "." + c = sel)
+                    let typeMatch  = tagName |> Option.exists (fun n -> n = sel)
+                    if classMatch || typeMatch then fillStyleFromSheet style acc
+                    else acc) Style.empty
+            if matchedStyle = Style.empty then element
+            else
+                let existing = element.Style |> Option.defaultValue Style.empty
+                let merged = fillStyleFromSheet matchedStyle existing
+                { element with Style = if merged = Style.empty then None else Some merged }
+
     let parseSvgRoot (mode: ParseMode) (root: XElement) : Result<ParseResult<Svg>, ParseError> =
         let state = stateFor mode
 
+        // Collect <style> elements from the SVG root (before defs/body parsing so rules are available)
+        let cssText =
+            root.Elements()
+            |> Seq.filter (fun e -> e.Name.LocalName = "style")
+            |> Seq.map _.Value
+            |> String.concat "\n"
+        let stateWithCss =
+            if cssText.Trim() = "" then state
+            else addCssRules (parseCssBlock cssText) state
+
         // Separate <defs> from body elements — defs go into SvgDefinitions, rest into Body
+        // Also exclude <style>, <title>, <desc> from body (handled separately)
+        let excludedLocally = System.Collections.Generic.HashSet(["defs"; "style"; "title"; "desc"])
         let defsElements = root.Elements() |> Seq.filter (fun e -> e.Name.LocalName = "defs") |> Seq.toList
-        let bodyElements = root.Elements() |> Seq.filter (fun e -> e.Name.LocalName <> "defs") |> Seq.toList
+        let bodyElements = root.Elements() |> Seq.filter (fun e -> not (excludedLocally.Contains(e.Name.LocalName))) |> Seq.toList
 
         let (definitions, stateAfterDefs) =
             defsElements
@@ -930,7 +1077,7 @@ module private SvgRootParser =
                 let (parsed, s2) = SvgElementParsers.parseDefs defsEl s
                 let merged =
                     { defs with Contents = Seq.append defs.Contents parsed.Contents }
-                merged, s2) (SvgDefinitions.create, state)
+                merged, s2) (SvgDefinitions.create, stateWithCss)
 
         let (children, finalState) =
             bodyElements
@@ -968,7 +1115,7 @@ module private SvgRootParser =
         let defsOption =
             if Seq.isEmpty definitions.Contents then None else Some definitions
 
-        let svg =
+        let baseSvg =
             {
                 Body = children |> Seq.ofList
                 Definitions = defsOption
@@ -978,6 +1125,11 @@ module private SvgRootParser =
                 Title = title
                 Description = description
             }
+
+        // Apply parsed CSS rules to elements (class and element-type selectors)
+        let svg =
+            if finalState.CssRules.IsEmpty then baseSvg
+            else Svg.mapElements (applySheetToElement finalState.CssRules) baseSvg
 
         Ok { Value = svg; Warnings = finalState.Warnings }
 

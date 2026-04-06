@@ -33,6 +33,13 @@ All notable changes to SharpVG will be documented in this file.
   - `Svg.findGroupAtEditPath`, `mapGroupAtEditPath` — locate or transform the group at a given tree path
 - `SvgDefinitions.addSymbol` — add a `Symbol` to a definitions block
 - `SymbolDef` case added to `SvgDefinitionsContent` DU
+- **`<style>` block parsing** — CSS rules inside `<style>` elements (both direct children of `<svg>` and inside `<defs>`) are parsed and applied to matching elements:
+  - Class selectors (`.foo`) matched against `element.Classes`
+  - Element-type selectors (`circle`, `rect`, …) matched against the element's tag name
+  - Multi-selector rules (`circle, .foo { … }`) supported
+  - CSS comments stripped before parsing
+  - Inline style attributes take precedence over stylesheet rules (sheet fills in fields not already set)
+  - Extended `tryParseCssProperty` to cover all `Style` record fields: `clip-path`, `filter`, `marker-start`, `marker-mid`, `marker-end`, `stroke-miterlimit`, `mask`, `paint-order`, `vector-effect`, `shape-rendering`
 - **Parse mode** — `ParseMode` DU (`Lenient` | `Strict`) controls how unknown elements are handled:
   - `Lenient` (default): unknown elements silently preserved as raw passthrough values
   - `Strict`: unknown body and definition elements each produce a `ParseWarning`; the element is still parsed as a raw passthrough
