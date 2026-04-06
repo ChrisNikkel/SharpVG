@@ -95,3 +95,24 @@ module TestPattern =
         let result = Pattern.ofElement "pat1" (Area.ofInts (10, 10)) rect |> Pattern.toString
         Assert.StartsWith("<pattern", result)
         Assert.EndsWith("</pattern>", result)
+
+    // Wiki: Pattern page — diagonal stripe pattern filling a rect
+    [<Fact>]
+    let ``Pattern wiki - diagonal stripe pattern fills rect via SvgDefinitions`` () =
+        let stripeStyle = Style.createWithStroke (Color.ofName Colors.Black) |> Style.withStrokeWidth (Length.ofInt 1)
+        let stripe =
+            Line.create (Point.ofInts (0, 0)) (Point.ofInts (10, 10))
+            |> Element.createWithStyle stripeStyle
+        let pattern =
+            Pattern.ofElement "stripes" (Area.ofInts (10, 10)) stripe
+            |> Pattern.withPatternUnits UserSpaceOnUse
+        let fillStyle = Style.createWithFill (Color.ofUrl "stripes")
+        let rect =
+            Rect.create Point.origin (Area.ofInts (200, 200))
+            |> Element.createWithStyle fillStyle
+        let definitions = SvgDefinitions.create |> SvgDefinitions.addPattern pattern
+        let result = [ rect ] |> Svg.ofList |> Svg.withDefinitions definitions |> Svg.toString
+        Assert.Contains("<pattern id=\"stripes\"", result)
+        Assert.Contains("patternUnits=\"userSpaceOnUse\"", result)
+        Assert.Contains("<line", result)
+        Assert.Contains("fill=\"url(#stripes)\"", result)

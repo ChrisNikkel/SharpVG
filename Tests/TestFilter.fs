@@ -355,3 +355,37 @@ module TestFilter =
     let ``turbulence filter with any baseFrequency always produces valid tag`` (freq: float) =
         let result = Filter.create (FilterEffect.createTurbulence FractalNoise freq 2) |> Filter.withId "t" |> Filter.toString
         checkTag "filter" result
+
+    // Wiki: FilterEffect page — drop shadow using feDropShadow
+    [<Fact>]
+    let ``FilterEffect wiki - drop shadow filter in SvgDefinitions`` () =
+        let dropShadow = FilterEffect.createDropShadow 3.0 3.0 4.0
+        let filter = Filter.create dropShadow |> Filter.withId "dropShadow"
+        let definitions = SvgDefinitions.create |> SvgDefinitions.addFilter filter
+        let style = Style.createWithFill (Color.ofName Colors.Blue) |> Style.withFilter "dropShadow"
+        let circle = Circle.create (Point.ofInts (50, 50)) (Length.ofInt 30) |> Element.createWithStyle style
+        let result = [ circle ] |> Svg.ofList |> Svg.withDefinitions definitions |> Svg.toString
+        Assert.Contains("<filter id=\"dropShadow\"", result)
+        Assert.Contains("feDropShadow", result)
+        Assert.Contains("filter=\"url(#dropShadow)\"", result)
+
+    // Wiki: FilterEffect page — noise texture with turbulence
+    [<Fact>]
+    let ``FilterEffect wiki - turbulence FractalNoise filter`` () =
+        let turbulence = FilterEffect.createTurbulence FractalNoise 0.65 3
+        let result = Filter.create turbulence |> Filter.withId "noise" |> Filter.toString
+        Assert.Contains("id=\"noise\"", result)
+        Assert.Contains("feTurbulence", result)
+        Assert.Contains("type=\"fractalNoise\"", result)
+        Assert.Contains("baseFrequency=\"0.65\"", result)
+        Assert.Contains("numOctaves=\"3\"", result)
+
+    // Wiki: FilterEffect page — morphology dilate for bold outline
+    [<Fact>]
+    let ``FilterEffect wiki - morphology dilate for outline`` () =
+        let dilate = FilterEffect.createMorphology Dilate 2.0
+        let result = Filter.create dilate |> Filter.withId "outline" |> Filter.toString
+        Assert.Contains("id=\"outline\"", result)
+        Assert.Contains("feMorphology", result)
+        Assert.Contains("operator=\"dilate\"", result)
+        Assert.Contains("radius=\"2\"", result)

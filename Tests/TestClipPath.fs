@@ -62,3 +62,25 @@ module TestClipPath =
         let result = ClipPath.ofElement "clip1" rect |> ClipPath.toString
         Assert.StartsWith("<clipPath", result)
         Assert.EndsWith("</clipPath>", result)
+
+    // Wiki: ClipPath page — circular clip region applied to a rect via definitions
+    [<Fact>]
+    let ``ClipPath wiki - circular clip applied to rect via SvgDefinitions`` () =
+        let clipCircle =
+            Circle.create (Point.ofInts (100, 100)) (Length.ofInt 80)
+            |> Element.create
+        let clipPath = ClipPath.ofElement "myClip" clipCircle
+        let clippedStyle = Style.createWithFill (Color.ofName Colors.Red) |> Style.withClipPath "myClip"
+        let rect =
+            Rect.create Point.origin (Area.ofInts (200, 200))
+            |> Element.createWithStyle clippedStyle
+        let definitions = SvgDefinitions.create |> SvgDefinitions.addClipPath clipPath
+        let result =
+            [ rect ]
+            |> Svg.ofList
+            |> Svg.withDefinitions definitions
+            |> Svg.toString
+        Assert.Contains("<defs>", result)
+        Assert.Contains("<clipPath id=\"myClip\"", result)
+        Assert.Contains("<circle", result)
+        Assert.Contains("clip-path=\"url(#myClip)\"", result)

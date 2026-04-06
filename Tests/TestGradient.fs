@@ -190,3 +190,40 @@ module TestGradient =
     [<Fact>]
     let ``SpreadMethod Repeat toString`` () =
         Assert.Equal("repeat", Repeat.ToString())
+
+    // Wiki: Gradient page — linear gradient fill on a rect
+    [<Fact>]
+    let ``Gradient wiki - linear gradient blue to white via definitions`` () =
+        let stops =
+            [ GradientStop.create 0.0 (Color.ofName Colors.Blue)
+              GradientStop.create 1.0 (Color.ofName Colors.White) ]
+        let gradient =
+            LinearGradient.create "blueWhite" (Point.ofFloats (0.0, 0.0)) (Point.ofFloats (1.0, 0.0)) stops
+            |> Gradient.ofLinear
+        let definitions = SvgDefinitions.create |> SvgDefinitions.addGradient gradient
+        let fillStyle = Style.createWithFill (Color.ofUrl "blueWhite")
+        let rect =
+            Rect.create (Point.ofInts (10, 10)) (Area.ofInts (200, 100))
+            |> Element.createWithStyle fillStyle
+        let result = [ rect ] |> Svg.ofList |> Svg.withDefinitions definitions |> Svg.toString
+        Assert.Contains("<linearGradient id=\"blueWhite\"", result)
+        Assert.Contains("x1=\"0\"", result)
+        Assert.Contains("x2=\"1\"", result)
+        Assert.Contains("<stop", result)
+        Assert.Contains("fill=\"url(#blueWhite)\"", result)
+
+    // Wiki: Gradient page — radial gradient with opacity stop
+    [<Fact>]
+    let ``Gradient wiki - radial gradient sunburst with opacity`` () =
+        let stops =
+            [ GradientStop.create 0.0 (Color.ofName Colors.Yellow)
+              GradientStop.createWithOpacity 1.0 (Color.ofName Colors.Red) 0.0 ]
+        let gradient =
+            RadialGradient.create "sunburst" (Point.ofFloats (0.5, 0.5)) (Length.ofFloat 0.5) stops
+            |> Gradient.ofRadial
+        let definitions = SvgDefinitions.create |> SvgDefinitions.addGradient gradient
+        let result = [] |> Svg.ofList |> Svg.withDefinitions definitions |> Svg.toString
+        Assert.Contains("<radialGradient id=\"sunburst\"", result)
+        Assert.Contains("cx=\"0.5\"", result)
+        Assert.Contains("r=\"0.5\"", result)
+        Assert.Equal(2, result |> Seq.filter (fun c -> c = '<') |> Seq.length |> (fun _ -> stops.Length))

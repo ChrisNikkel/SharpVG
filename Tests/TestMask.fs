@@ -77,3 +77,22 @@ module TestMask =
         let result = Mask.ofElement "mask1" rect |> Mask.toString
         Assert.StartsWith("<mask", result)
         Assert.EndsWith("</mask>", result)
+
+    // Wiki: Mask page — white circle mask applied to a red rect
+    [<Fact>]
+    let ``Mask wiki - white circle mask applied to rect via SvgDefinitions`` () =
+        let maskCircle =
+            Circle.create (Point.ofInts (100, 100)) (Length.ofInt 80)
+            |> Element.createWithStyle (Style.createWithFill (Color.ofName Colors.White))
+        let mask = Mask.ofElement "fade" maskCircle
+        let maskedStyle =
+            Style.createWithFill (Color.ofName Colors.Red)
+            |> Style.withMask "fade"
+        let rect =
+            Rect.create Point.origin (Area.ofInts (200, 200))
+            |> Element.createWithStyle maskedStyle
+        let definitions = SvgDefinitions.create |> SvgDefinitions.addMask mask
+        let result = [ rect ] |> Svg.ofList |> Svg.withDefinitions definitions |> Svg.toString
+        Assert.Contains("<mask id=\"fade\"", result)
+        Assert.Contains("<circle", result)
+        Assert.Contains("mask=\"url(#fade)\"", result)

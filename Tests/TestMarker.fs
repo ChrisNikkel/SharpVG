@@ -94,3 +94,29 @@ module TestMarker =
     [<Fact>]
     let ``MarkerOrient AngleOrient toString`` () =
         Assert.Equal("90", (AngleOrient 90.0).ToString())
+
+    // Wiki: Marker page — arrowhead at end of a line via definitions
+    [<Fact>]
+    let ``Marker wiki - arrowhead marker on line end`` () =
+        let arrowShape =
+            Polygon.ofList [ Point.ofInts (0, 0); Point.ofInts (10, 5); Point.ofInts (0, 10) ]
+            |> Element.createWithStyle (Style.createWithFill (Color.ofName Colors.Black))
+        let arrowMarker =
+            Marker.create "arrow"
+            |> Marker.withSize (Area.ofInts (10, 10))
+            |> Marker.withRefPoint (Point.ofInts (10, 5))
+            |> Marker.withOrient AutoOrient
+            |> Marker.addElement arrowShape
+        let lineStyle =
+            Style.createWithStroke (Color.ofName Colors.Black)
+            |> Style.withStrokeWidth (Length.ofInt 2)
+            |> Style.withMarkerEnd "arrow"
+        let line =
+            Line.create (Point.ofInts (20, 50)) (Point.ofInts (180, 50))
+            |> Element.createWithStyle lineStyle
+        let definitions = SvgDefinitions.create |> SvgDefinitions.addMarker arrowMarker
+        let result = [ line ] |> Svg.ofList |> Svg.withDefinitions definitions |> Svg.toString
+        Assert.Contains("<marker id=\"arrow\"", result)
+        Assert.Contains("orient=\"auto\"", result)
+        Assert.Contains("<polygon", result)
+        Assert.Contains("marker-end=\"url(#arrow)\"", result)
