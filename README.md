@@ -12,6 +12,7 @@ _[Pull requests](https://github.com/ChrisNikkel/SharpVG/pulls) and [suggestions]
 
   - Allows you to emit SVG using simple F# commands so that you can create graphics and animations that are easy to distribute
   - All basic SVG elements are supported: [line](https://github.com/ChrisNikkel/SharpVG/wiki/Line), [circle](https://github.com/ChrisNikkel/SharpVG/wiki/Circle), [ellipse](https://github.com/ChrisNikkel/SharpVG/wiki/Ellipse), [rect](https://github.com/ChrisNikkel/SharpVG/wiki/Rect), [text](https://github.com/ChrisNikkel/SharpVG/wiki/Text), [polygon](https://github.com/ChrisNikkel/SharpVG/wiki/Polygon), [polyline](https://github.com/ChrisNikkel/SharpVG/wiki/polyLine), [path](https://github.com/ChrisNikkel/SharpVG/wiki/Path), [image](https://github.com/ChrisNikkel/SharpVG/wiki/Image), and [groups](https://github.com/ChrisNikkel/SharpVG/wiki/Group)
+  - **SVG parsing** — load existing SVG files back into the SharpVG model with `SvgParser.ofFile`, `ofString`, `ofStream`, and SVGZ variants; unknown elements round-trip faithfully
   - No understanding of SVG is required and its as easy as using seq, list, or array
   - No external dependencies other than SharpVG are required
   - Cross platform support on Windows, Linux, and OSX
@@ -112,7 +113,7 @@ See [Documentation/FableTutorial.md](Documentation/FableTutorial.md) for a full 
 
 Explore interactively:
 ```bash
-fsharpi -r:SharpVG/bin/Debug/netcoreapp2.0/SharpVG.dll
+fsharpi -r:SharpVG/bin/Debug/net9.0/SharpVG.dll
 ```
 ```F#
 open SharpVG;;

@@ -24,8 +24,6 @@ This document captures the requirements for adding SVG parsing and mutation capa
 ## Non-Goals
 
 - Full SVG spec compliance (we target the subset SharpVG can already express)
-- SVGZ (compressed SVG) support in v1
-- CSS stylesheet parsing (class-based styles remain opaque strings unless already named styles)
 - JavaScript/scripting execution
 - Rasterization or rendering to pixels
 

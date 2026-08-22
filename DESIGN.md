@@ -333,16 +333,19 @@ preserves the unknown elements in their original position in document order.
 ### Done
 - `RawElement` type + `GroupElement.Raw` case (`RawElement.fs`, `Group.fs`)
 - `SvgParser.ofString` / `ofFile` / `ofStream` / `ofHtmlString` / `ofHtmlFile`
+- `SvgParser.ofGzipStream` / `ofGzipFile` — SVGZ (gzip-compressed SVG)
+- `…With` variants accepting `ParseMode` for all entry points
 - Recognized shapes: `circle`, `rect`, `line`, `ellipse`, `path`, `polygon`, `polyline`, `text`, `image`, `g`, `use`, `a`
 - Attribute parsing: `id`, `class`, `style` (presentation attrs + inline CSS), `transform`
 - `<defs>` with `symbol`, `linearGradient`, `radialGradient`, `clipPath`, `mask`, `pattern`, `marker`, `filter`
+- Filter effect children: `feGaussianBlur`, `feOffset`, `feBlend`, `feColorMatrix`, `feFlood`, `feTurbulence`, `feMorphology`, `feDropShadow`, `feComposite`, `feMerge`
 - `xlink:href` normalization to `href`
 - Unknown elements → `RawElement` passthrough
+- Inline `<style>` block parsing — class, element-type, and id selectors; applied to matching elements
+- Strict parse mode (`ParseMode.Strict`) — unknown elements produce `ParseWarning`
 - Mutation helpers: `Svg.mapElements`, `Svg.mapElementsWhere`, `Svg.findById`, `Svg.findAll`, `Svg.replaceById`, `Group.mapElements`, `Group.findById`
 
 ### Not yet implemented
-- Inline `<style>` block parsing → named `Style` records
-- Strict parse mode (fail on unknown elements instead of producing `RawElement`)
 - `SvgParser.ofSeq` (parse multiple SVG documents from a stream)
 
 ---
@@ -353,7 +356,7 @@ preserves the unknown elements in their original position in document order.
 |---|---|
 | XML library | `System.Xml.Linq` (XDocument) — simpler, sufficient for expected sizes |
 | Unknown attributes | Preserved in `RawElement.Attributes` — enables faithful round-trip |
-| Inline `<style>` block | Not yet parsed — treated as `RawElement` passthrough |
+| Inline `<style>` block | Parsed — class, element-type, and id selectors applied to matching elements |
 | `href` normalization | Normalized to `href` (SVG 2 convention); `xlink:href` also checked |
 | `GroupElement.Raw` | Added to existing DU — least disruption |
 | Error handling | `Result<ParseResult<T>, ParseError>` — explicit, composable |
