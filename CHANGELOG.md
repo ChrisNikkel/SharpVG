@@ -2,7 +2,7 @@
 
 All notable changes to SharpVG will be documented in this file.
 
-## [Unreleased]
+## [1.0.0] - 2026-08-22
 
 ### Added
 - **Round-trip tests** — 28 tests covering all major SVG constructs; exposed and fixed several parser gaps
