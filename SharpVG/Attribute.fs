@@ -26,8 +26,8 @@ module Attribute =
     let createCSS =
         create AttributeType.CSS
 
-    let createHref (id: string) =
-        createXML "href" ("#" + id)
+    let createHref (href: HRef) =
+        createXML "href" (HRef.toString href)
 
     let toString (attribute : Attribute) =
         attribute.ToString()

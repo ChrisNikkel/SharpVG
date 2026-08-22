@@ -5,6 +5,15 @@ All notable changes to SharpVG will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Round-trip tests** — 28 tests covering all major SVG constructs; exposed and fixed several parser gaps
+- **`HRef` type** (`IdRef of ElementId | UrlRef of string`) with `HRef.ofId`, `HRef.ofUrl`, `HRef.toString` — type-safe distinction between element-id references (`href="#id"`) and URL references; replaces bare `string` in href positions
+- **`Timing.createImmediate`** — create timing with no `begin` attribute (animation starts immediately); `Timing.withBegin` sets begin on an existing `Timing`
+- **`FilterEffect.createDiffuseLightingWithKernelUnitLength`** — variant of `createDiffuseLighting` that sets `kernelUnitLength`
+- **`FilterEffect.withResult`** — set a `result` name on any filter effect (enables downstream effects to reference it)
+- **`FilterEffect.withInput`** — set the primary `in` source on any effect that accepts one
+- **`FilterEffectSource.ResultRef`** — reference a previous effect's result by name string
+- **`Filter.ofChain`** — build a filter from a list of effects, automatically wiring `result`/`in` between steps
+- **`Filter.ofEffects`** — build a filter from a list of effects without auto-wiring
 - **SVG parsing** — `SvgParser` module for loading SVG into the SharpVG model:
   - `SvgParser.ofString`, `ofFile`, `ofStream` — parse SVG from string, file, or stream
   - `SvgParser.ofGzipStream`, `ofGzipFile` — parse SVGZ (gzip-compressed SVG)
@@ -36,6 +45,7 @@ All notable changes to SharpVG will be documented in this file.
 - **`<style>` block parsing** — CSS rules inside `<style>` elements (both direct children of `<svg>` and inside `<defs>`) are parsed and applied to matching elements:
   - Class selectors (`.foo`) matched against `element.Classes`
   - Element-type selectors (`circle`, `rect`, …) matched against the element's tag name
+  - ID selectors (`#myId`) matched against the element's `id` attribute
   - Multi-selector rules (`circle, .foo { … }`) supported
   - CSS comments stripped before parsing
   - Inline style attributes take precedence over stylesheet rules (sheet fills in fields not already set)
@@ -45,6 +55,18 @@ All notable changes to SharpVG will be documented in this file.
   - `Strict`: unknown body and definition elements each produce a `ParseWarning`; the element is still parsed as a raw passthrough
   - All entry points now have a `…With` variant accepting a `ParseMode`: `SvgParser.ofStringWith`, `ofFileWith`, `ofStreamWith`, `ofGzipStreamWith`, `ofGzipFileWith`, `ofHtmlStringWith`, `ofHtmlFileWith`
   - Existing `ofString`, `ofFile`, etc. unchanged — they use `Lenient` mode
+
+### Changed
+- **`Timing.Begin`** changed from `TimeSpan` to `TimeSpan option`; `None` omits the `begin` attribute so the animation starts immediately
+- **`Timing.withResart`** renamed to **`Timing.withRestart`** (typo fix)
+- **`Element.Href`**, **`TextPath.Href`**, **`LinearGradient.Href`**, **`RadialGradient.Href`** changed from `string option` / `ElementId` to `HRef option` / `HRef`; `withHref` functions updated accordingly
+- **`Attribute.createHref`** now takes `HRef` instead of `string` — `#` prefix is no longer added unconditionally; use `HRef.ofId` for element references
+- **`SvgParser` filter effect parsing** — `<feGaussianBlur>`, `<feOffset>`, `<feBlend>`, `<feColorMatrix>`, `<feFlood>`, `<feTurbulence>`, `<feMorphology>`, `<feDropShadow>`, `<feComposite>`, `<feMerge>` are now parsed from `<filter>` children; `result` and `in` attributes preserved
+- **`SvgParser` presentation attribute parsing** — `clip-path`, `filter`, `mask`, `marker-start`, `marker-mid`, `marker-end`, `stroke-miterlimit`, `paint-order`, `vector-effect`, `shape-rendering` now read as presentation attributes (not only from `style="..."`)
+- **`SvgParser` symbol id preservation** — `<symbol id="...">` now stores the symbol as a named element so the id round-trips
+- **`FilterEffect.Result`** field added (`string option`); `FilterEffect.ToTag` emits `result="..."` when set
+- **`ColorMatrix.Matrix`** element type changed from `int` to `float` — matrix values can now represent fractional coefficients
+- **`DiffuseLighting.KernelUnitLength`** changed from `float` to `float option`; `createDiffuseLighting` and `createDiffuseLightingWithInput` no longer take a `kernelUnitLength` argument (defaults to `None`)
 
 ## [0.1.0] - 2026-03-14
 

@@ -105,7 +105,7 @@ module TestGradient =
     [<Fact>]
     let ``LinearGradient withHref`` () =
         let gradient = LinearGradient.create "g" Point.origin (Point.ofInts (1, 0)) []
-                       |> LinearGradient.withHref "baseGrad"
+                       |> LinearGradient.withHref (HRef.ofId "baseGrad")
         let result = gradient |> LinearGradient.toString
         Assert.Contains("href=\"#baseGrad\"", result)
 
@@ -161,7 +161,7 @@ module TestGradient =
     [<Fact>]
     let ``RadialGradient withHref`` () =
         let gradient = RadialGradient.create "rGrad" (Point.ofInts (50, 50)) (Length.ofInt 50) []
-                       |> RadialGradient.withHref "baseGrad"
+                       |> RadialGradient.withHref (HRef.ofId "baseGrad")
         let result = gradient |> RadialGradient.toString
         Assert.Contains("href=\"#baseGrad\"", result)
 

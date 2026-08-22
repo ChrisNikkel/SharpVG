@@ -40,7 +40,7 @@ type LinearGradient =
         GradientUnits: FilterUnits option
         SpreadMethod: SpreadMethod option
         GradientTransform: Transform option
-        Href: string option
+        Href: HRef option
         Stops: GradientStop list
     }
 with
@@ -68,7 +68,7 @@ type RadialGradient =
         GradientUnits: FilterUnits option
         SpreadMethod: SpreadMethod option
         GradientTransform: Transform option
-        Href: string option
+        Href: HRef option
         Stops: GradientStop list
     }
 with
@@ -124,8 +124,8 @@ module LinearGradient =
     let withGradientTransform transform (gradient: LinearGradient) =
         { gradient with GradientTransform = Some transform }
 
-    let withHref id (gradient: LinearGradient) =
-        { gradient with Href = Some id }
+    let withHref (href: HRef) (gradient: LinearGradient) =
+        { gradient with Href = Some href }
 
     let toTag = LinearGradient.ToTag
 
@@ -147,8 +147,8 @@ module RadialGradient =
     let withGradientTransform transform (gradient: RadialGradient) =
         { gradient with GradientTransform = Some transform }
 
-    let withHref id (gradient: RadialGradient) =
-        { gradient with Href = Some id }
+    let withHref (href: HRef) (gradient: RadialGradient) =
+        { gradient with Href = Some href }
 
     let toTag = RadialGradient.ToTag
 

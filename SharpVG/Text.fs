@@ -144,7 +144,7 @@ with
 
 type TextPath =
     {
-        Href: ElementId
+        Href: HRef
         Body: string
         StartOffset: Length option
         Method: TextPathMethod option

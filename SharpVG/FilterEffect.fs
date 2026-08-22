@@ -48,9 +48,9 @@ type EdgeMode =
             | NoEdge -> "none"
 
 type ColorMatrix =
-    | Matrix of int list // TODO: Convert top a 5x4 matrix object of some sort
-    | Saturate of float // TODO: Constrain to 0 to 1.0 or make type for percent
-    | HueRotate of float // TODO: Make type for degrees
+    | Matrix of float list
+    | Saturate of float
+    | HueRotate of float
     | LuminanceToAlpha
     with
         static member ToTag colorMatrix =
@@ -86,7 +86,7 @@ type DiffuseLighting =
     {
         SurfaceScale : float
         DiffuseConstant : float
-        KernelUnitLength : float // TODO: Make optional
+        KernelUnitLength : float option
     }
     with
         static member ToTag diffuseLighting =
@@ -94,7 +94,7 @@ type DiffuseLighting =
                 [
                     Some(Attribute.createXML "surfaceScale" (string diffuseLighting.SurfaceScale))
                     Some(Attribute.createXML "diffuseConstant" (string diffuseLighting.DiffuseConstant))
-                    Some(Attribute.createXML "kernelUnitLength" (string diffuseLighting.KernelUnitLength))
+                    diffuseLighting.KernelUnitLength |> Option.map (string >> Attribute.createXML "kernelUnitLength")
                 ] |> List.choose id
 
             Tag.createWithAttributes "feDiffuseLighting" attributes
@@ -102,7 +102,7 @@ type DiffuseLighting =
 type Flood =
     {
         Color : Color
-        Opacity : float option // TODO: Make constrain to 0 to 1.0 or make type for percent
+        Opacity : float option
     }
     with
         static member ToTag flood =
@@ -207,6 +207,7 @@ and FilterEffect =
         FilterEffectType : FilterEffectType
         Offset : Point option
         Scale : Area option
+        Result : string option
     }
 with
     static member ToTag filterEffect =
@@ -218,10 +219,14 @@ with
             ] |> List.choose id
 
         let additionalAttributes filterEffect =
-            [
-                filterEffect.Offset |> Option.map Point.toAttributes
-                filterEffect.Scale |> Option.map Area.toAttributes
-            ] |> List.choose id |> List.concat
+            let posAndSize =
+                [
+                    filterEffect.Offset |> Option.map Point.toAttributes
+                    filterEffect.Scale |> Option.map Area.toAttributes
+                ] |> List.choose id |> List.concat
+            let resultAttr =
+                filterEffect.Result |> Option.map (Attribute.createXML "result" >> List.singleton) |> Option.defaultValue []
+            posAndSize @ resultAttr
 
         match filterEffect.FilterEffectType with
             | Blend (blend, input1, input2) -> Tag.create "feBlend" |> Tag.addAttributes ((Attribute.createXML "mode" (blend.ToString())) :: inputsToAttributes input1 input2)
@@ -254,7 +259,7 @@ with
                 |> Tag.addAttributes (inputsToAttributes input1 input2)
             | Flood (flood) -> Flood.ToTag flood
             | GaussianBlur (gaussianBlur, input) -> GaussianBlur.ToTag gaussianBlur |> Tag.addAttributes (inputsToAttributes input None)
-            | Image (image) -> Tag.createWithAttribute "feImage" (Attribute.createHref image)
+            | Image (image) -> Tag.createWithAttribute "feImage" (Attribute.createHref (HRef.ofUrl image))
             | Merge inputs ->
                 let body = inputs |> List.map (fun src -> Tag.createWithAttribute "feMergeNode" (Attribute.createXML "in" (src.ToString())) |> Tag.toString) |> String.concat ""
                 Tag.create "feMerge" |> Tag.withBody body
@@ -309,6 +314,7 @@ and FilterEffectSource =
     | FillPaint
     | StrokePaint
     | NamedFilterEffect of NamedFilterEffect
+    | ResultRef of string
     override this.ToString() =
         match this with
             | SourceGraphic -> "SourceGraphic"
@@ -318,118 +324,141 @@ and FilterEffectSource =
             | FillPaint -> "FillPaint"
             | StrokePaint -> "StrokePaint"
             | NamedFilterEffect namedFilterEffect -> namedFilterEffect.Name
-
-// TODO: make it easy to string things together so that if result or inputs aren't specified random ids are created and linked together.
+            | ResultRef name -> name
 
 module FilterEffect =
 
     let createBlend blend =
-        { FilterEffectType = Blend (blend, None, None); Offset = None; Scale = None }
+        { FilterEffectType = Blend (blend, None, None); Offset = None; Scale = None; Result = None }
 
     let createBlendWithInput blend input =
-        { FilterEffectType = Blend (blend, Some(input), None); Offset = None; Scale = None }
+        { FilterEffectType = Blend (blend, Some(input), None); Offset = None; Scale = None; Result = None }
 
     let createBlendWithInputs blend input1 input2 =
-        { FilterEffectType = Blend (blend, Some(input1), Some(input2)); Offset = None; Scale = None }
+        { FilterEffectType = Blend (blend, Some(input1), Some(input2)); Offset = None; Scale = None; Result = None }
 
     let createColorMatrix colorMatrix =
-        { FilterEffectType = ColorMatrix (colorMatrix, None); Offset = None; Scale = None }
+        { FilterEffectType = ColorMatrix (colorMatrix, None); Offset = None; Scale = None; Result = None }
 
     let createColorMatrixWithInput colorMatrix input =
-        { FilterEffectType = ColorMatrix (colorMatrix, input); Offset = None; Scale = None }
+        { FilterEffectType = ColorMatrix (colorMatrix, input); Offset = None; Scale = None; Result = None }
 
     let createComposite composite =
-        { FilterEffectType = Composite (composite, None, None); Offset = None; Scale = None }
+        { FilterEffectType = Composite (composite, None, None); Offset = None; Scale = None; Result = None }
 
     let createCompositeWithInput composite input =
-        { FilterEffectType = Composite (composite, Some input, None); Offset = None; Scale = None }
+        { FilterEffectType = Composite (composite, Some input, None); Offset = None; Scale = None; Result = None }
 
     let createCompositeWithInputs composite input1 input2 =
-        { FilterEffectType = Composite (composite, Some input1, Some input2); Offset = None; Scale = None }
+        { FilterEffectType = Composite (composite, Some input1, Some input2); Offset = None; Scale = None; Result = None }
 
-    let createDiffuseLighting surfaceScale diffuseConstant kernelUnitLength =
-        { FilterEffectType = DiffuseLighting ({ SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = kernelUnitLength }, None); Offset = None; Scale = None }
+    let createDiffuseLighting surfaceScale diffuseConstant =
+        { FilterEffectType = DiffuseLighting ({ SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = None }, None); Offset = None; Scale = None; Result = None }
 
-    let createDiffuseLightingWithInput surfaceScale diffuseConstant kernelUnitLength input=
-        { FilterEffectType = DiffuseLighting ({ SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = kernelUnitLength }, Some input); Offset = None; Scale = None }
+    let createDiffuseLightingWithInput surfaceScale diffuseConstant input =
+        { FilterEffectType = DiffuseLighting ({ SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = None }, Some input); Offset = None; Scale = None; Result = None }
+
+    let createDiffuseLightingWithKernelUnitLength surfaceScale diffuseConstant kernelUnitLength =
+        { FilterEffectType = DiffuseLighting ({ SurfaceScale = surfaceScale; DiffuseConstant = diffuseConstant; KernelUnitLength = Some kernelUnitLength }, None); Offset = None; Scale = None; Result = None }
 
     let createFlood color =
-        { FilterEffectType = Flood { Color = color; Opacity = None }; Offset = None; Scale = None }
+        { FilterEffectType = Flood { Color = color; Opacity = None }; Offset = None; Scale = None; Result = None }
 
     let createFloodWithOpacity color opacity =
-        { FilterEffectType = Flood { Color = color; Opacity = Some opacity }; Offset = None; Scale = None }
+        { FilterEffectType = Flood { Color = color; Opacity = Some opacity }; Offset = None; Scale = None; Result = None }
 
     let createGaussianBlur standardDeviation =
-        { FilterEffectType = GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = None }, None); Offset = None; Scale = None }
+        { FilterEffectType = GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = None }, None); Offset = None; Scale = None; Result = None }
 
     let createGaussianBlurWithEdgeMode standardDeviation edgeMode =
-        { FilterEffectType = GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = Some(edgeMode) }, None); Offset = None; Scale = None }
+        { FilterEffectType = GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = Some(edgeMode) }, None); Offset = None; Scale = None; Result = None }
 
     let createGaussianBlurWithInput standardDeviation input =
-        { FilterEffectType = GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = None }, Some input); Offset = None; Scale = None }
+        { FilterEffectType = GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = None }, Some input); Offset = None; Scale = None; Result = None }
 
     let createGaussianBlurWithEdgeModeAndInput standardDeviation edgeMode input =
-        { FilterEffectType = GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = Some(edgeMode) }, Some input); Offset = None; Scale = None }
+        { FilterEffectType = GaussianBlur ({ StandardDeviation = standardDeviation; EdgeMode = Some(edgeMode) }, Some input); Offset = None; Scale = None; Result = None }
 
     let createImage image =
-        { FilterEffectType = Image image; Offset = None; Scale = None }
+        { FilterEffectType = Image image; Offset = None; Scale = None; Result = None }
 
     let createOffset offset =
-        { FilterEffectType = Offset (offset, None); Offset = None; Scale = None }
+        { FilterEffectType = Offset (offset, None); Offset = None; Scale = None; Result = None }
 
     let createOffsetWithInput offset input =
-        { FilterEffectType = Offset (offset, Some input); Offset = None; Scale = None }
+        { FilterEffectType = Offset (offset, Some input); Offset = None; Scale = None; Result = None }
 
     let createComponentTransfer rFunc gFunc bFunc aFunc =
-        { FilterEffectType = ComponentTransfer (rFunc, gFunc, bFunc, aFunc, None); Offset = None; Scale = None }
+        { FilterEffectType = ComponentTransfer (rFunc, gFunc, bFunc, aFunc, None); Offset = None; Scale = None; Result = None }
 
     let createComponentTransferWithInput rFunc gFunc bFunc aFunc input =
-        { FilterEffectType = ComponentTransfer (rFunc, gFunc, bFunc, aFunc, Some input); Offset = None; Scale = None }
+        { FilterEffectType = ComponentTransfer (rFunc, gFunc, bFunc, aFunc, Some input); Offset = None; Scale = None; Result = None }
 
     let createConvolveMatrix order kernelMatrix =
-        { FilterEffectType = ConvolveMatrix (order, kernelMatrix, None, None, false, None); Offset = None; Scale = None }
+        { FilterEffectType = ConvolveMatrix (order, kernelMatrix, None, None, false, None); Offset = None; Scale = None; Result = None }
 
     let createConvolveMatrixFull order kernelMatrix divisor bias preserveAlpha =
-        { FilterEffectType = ConvolveMatrix (order, kernelMatrix, divisor, bias, preserveAlpha, None); Offset = None; Scale = None }
+        { FilterEffectType = ConvolveMatrix (order, kernelMatrix, divisor, bias, preserveAlpha, None); Offset = None; Scale = None; Result = None }
 
     let createDisplacementMap scale xSelector ySelector =
-        { FilterEffectType = DisplacementMap (scale, xSelector, ySelector, None, None); Offset = None; Scale = None }
+        { FilterEffectType = DisplacementMap (scale, xSelector, ySelector, None, None); Offset = None; Scale = None; Result = None }
 
     let createDisplacementMapWithInputs scale xSelector ySelector input1 input2 =
-        { FilterEffectType = DisplacementMap (scale, xSelector, ySelector, Some input1, Some input2); Offset = None; Scale = None }
+        { FilterEffectType = DisplacementMap (scale, xSelector, ySelector, Some input1, Some input2); Offset = None; Scale = None; Result = None }
 
     let createMerge inputs =
-        { FilterEffectType = Merge inputs; Offset = None; Scale = None }
+        { FilterEffectType = Merge inputs; Offset = None; Scale = None; Result = None }
 
     let createMorphology op radius =
-        { FilterEffectType = Morphology (op, radius, None); Offset = None; Scale = None }
+        { FilterEffectType = Morphology (op, radius, None); Offset = None; Scale = None; Result = None }
 
     let createMorphologyWithInput op radius input =
-        { FilterEffectType = Morphology (op, radius, Some input); Offset = None; Scale = None }
+        { FilterEffectType = Morphology (op, radius, Some input); Offset = None; Scale = None; Result = None }
 
     let createSpecularLighting surfaceScale specularConstant specularExponent lightSource =
-        { FilterEffectType = SpecularLighting (surfaceScale, specularConstant, specularExponent, lightSource, None); Offset = None; Scale = None }
+        { FilterEffectType = SpecularLighting (surfaceScale, specularConstant, specularExponent, lightSource, None); Offset = None; Scale = None; Result = None }
 
     let createSpecularLightingWithInput surfaceScale specularConstant specularExponent lightSource input =
-        { FilterEffectType = SpecularLighting (surfaceScale, specularConstant, specularExponent, lightSource, Some input); Offset = None; Scale = None }
+        { FilterEffectType = SpecularLighting (surfaceScale, specularConstant, specularExponent, lightSource, Some input); Offset = None; Scale = None; Result = None }
 
     let createTurbulence turbType baseFrequency numOctaves =
-        { FilterEffectType = Turbulence (turbType, baseFrequency, numOctaves, None); Offset = None; Scale = None }
+        { FilterEffectType = Turbulence (turbType, baseFrequency, numOctaves, None); Offset = None; Scale = None; Result = None }
 
     let createTurbulenceWithSeed turbType baseFrequency numOctaves seed =
-        { FilterEffectType = Turbulence (turbType, baseFrequency, numOctaves, Some seed); Offset = None; Scale = None }
+        { FilterEffectType = Turbulence (turbType, baseFrequency, numOctaves, Some seed); Offset = None; Scale = None; Result = None }
 
     let createDropShadow dx dy stdDeviation =
-        { FilterEffectType = DropShadow (dx, dy, stdDeviation, None, None, None); Offset = None; Scale = None }
+        { FilterEffectType = DropShadow (dx, dy, stdDeviation, None, None, None); Offset = None; Scale = None; Result = None }
 
     let createDropShadowWithColor dx dy stdDeviation color =
-        { FilterEffectType = DropShadow (dx, dy, stdDeviation, Some color, None, None); Offset = None; Scale = None }
+        { FilterEffectType = DropShadow (dx, dy, stdDeviation, Some color, None, None); Offset = None; Scale = None; Result = None }
 
     let createDropShadowFull dx dy stdDeviation color opacity =
-        { FilterEffectType = DropShadow (dx, dy, stdDeviation, Some color, Some opacity, None); Offset = None; Scale = None }
+        { FilterEffectType = DropShadow (dx, dy, stdDeviation, Some color, Some opacity, None); Offset = None; Scale = None; Result = None }
 
     let withName filterEffect result =
         { FilterEffect = filterEffect; Name = result }
+
+    let withResult (result: string) (filterEffect: FilterEffect) : FilterEffect =
+        { filterEffect with Result = Some result }
+
+    let withInput (source: FilterEffectSource) (filterEffect: FilterEffect) : FilterEffect =
+        let newType =
+            match filterEffect.FilterEffectType with
+            | Blend (mode, _, input2)                           -> Blend (mode, Some source, input2)
+            | ColorMatrix (cm, _)                               -> ColorMatrix (cm, Some source)
+            | ComponentTransfer (r, g, b, a, _)                 -> ComponentTransfer (r, g, b, a, Some source)
+            | Composite (op, _, input2)                         -> Composite (op, Some source, input2)
+            | ConvolveMatrix (order, km, div, bias, pa, _)      -> ConvolveMatrix (order, km, div, bias, pa, Some source)
+            | DiffuseLighting (dl, _)                           -> DiffuseLighting (dl, Some source)
+            | DisplacementMap (scale, x, y, _, input2)          -> DisplacementMap (scale, x, y, Some source, input2)
+            | GaussianBlur (gb, _)                              -> GaussianBlur (gb, Some source)
+            | Morphology (op, r, _)                             -> Morphology (op, r, Some source)
+            | Offset (p, _)                                     -> Offset (p, Some source)
+            | SpecularLighting (ss, sc, se, ls, _)              -> SpecularLighting (ss, sc, se, ls, Some source)
+            | DropShadow (dx, dy, sd, c, o, _)                  -> DropShadow (dx, dy, sd, c, o, Some source)
+            | Flood _ | Image _ | Merge _ | Turbulence _        -> filterEffect.FilterEffectType
+        { filterEffect with FilterEffectType = newType }
 
     let withOffset (filterEffect: FilterEffect) offset =
         { filterEffect with Offset = offset }

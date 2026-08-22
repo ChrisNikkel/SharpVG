@@ -30,7 +30,7 @@ module TestFilter =
 
     [<Fact>]
     let ``create color matrix matrix filter`` () =
-        let identity = [1;0;0;0;0; 0;1;0;0;0; 0;0;1;0;0; 0;0;0;1;0]
+        let identity = [1.0;0.0;0.0;0.0;0.0; 0.0;1.0;0.0;0.0;0.0; 0.0;0.0;1.0;0.0;0.0; 0.0;0.0;0.0;1.0;0.0]
         let result = FilterEffect.createColorMatrix (ColorMatrix.Matrix identity) |> FilterEffect.toString
         Assert.Contains("type=\"matrix\"", result)
         Assert.Contains("values=\"1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0\"", result)
@@ -299,7 +299,7 @@ module TestFilter =
     // DiffuseLighting and NamedFilterEffect rendering
     [<Fact>]
     let ``DiffuseLighting renders feDiffuseLighting tag`` () =
-        let fe = FilterEffect.createDiffuseLighting 1.0 0.5 1.0
+        let fe = FilterEffect.createDiffuseLighting 1.0 0.5
         let result = fe |> FilterEffect.toString
         Assert.Contains("feDiffuseLighting", result)
         Assert.Contains("surfaceScale=\"1\"", result)
@@ -389,3 +389,63 @@ module TestFilter =
         Assert.Contains("feMorphology", result)
         Assert.Contains("operator=\"dilate\"", result)
         Assert.Contains("radius=\"2\"", result)
+
+    // FilterEffect.withResult
+    [<Fact>]
+    let ``withResult adds result attribute to rendered tag`` () =
+        let result = FilterEffect.createGaussianBlur 3.0 |> FilterEffect.withResult "blurred" |> FilterEffect.toString
+        Assert.Contains("result=\"blurred\"", result)
+
+    // FilterEffect.withInput
+    [<Fact>]
+    let ``withInput sets in attribute on GaussianBlur`` () =
+        let result = FilterEffect.createGaussianBlur 3.0 |> FilterEffect.withInput SourceAlpha |> FilterEffect.toString
+        Assert.Contains("in=\"SourceAlpha\"", result)
+
+    [<Fact>]
+    let ``withInput sets in attribute using ResultRef`` () =
+        let result = FilterEffect.createOffset (Point.ofInts (2, 2)) |> FilterEffect.withInput (ResultRef "blurred") |> FilterEffect.toString
+        Assert.Contains("in=\"blurred\"", result)
+
+    // FilterEffectSource.ResultRef
+    [<Fact>]
+    let ``ResultRef toString returns name string`` () =
+        Assert.Equal("myResult", (ResultRef "myResult").ToString())
+
+    // Filter.ofChain
+    [<Fact>]
+    let ``ofChain wires result and in attributes between steps`` () =
+        let blur = FilterEffect.createGaussianBlur 4.0
+        let offset = FilterEffect.createOffset (Point.ofInts (3, 3))
+        let filter = Filter.ofChain [ blur; offset ] |> Filter.withId "chain"
+        let result = filter |> Filter.toString
+        Assert.Contains("result=\"step0\"", result)
+        Assert.Contains("in=\"step0\"", result)
+
+    [<Fact>]
+    let ``ofChain with three effects wires all steps`` () =
+        let blur = FilterEffect.createGaussianBlur 4.0
+        let offset = FilterEffect.createOffset (Point.ofInts (3, 3))
+        let composite = FilterEffect.createComposite Over
+        let filter = Filter.ofChain [ blur; offset; composite ] |> Filter.withId "chain3"
+        let result = filter |> Filter.toString
+        Assert.Contains("result=\"step0\"", result)
+        Assert.Contains("result=\"step1\"", result)
+        Assert.Contains("in=\"step0\"", result)
+        Assert.Contains("in=\"step1\"", result)
+
+    [<Fact>]
+    let ``ofChain with single effect is same as create`` () =
+        let blur = FilterEffect.createGaussianBlur 4.0
+        let result = Filter.ofChain [ blur ] |> Filter.withId "f" |> Filter.toString
+        Assert.Contains("feGaussianBlur", result)
+        Assert.DoesNotContain("result=", result)
+
+    // Filter.ofEffects
+    [<Fact>]
+    let ``ofEffects builds filter with all given effects`` () =
+        let blur = FilterEffect.createGaussianBlur 4.0
+        let offset = FilterEffect.createOffset (Point.ofInts (3, 3))
+        let result = Filter.ofEffects [ blur; offset ] |> Filter.withId "multi" |> Filter.toString
+        Assert.Contains("feGaussianBlur", result)
+        Assert.Contains("feOffset", result)

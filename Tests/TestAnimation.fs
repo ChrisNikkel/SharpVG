@@ -24,7 +24,7 @@ module TestAnimation =
         let targetName = "orange-circle"
         let circleWithStyle = circle |> Element.createWithName targetName |> Element.withStyle style
         let timing = Timing.create (TimeSpan(0, 0, 0, 1)) |> Timing.withDuration (TimeSpan(0, 0, 3))
-        let circleAnimation = Animation.createAnimation timing AttributeType.XML "cy" "50" "250" |> Element.create |> Element.withHref ("#" + targetName)
+        let circleAnimation = Animation.createAnimation timing AttributeType.XML "cy" "50" "250" |> Element.create |> Element.withHref (HRef.ofId targetName)
 
         Assert.Equal("<circle id=\"orange-circle\" fill=\"orange\" r=\"30\" cx=\"50\" cy=\"50\"/>", circleWithStyle |> Element.toString)
         Assert.Equal("<animate href=\"#orange-circle\" attributeName=\"cy\" attributeType=\"XML\" from=\"50\" to=\"250\" begin=\"1s\" dur=\"3s\"/>", circleAnimation |> Element.toString)

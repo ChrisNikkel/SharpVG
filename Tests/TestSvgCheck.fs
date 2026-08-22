@@ -182,7 +182,7 @@ module TestSvgCheck =
         let timing =
             Timing.create beginTime
             |> Timing.withDuration duration
-            |> Timing.withResart WhenNotActive
+            |> Timing.withRestart WhenNotActive
         let animation = Animation.createAnimation timing AttributeType.XML "opacity" "1" "0"
         let center = Point.ofInts (50, 50)
         let radius = Length.ofInt 30

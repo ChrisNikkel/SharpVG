@@ -48,6 +48,7 @@
     <Compile Include="SvgCheck.fs" />
     <Compile Include="TestSvgCheck.fs" />
     <Compile Include="TestSvgParser.fs" />
+    <Compile Include="TestRoundTrip.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

@@ -1,3 +1,15 @@
 namespace SharpVG
 
-type ElementId = string // TODO: Add another similar base object for href that can reference this.
+type ElementId = string
+
+type HRef =
+    | IdRef of ElementId
+    | UrlRef of string
+
+module HRef =
+    let ofId (id: ElementId) : HRef = IdRef id
+    let ofUrl (url: string) : HRef = UrlRef url
+    let toString href =
+        match href with
+        | IdRef id -> "#" + id
+        | UrlRef url -> url

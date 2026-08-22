@@ -9,8 +9,6 @@ with
             | UserSpaceOnUse -> "userSpaceOnUse"
             | ObjectBoundingBox -> "objectBoundingBox"
 
-// TODO: Make it so you can use feImage to define "In" or maybe "In2" or instead use a ElementId.  Not sure if this should go in Filters or Effects.
-
 type Filter =
     {
         Id : ElementId option
@@ -75,6 +73,25 @@ module Filter =
 
     let toTag =
         Filter.ToTag
+
+    let ofEffects (effects: FilterEffect list) : Filter =
+        { empty with FilterEffects = effects }
+
+    let ofChain (effects: FilterEffect list) : Filter =
+        match effects with
+        | [] -> empty
+        | [single] -> create single
+        | _ ->
+            let n = effects.Length
+            let wired =
+                effects
+                |> List.mapi (fun i effect ->
+                    let withResultName =
+                        if i < n - 1 then effect |> FilterEffect.withResult (sprintf "step%d" i)
+                        else effect
+                    if i = 0 then withResultName
+                    else withResultName |> FilterEffect.withInput (ResultRef (sprintf "step%d" (i - 1))))
+            { empty with FilterEffects = wired }
 
     let toString (filter : Filter) =
         filter.ToString()

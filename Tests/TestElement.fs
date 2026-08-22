@@ -79,7 +79,7 @@ module TestElement =
 
     [<Fact>]
     let ``element withHref`` () =
-        let result = Rect.create Point.origin Area.full |> Element.create |> Element.withHref "#anchor" |> Element.toString
+        let result = Rect.create Point.origin Area.full |> Element.create |> Element.withHref (HRef.ofId "anchor") |> Element.toString
         Assert.Contains("href=\"#anchor\"", result)
 
     [<Fact>]

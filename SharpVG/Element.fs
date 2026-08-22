@@ -9,7 +9,7 @@ type Element = {
         Classes: seq<string>
         Content: ElementContent
         Style: Style option
-        Href: string option
+        Href: HRef option
         Transforms: seq<Transform>
         Animations: seq<Animation>
     }
@@ -40,7 +40,7 @@ with
                     element.Name |> Option.map (Attribute.createCSS "id" >> List.singleton)
                     (let joined = classes |> String.concat " " in if joined = "" then None else Some [Attribute.createCSS "class" joined])
                     element.Style |> Option.filter (not << Style.isNamed) |> Option.map Style.toAttributes
-                    element.Href |> Option.map (Attribute.createCSS "href" >> List.singleton)
+                    element.Href |> Option.map (HRef.toString >> Attribute.createCSS "href" >> List.singleton)
                     if Seq.isEmpty element.Transforms then None else Some [ element.Transforms |> Transforms.toAttribute ]
             ]
             |> List.choose id

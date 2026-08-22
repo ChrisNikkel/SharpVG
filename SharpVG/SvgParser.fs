@@ -306,7 +306,10 @@ module private SvgParserHelpers =
         let presentationAttrs =
             [ "fill"; "stroke"; "stroke-width"; "opacity"; "fill-opacity"; "fill-rule"
               "stroke-linecap"; "stroke-linejoin"; "stroke-dasharray"; "stroke-dashoffset"
-              "visibility"; "display" ]
+              "visibility"; "display"
+              "clip-path"; "filter"; "mask"
+              "marker-start"; "marker-mid"; "marker-end"
+              "stroke-miterlimit"; "paint-order"; "vector-effect"; "shape-rendering" ]
 
         let fromPresentation =
             presentationAttrs
@@ -437,6 +440,11 @@ module private SvgParserHelpers =
         xel.Attribute(XName.Get "href") |> Option.ofObj
         |> Option.orElse (xel.Attribute(xlinkNs + "href") |> Option.ofObj)
         |> Option.map _.Value
+
+    let tryHRefRef (xel: XElement) =
+        tryHref xel |> Option.map (fun s ->
+            if s.StartsWith("#") then HRef.ofId s.[1..]
+            else HRef.ofUrl s)
 
     let tryParseSpreadMethod (s: string) =
         match s.ToLowerInvariant() with
@@ -793,7 +801,7 @@ module private SvgElementParsers =
             LinearGradient.create elemId point1 point2 stops
             |> applyOpt LinearGradient.withSpreadMethod (tryAttr "spreadMethod" xel |> Option.bind tryParseSpreadMethod)
             |> applyOpt LinearGradient.withGradientUnits (tryAttr "gradientUnits" xel |> Option.bind tryParseFilterUnits)
-            |> applyOpt LinearGradient.withHref (tryHref xel)
+            |> applyOpt LinearGradient.withHref (tryHRefRef xel)
         fun (defs, s) -> SvgDefinitions.addGradient (Gradient.ofLinear gradient) defs, s
 
     let parseRadialGradient (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState -> SvgDefinitions * ParseState =
@@ -819,7 +827,7 @@ module private SvgElementParsers =
             |> applyOpt RadialGradient.withFocal focal
             |> applyOpt RadialGradient.withSpreadMethod (tryAttr "spreadMethod" xel |> Option.bind tryParseSpreadMethod)
             |> applyOpt RadialGradient.withGradientUnits (tryAttr "gradientUnits" xel |> Option.bind tryParseFilterUnits)
-            |> applyOpt RadialGradient.withHref (tryHref xel)
+            |> applyOpt RadialGradient.withHref (tryHRefRef xel)
         fun (defs, s) -> SvgDefinitions.addGradient (Gradient.ofRadial gradient) defs, s
 
     let parseClipPath (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState -> SvgDefinitions * ParseState =
@@ -936,6 +944,120 @@ module private SvgElementParsers =
             |> applyOpt Marker.withUnits units
         fun (defs, s) -> SvgDefinitions.addMarker marker defs, s
 
+    let private tryParseFilterSource (s: string) : FilterEffectSource option =
+        match s.Trim() with
+        | "SourceGraphic"   -> Some SourceGraphic
+        | "SourceAlpha"     -> Some SourceAlpha
+        | "BackgroundImage" -> Some BackgroundImage
+        | "BackgroundAlpha" -> Some BackgroundAlpha
+        | "FillPaint"       -> Some FillPaint
+        | "StrokePaint"     -> Some StrokePaint
+        | name when name <> "" -> Some (ResultRef name)
+        | _ -> None
+
+    let private tryInAttr name (xel: XElement) =
+        tryAttr name xel |> Option.bind tryParseFilterSource
+
+    let private withResult' result (fe: FilterEffect) =
+        match result with Some r -> FilterEffect.withResult r fe | None -> fe
+
+    let private withInput' src (fe: FilterEffect) =
+        match src with Some s -> FilterEffect.withInput s fe | None -> fe
+
+    let private parseFilterEffect (xel: XElement) : FilterEffect option =
+        let result = tryAttr "result" xel
+        let inSrc  = tryInAttr "in" xel
+        let effect =
+            match xel.Name.LocalName with
+            | "feGaussianBlur" ->
+                let stdDev = match xel with FloatAttr "stdDeviation" v -> v | _ -> 0.0
+                Some (FilterEffect.createGaussianBlur stdDev)
+            | "feOffset" ->
+                let dx = match xel with FloatAttr "dx" v -> v | _ -> 0.0
+                let dy = match xel with FloatAttr "dy" v -> v | _ -> 0.0
+                Some (FilterEffect.createOffset (Point.ofFloats (dx, dy)))
+            | "feBlend" ->
+                let mode =
+                    tryAttr "mode" xel
+                    |> Option.bind (fun m ->
+                        match m with
+                        | "multiply"   -> Some Multiply  | "screen"     -> Some Screen
+                        | "overlay"    -> Some Overlay    | "darken"     -> Some Darken
+                        | "lighten"    -> Some Lighten    | "color-dodge"-> Some ColorDodge
+                        | "color-burn" -> Some ColorBurn  | "hard-light" -> Some HardLight
+                        | "soft-light" -> Some SoftLight  | "difference" -> Some Difference
+                        | "exclusion"  -> Some Exclusion  | "hue"        -> Some Hue
+                        | "saturation" -> Some Saturation | "color"      -> Some Color
+                        | "luminosity" -> Some Luminosity | _            -> Some Normal)
+                    |> Option.defaultValue Normal
+                Some (FilterEffect.createBlend mode)
+            | "feColorMatrix" ->
+                let cm =
+                    match tryAttr "type" xel with
+                    | Some "saturate"        -> tryAttr "values" xel |> Option.bind tryParseFloat |> Option.map Saturate
+                    | Some "hueRotate"       -> tryAttr "values" xel |> Option.bind tryParseFloat |> Option.map HueRotate
+                    | Some "luminanceToAlpha"-> Some LuminanceToAlpha
+                    | _ ->
+                        tryAttr "values" xel
+                        |> Option.map (fun v ->
+                            v.Split([|' ';','|], System.StringSplitOptions.RemoveEmptyEntries)
+                            |> Array.toList |> List.choose tryParseFloat |> Matrix)
+                cm |> Option.map FilterEffect.createColorMatrix
+            | "feFlood" ->
+                let color = tryAttr "flood-color" xel |> Option.bind tryParseColor
+                let opacity = tryAttr "flood-opacity" xel |> Option.bind tryParseFloat
+                match color with
+                | Some c ->
+                    match opacity with
+                    | Some o -> Some (FilterEffect.createFloodWithOpacity c o)
+                    | None   -> Some (FilterEffect.createFlood c)
+                | None -> Some (FilterEffect.createFlood (Color.ofName Colors.Black))
+            | "feTurbulence" ->
+                let turbType =
+                    match tryAttr "type" xel with
+                    | Some "turbulence" -> TurbulenceNoise
+                    | _                 -> FractalNoise
+                let baseFreq   = match xel with FloatAttr "baseFrequency" v -> v | _ -> 0.0
+                let numOctaves = tryAttr "numOctaves" xel |> Option.bind (fun s -> System.Int32.TryParse s |> function true, v -> Some v | _ -> None) |> Option.defaultValue 1
+                let seed       = tryAttr "seed" xel |> Option.bind (fun s -> System.Int32.TryParse s |> function true, v -> Some v | _ -> None)
+                Some (match seed with
+                      | Some s -> FilterEffect.createTurbulenceWithSeed turbType baseFreq numOctaves s
+                      | None   -> FilterEffect.createTurbulence turbType baseFreq numOctaves)
+            | "feMorphology" ->
+                let op = match tryAttr "operator" xel with Some "dilate" -> Dilate | _ -> Erode
+                let radius = match xel with FloatAttr "radius" v -> v | _ -> 0.0
+                Some (FilterEffect.createMorphology op radius)
+            | "feDropShadow" ->
+                let dx     = match xel with FloatAttr "dx" v -> v | _ -> 0.0
+                let dy     = match xel with FloatAttr "dy" v -> v | _ -> 0.0
+                let stdDev = match xel with FloatAttr "stdDeviation" v -> v | _ -> 0.0
+                let color  = tryAttr "flood-color" xel |> Option.bind tryParseColor
+                let opacity= tryAttr "flood-opacity" xel |> Option.bind tryParseFloat
+                Some (match color, opacity with
+                      | Some c, Some o -> FilterEffect.createDropShadowFull dx dy stdDev c o
+                      | Some c, None   -> FilterEffect.createDropShadowWithColor dx dy stdDev c
+                      | _              -> FilterEffect.createDropShadow dx dy stdDev)
+            | "feComposite" ->
+                let op =
+                    match tryAttr "operator" xel with
+                    | Some "in"         -> In       | Some "out"      -> Out
+                    | Some "atop"       -> Atop     | Some "xor"      -> Xor
+                    | Some "lighter"    -> Lighter  | Some "arithmetic"-> Arithmetic
+                    | _                 -> Over
+                Some (FilterEffect.createComposite op)
+            | "feMerge" ->
+                let inputs =
+                    xel.Elements()
+                    |> Seq.choose (fun child ->
+                        if child.Name.LocalName = "feMergeNode" then
+                            tryInAttr "in" child
+                        else None)
+                    |> Seq.toList
+                Some (FilterEffect.createMerge inputs)
+            | _ -> None
+        effect
+        |> Option.map (withInput' inSrc >> withResult' result)
+
     let parseFilter (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState -> SvgDefinitions * ParseState =
         let elemId = tryAttr "id" xel
         let location =
@@ -951,6 +1073,10 @@ module private SvgElementParsers =
                 Some (Area.ofFloats (w, h))
             | _ -> None
         let filterUnits = tryAttr "filterUnits" xel |> Option.bind tryParseFilterUnits
+        let effects =
+            xel.Elements()
+            |> Seq.choose parseFilterEffect
+            |> Seq.toList
         let filter =
             {
                 Filter.empty with
@@ -958,6 +1084,7 @@ module private SvgElementParsers =
                     Location = location
                     Area = area
                     FilterUnits = filterUnits
+                    FilterEffects = effects
             }
         fun (defs, s) -> SvgDefinitions.addFilter filter defs, s
 
@@ -984,7 +1111,14 @@ module private SvgElementParsers =
             Symbol.create viewBox
             |> Symbol.addElements (elements |> Seq.ofList)
             |> (fun sym -> Symbol.withSize size sym)
-        fun (defs, s) -> SvgDefinitions.addSymbol symbol defs, s
+        let elemId = tryAttr "id" xel
+        fun (defs, s) ->
+            match elemId with
+            | Some id ->
+                let symbolElement = symbol |> Element.createWithName id
+                SvgDefinitions.addElement symbolElement defs, s
+            | None ->
+                SvgDefinitions.addSymbol symbol defs, s
 
     let parseDefs (xel: XElement) (state: ParseState) : SvgDefinitions * ParseState =
         xel.Elements()
@@ -1044,7 +1178,8 @@ module private SvgRootParser =
                 |> List.fold (fun acc (sel, style) ->
                     let classMatch = sel.StartsWith(".") && element.Classes |> Seq.exists (fun c -> "." + c = sel)
                     let typeMatch  = tagName |> Option.exists (fun n -> n = sel)
-                    if classMatch || typeMatch then fillStyleFromSheet style acc
+                    let idMatch    = sel.StartsWith("#") && element.Name |> Option.exists (fun n -> "#" + n = sel)
+                    if classMatch || typeMatch || idMatch then fillStyleFromSheet style acc
                     else acc) Style.empty
             if matchedStyle = Style.empty then element
             else

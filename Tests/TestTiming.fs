@@ -32,15 +32,15 @@ module TestTiming =
 
     [<Fact>]
     let ``create timing with restart always`` () =
-        Assert.Equal("begin=\"4s\" restart=\"always\"", Timing.create (TimeSpan.FromSeconds(4.0)) |> Timing.withResart Always |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " ")
+        Assert.Equal("begin=\"4s\" restart=\"always\"", Timing.create (TimeSpan.FromSeconds(4.0)) |> Timing.withRestart Always |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " ")
 
     [<Fact>]
     let ``create timing with restart when not active`` () =
-        Assert.Equal("begin=\"4s\" restart=\"whenNotActive\"", Timing.create (TimeSpan.FromSeconds(4.0)) |> Timing.withResart WhenNotActive |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " ")
+        Assert.Equal("begin=\"4s\" restart=\"whenNotActive\"", Timing.create (TimeSpan.FromSeconds(4.0)) |> Timing.withRestart WhenNotActive |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " ")
 
     [<Fact>]
     let ``create timing with never restart`` () =
-        Assert.Equal("begin=\"4s\" restart=\"never\"", Timing.create (TimeSpan.FromSeconds(4.0)) |> Timing.withResart Never |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " ")
+        Assert.Equal("begin=\"4s\" restart=\"never\"", Timing.create (TimeSpan.FromSeconds(4.0)) |> Timing.withRestart Never |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " ")
 
     [<Fact>]
     let ``create timing with frozen final state`` () =
@@ -70,7 +70,7 @@ module TestTiming =
 
     [<Fact>]
     let ``Timing wiki - restart and fill example`` () =
-        let timing = Timing.create (TimeSpan.FromSeconds 2.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0) |> Timing.withResart Always |> Timing.withFinalState Freeze
+        let timing = Timing.create (TimeSpan.FromSeconds 2.0) |> Timing.withDuration (TimeSpan.FromSeconds 1.0) |> Timing.withRestart Always |> Timing.withFinalState Freeze
         let attributeString = timing |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " "
         Assert.Contains("begin=\"2s\"", attributeString)
         Assert.Contains("dur=\"1s\"", attributeString)
@@ -89,3 +89,29 @@ module TestTiming =
         let repetition = { RepeatCount = RepeatCountValue.Indefinite; RepeatDuration = Some RepeatDurationValue.Indefinite }
         let attributeString = Timing.create (TimeSpan.FromSeconds 0.0) |> Timing.withRepetition repetition |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " "
         Assert.Contains("repeatDuration=\"indefinite\"", attributeString)
+
+    [<Fact>]
+    let ``createImmediate omits begin attribute`` () =
+        let attributeString = Timing.createImmediate |> Timing.toAttributes |> List.map Attribute.toString |> String.concat " "
+        Assert.DoesNotContain("begin=", attributeString)
+
+    [<Fact>]
+    let ``createImmediate with duration`` () =
+        let attributeString =
+            Timing.createImmediate
+            |> Timing.withDuration (TimeSpan.FromSeconds 2.0)
+            |> Timing.toAttributes
+            |> List.map Attribute.toString
+            |> String.concat " "
+        Assert.DoesNotContain("begin=", attributeString)
+        Assert.Contains("dur=\"2s\"", attributeString)
+
+    [<Fact>]
+    let ``withBegin sets begin attribute`` () =
+        let attributeString =
+            Timing.createImmediate
+            |> Timing.withBegin (TimeSpan.FromSeconds 3.0)
+            |> Timing.toAttributes
+            |> List.map Attribute.toString
+            |> String.concat " "
+        Assert.Contains("begin=\"3s\"", attributeString)

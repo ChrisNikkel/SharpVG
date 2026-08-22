@@ -864,3 +864,291 @@ module TestSvgParser =
         let svg = parseOk input
         let circle = Svg.findAll (fun _ -> true) svg |> List.head
         Assert.Equal(Some (Color.ofName Colors.Red), circle.Style.Value.Fill)
+
+    [<Fact>]
+    let ``style block - id selector applies style to matching element`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg">
+  <style>#myCircle { fill: red; }</style>
+  <circle id="myCircle" cx="10" cy="10" r="5"/>
+</svg>"""
+        let svg = parseOk input
+        let circle = Svg.findAll (fun _ -> true) svg |> List.head
+        Assert.Equal(Some (Color.ofName Colors.Red), circle.Style.Value.Fill)
+
+    [<Fact>]
+    let ``style block - id selector does not apply to non-matching element`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg">
+  <style>#myCircle { fill: red; }</style>
+  <circle id="otherCircle" cx="10" cy="10" r="5"/>
+</svg>"""
+        let svg = parseOk input
+        let circle = Svg.findAll (fun _ -> true) svg |> List.head
+        let fill = circle.Style |> Option.bind (fun s -> s.Fill)
+        Assert.True(fill.IsNone)
+
+    // --- Presentation attribute parsing ---
+
+    [<Fact>]
+    let ``presentation attr - clip-path parsed into Style.ClipPath`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="100" height="100" clip-path="url(#myClip)"/></svg>"""
+        let element = parseOk input |> Svg.findAll (fun _ -> true) |> List.head
+        Assert.Equal(Some "myClip", element.Style |> Option.bind (fun s -> s.ClipPath))
+
+    [<Fact>]
+    let ``presentation attr - filter parsed into Style.Filter`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="20" filter="url(#myFilter)"/></svg>"""
+        let element = parseOk input |> Svg.findAll (fun _ -> true) |> List.head
+        Assert.Equal(Some "myFilter", element.Style |> Option.bind (fun s -> s.Filter))
+
+    [<Fact>]
+    let ``presentation attr - mask parsed into Style.Mask`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="20" mask="url(#myMask)"/></svg>"""
+        let element = parseOk input |> Svg.findAll (fun _ -> true) |> List.head
+        Assert.Equal(Some "myMask", element.Style |> Option.bind (fun s -> s.Mask))
+
+    [<Fact>]
+    let ``presentation attr - marker-end parsed into Style.MarkerEnd`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="0" x2="100" y2="0" marker-end="url(#arrow)"/></svg>"""
+        let element = parseOk input |> Svg.findAll (fun _ -> true) |> List.head
+        Assert.Equal(Some "arrow", element.Style |> Option.bind (fun s -> s.MarkerEnd))
+
+    [<Fact>]
+    let ``presentation attr - marker-start parsed into Style.MarkerStart`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="0" x2="100" y2="0" marker-start="url(#dot)"/></svg>"""
+        let element = parseOk input |> Svg.findAll (fun _ -> true) |> List.head
+        Assert.Equal(Some "dot", element.Style |> Option.bind (fun s -> s.MarkerStart))
+
+    [<Fact>]
+    let ``presentation attr - marker-mid parsed into Style.MarkerMid`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><polyline points="0,0 50,50 100,0" marker-mid="url(#mid)"/></svg>"""
+        let element = parseOk input |> Svg.findAll (fun _ -> true) |> List.head
+        Assert.Equal(Some "mid", element.Style |> Option.bind (fun s -> s.MarkerMid))
+
+    [<Fact>]
+    let ``presentation attr - stroke-miterlimit parsed into Style.StrokeMiterLimit`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="50" height="50" stroke-miterlimit="4"/></svg>"""
+        let element = parseOk input |> Svg.findAll (fun _ -> true) |> List.head
+        Assert.Equal(Some 4.0, element.Style |> Option.bind (fun s -> s.StrokeMiterLimit))
+
+    [<Fact>]
+    let ``presentation attr - style="" clip-path also works`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="100" height="100" style="clip-path:url(#c)"/></svg>"""
+        let element = parseOk input |> Svg.findAll (fun _ -> true) |> List.head
+        Assert.Equal(Some "c", element.Style |> Option.bind (fun s -> s.ClipPath))
+
+    [<Fact>]
+    let ``presentation attr - inline style overrides presentation attribute`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="100" height="100" clip-path="url(#outer)" style="clip-path:url(#inner)"/></svg>"""
+        let element = parseOk input |> Svg.findAll (fun _ -> true) |> List.head
+        Assert.Equal(Some "inner", element.Style |> Option.bind (fun s -> s.ClipPath))
+
+    // --- Filter effect parsing ---
+
+    let private filterDef (svg: Svg) =
+        svg.Definitions.Value.Contents
+        |> Seq.pick (function FilterDef f -> Some f | _ -> None)
+
+    [<Fact>]
+    let ``filter parse - feGaussianBlur stdDeviation preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feGaussianBlur stdDeviation="5"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        Assert.Equal(1, filter.FilterEffects.Length)
+        Assert.Contains("stdDeviation=\"5\"", filter.FilterEffects.[0] |> FilterEffect.toString)
+
+    [<Fact>]
+    let ``filter parse - feOffset dx/dy preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feOffset dx="3" dy="4"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        let rendered = filter.FilterEffects.[0] |> FilterEffect.toString
+        Assert.Contains("dx=\"3\"", rendered)
+        Assert.Contains("dy=\"4\"", rendered)
+
+    [<Fact>]
+    let ``filter parse - feBlend mode preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feBlend mode="multiply"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        Assert.Contains("mode=\"multiply\"", filter.FilterEffects.[0] |> FilterEffect.toString)
+
+    [<Fact>]
+    let ``filter parse - feBlend without in does not add spurious in attribute`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feBlend mode="screen"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        let rendered = filter.FilterEffects.[0] |> FilterEffect.toString
+        Assert.DoesNotContain("in=", rendered)
+
+    [<Fact>]
+    let ``filter parse - feColorMatrix saturate preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feColorMatrix type="saturate" values="0.5"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        let rendered = filter.FilterEffects.[0] |> FilterEffect.toString
+        Assert.Contains("type=\"saturate\"", rendered)
+        Assert.Contains("values=\"0.5\"", rendered)
+
+    [<Fact>]
+    let ``filter parse - feColorMatrix hueRotate preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feColorMatrix type="hueRotate" values="90"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        let rendered = filter.FilterEffects.[0] |> FilterEffect.toString
+        Assert.Contains("type=\"hueRotate\"", rendered)
+        Assert.Contains("values=\"90\"", rendered)
+
+    [<Fact>]
+    let ``filter parse - feColorMatrix luminanceToAlpha preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feColorMatrix type="luminanceToAlpha"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        Assert.Contains("type=\"luminanceToAlpha\"", filter.FilterEffects.[0] |> FilterEffect.toString)
+
+    [<Fact>]
+    let ``filter parse - feColorMatrix matrix values preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        let rendered = filter.FilterEffects.[0] |> FilterEffect.toString
+        Assert.Contains("type=\"matrix\"", rendered)
+        Assert.Contains("values=", rendered)
+
+    [<Fact>]
+    let ``filter parse - feFlood color preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feFlood flood-color="red"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        Assert.Contains("flood-color=\"red\"", filter.FilterEffects.[0] |> FilterEffect.toString)
+
+    [<Fact>]
+    let ``filter parse - feFlood opacity preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feFlood flood-color="blue" flood-opacity="0.5"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        let rendered = filter.FilterEffects.[0] |> FilterEffect.toString
+        Assert.Contains("flood-color=\"blue\"", rendered)
+        Assert.Contains("flood-opacity=\"0.5\"", rendered)
+
+    [<Fact>]
+    let ``filter parse - feTurbulence type and baseFrequency preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        let rendered = filter.FilterEffects.[0] |> FilterEffect.toString
+        Assert.Contains("type=\"fractalNoise\"", rendered)
+        Assert.Contains("baseFrequency=\"0.65\"", rendered)
+        Assert.Contains("numOctaves=\"3\"", rendered)
+
+    [<Fact>]
+    let ``filter parse - feTurbulence turbulence type preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feTurbulence type="turbulence" baseFrequency="0.1"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        Assert.Contains("type=\"turbulence\"", filter.FilterEffects.[0] |> FilterEffect.toString)
+
+    [<Fact>]
+    let ``filter parse - feTurbulence seed preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="42"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        Assert.Contains("seed=\"42\"", filter.FilterEffects.[0] |> FilterEffect.toString)
+
+    [<Fact>]
+    let ``filter parse - feMorphology erode preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feMorphology operator="erode" radius="2"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        let rendered = filter.FilterEffects.[0] |> FilterEffect.toString
+        Assert.Contains("operator=\"erode\"", rendered)
+        Assert.Contains("radius=\"2\"", rendered)
+
+    [<Fact>]
+    let ``filter parse - feMorphology dilate preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feMorphology operator="dilate" radius="3"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        Assert.Contains("operator=\"dilate\"", filter.FilterEffects.[0] |> FilterEffect.toString)
+
+    [<Fact>]
+    let ``filter parse - feDropShadow dx/dy/stdDeviation preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feDropShadow dx="3" dy="4" stdDeviation="2"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        let rendered = filter.FilterEffects.[0] |> FilterEffect.toString
+        Assert.Contains("dx=\"3\"", rendered)
+        Assert.Contains("dy=\"4\"", rendered)
+        Assert.Contains("stdDeviation=\"2\"", rendered)
+
+    [<Fact>]
+    let ``filter parse - feComposite operator preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feComposite operator="atop"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        Assert.Contains("operator=\"atop\"", filter.FilterEffects.[0] |> FilterEffect.toString)
+
+    [<Fact>]
+    let ``filter parse - feMerge with feMergeNode inputs parsed`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="blur"/></feMerge></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        let rendered = filter.FilterEffects.[0] |> FilterEffect.toString
+        Assert.Contains("feMerge", rendered)
+        Assert.Contains("in=\"SourceGraphic\"", rendered)
+        Assert.Contains("in=\"blur\"", rendered)
+
+    [<Fact>]
+    let ``filter parse - result attribute preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feGaussianBlur stdDeviation="5" result="blurred"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        Assert.Contains("result=\"blurred\"", filter.FilterEffects.[0] |> FilterEffect.toString)
+
+    [<Fact>]
+    let ``filter parse - in attribute preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feGaussianBlur in="SourceAlpha" stdDeviation="3"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        Assert.Contains("in=\"SourceAlpha\"", filter.FilterEffects.[0] |> FilterEffect.toString)
+
+    [<Fact>]
+    let ``filter parse - chained effects with result/in wiring preserved`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feGaussianBlur stdDeviation="4" result="blur"/><feOffset in="blur" dx="3" dy="3"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        Assert.Equal(2, filter.FilterEffects.Length)
+        Assert.Contains("result=\"blur\"", filter.FilterEffects.[0] |> FilterEffect.toString)
+        Assert.Contains("in=\"blur\"", filter.FilterEffects.[1] |> FilterEffect.toString)
+
+    [<Fact>]
+    let ``filter parse - multiple effects all present`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><filter id="f"><feGaussianBlur stdDeviation="2"/><feOffset dx="1" dy="1"/><feBlend mode="normal"/></filter></defs></svg>"""
+        let filter = parseOk input |> filterDef
+        Assert.Equal(3, filter.FilterEffects.Length)
+
+    // --- Symbol id preservation ---
+
+    [<Fact>]
+    let ``symbol with id becomes named element preserving id`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><symbol id="icon" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40"/></symbol></defs></svg>"""
+        let rendered = parseOk input |> Svg.toString
+        Assert.Contains("id=\"icon\"", rendered)
+
+    [<Fact>]
+    let ``symbol without id stays as SymbolDef`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><symbol viewBox="0 0 100 100"><circle cx="50" cy="50" r="40"/></symbol></defs></svg>"""
+        let svg = parseOk input
+        Assert.True(svg.Definitions.IsSome)
+        let hasSymbol =
+            svg.Definitions.Value.Contents
+            |> Seq.exists (function SymbolDef _ -> true | _ -> false)
+        Assert.True(hasSymbol)
+
+    [<Fact>]
+    let ``symbol id survives two parse-render cycles`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><symbol id="icon" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40"/></symbol></defs><use href="#icon" x="10" y="10"/></svg>"""
+        let rendered1 = parseOk input |> Svg.toString
+        let rendered2 = parseOk rendered1 |> Svg.toString
+        Assert.Equal(rendered1, rendered2)
+
+    // --- Gradient href round-trip (no double-hash) ---
+
+    [<Fact>]
+    let ``linear gradient href parsed without double hash`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="derived" href="#base" x1="0" y1="0" x2="1" y2="0"></linearGradient></defs></svg>"""
+        let rendered = parseOk input |> Svg.toString
+        Assert.Contains("href=\"#base\"", rendered)
+        Assert.DoesNotContain("href=\"##", rendered)
+
+    [<Fact>]
+    let ``radial gradient href parsed without double hash`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="derived" href="#base" cx="50" cy="50" r="50"></radialGradient></defs></svg>"""
+        let rendered = parseOk input |> Svg.toString
+        Assert.Contains("href=\"#base\"", rendered)
+        Assert.DoesNotContain("href=\"##", rendered)
+
+    [<Fact>]
+    let ``gradient href survives two parse-render cycles`` () =
+        let input = """<svg xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="base" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="red"/><stop offset="1" stop-color="blue"/></linearGradient><linearGradient id="derived" href="#base" x1="0" y1="0" x2="1" y2="0"></linearGradient></defs></svg>"""
+        let rendered1 = parseOk input |> Svg.toString
+        let rendered2 = parseOk rendered1 |> Svg.toString
+        Assert.Equal(rendered1, rendered2)

@@ -31,7 +31,7 @@ type FinalState = // fill
 
 type Timing =
     {
-        Begin: TimeSpan // TODO: make optional
+        Begin: TimeSpan option
         Duration: DurationValue option
         End: TimeSpan option
         Minimum: TimeSpan option
@@ -44,7 +44,7 @@ type Timing =
 module Timing =
     let create b =
         {
-            Begin = b
+            Begin = Some b
             Duration = None
             End = None
             Minimum = None
@@ -53,6 +53,21 @@ module Timing =
             Repetition = None
             FinalState = None
         }
+
+    let createImmediate =
+        {
+            Begin = None
+            Duration = None
+            End = None
+            Minimum = None
+            Maximum = None
+            Restart = None
+            Repetition = None
+            FinalState = None
+        }
+
+    let withBegin b timing =
+        { timing with Begin = Some b }
 
     let withDuration duration timing =
         { timing with Duration = Some(Duration(duration)) }
@@ -69,7 +84,7 @@ module Timing =
     let withMaximum maximum timing =
         { timing with Maximum = Some(maximum) }
 
-    let withResart restart timing =
+    let withRestart restart timing =
         { timing with Restart = Some(restart) }
 
     let withRepetition repetition timing =
@@ -121,7 +136,7 @@ module Timing =
                 | Never -> "never"
 
         [
-            Some (Attribute.createXML "begin" (timing.Begin |> timeSpanToString))
+            timing.Begin |> Option.map (timeSpanToString >> Attribute.createXML "begin")
             timing.Duration |> Option.map (durationToString >> Attribute.createXML "dur")
             timing.End |> Option.map (timeSpanToString >> Attribute.createXML "end")
             timing.Minimum |> Option.map (timeSpanToString >> Attribute.createXML "min")
