@@ -1,5 +1,8 @@
 namespace SharpVG
 
+// SvgParser relies on System.Xml.Linq and file IO, which Fable cannot compile to JS.
+#if !FABLE_COMPILER
+
 open System
 open System.Xml.Linq
 open System.Globalization
@@ -1407,3 +1410,4 @@ module SvgParser =
                     let cleaned = { g with Body = stripBody g.Body }
                     Some (GroupElement.Group cleaned))
         { svg with Body = stripBody svg.Body }
+#endif

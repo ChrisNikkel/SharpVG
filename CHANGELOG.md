@@ -2,6 +2,14 @@
 
 All notable changes to SharpVG will be documented in this file.
 
+## Unreleased
+
+### Changed
+- `Examples/FableClock` no longer uses npm/Vite; run it with `dotnet fable` and any static file server. Fable is pinned as a local .NET tool.
+
+### Fixed
+- Fable builds failed because `SvgParser` uses .NET-only APIs; it is now excluded when compiling with Fable (`FABLE_COMPILER`).
+
 ## [1.0.0] - 2026-08-22
 
 ### Added

@@ -15,34 +15,34 @@ SharpVG generates SVG as a plain string. Fable gives you access to the browser D
 ## Prerequisites
 
 - .NET SDK 8+
-- Node.js 18+ and npm
-- Fable 4 installed as a global tool:
-  ```bash
-  dotnet tool install -g fable
-  ```
+- Python 3 (or any static file server)
+
+Fable is pinned as a local .NET tool in `.config/dotnet-tools.json`; `dotnet tool restore` installs it. No Node.js or npm is needed — Fable emits plain ES modules that browsers load directly.
 
 ## Running the example
 
-```bash
-cd Examples/Fable
-npm install
-npm start        # compiles F# → JS and starts Vite dev server
-```
-
-Open `http://localhost:5173` to see a live SVG clock that updates every second.
-
-To produce a production build:
+From the repository root:
 
 ```bash
-npm run build    # outputs to dist/
+dotnet tool restore
+dotnet fable Examples/FableClock/src --watch   # compiles F# → JS, recompiles on save
 ```
+
+In a second terminal, also from the repository root:
+
+```bash
+python3 -m http.server
+```
+
+Open `http://localhost:8000/Examples/FableClock/` to see a live SVG clock that updates every second. Refresh the page after editing `App.fs`.
+
+Serve from the repository root, not the example folder: the compiled `App.fs.js` imports SharpVG's compiled modules by relative path (`../../../SharpVG/*.fs.js`).
 
 ## Project layout
 
 ```
-Examples/Fable/
+Examples/FableClock/
 ├── index.html        # single-page shell — just a <div id="app">
-├── package.json      # npm scripts + Vite dev dependency
 └── src/
     ├── App.fsproj    # references SharpVG + Fable.Browser.Dom
     └── App.fs        # all application logic

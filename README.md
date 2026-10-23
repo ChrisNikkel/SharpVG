@@ -107,7 +107,10 @@ dotnet run -p Examples/Life/Life.fsproj
 
 Run the Fable (browser) example — a live SVG clock:
 ```bash
-cd Examples/FableClock && npm install && npm start
+dotnet tool restore
+dotnet fable Examples/FableClock/src --watch
+python3 -m http.server   # in a second terminal, from the repo root
+# open http://localhost:8000/Examples/FableClock/
 ```
 See [Documentation/FableTutorial.md](Documentation/FableTutorial.md) for a full walkthrough.
 
